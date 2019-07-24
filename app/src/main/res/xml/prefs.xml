@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/title_ocd_settings">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="show_progress_bar"
+            android:summary="@string/summary_display_progress_bar"
+            android:title="@string/title_display_progress_bar" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="auto_delete"
+            android:summary="@string/summary_auto_delete"
+            android:title="@string/title_auto_delete" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="show_perm"
+            android:summary="@string/summary_show_perm"
+            android:title="@string/title_show_perm" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="show_recent_mission"
+            android:summary="@string/summary_show_recent_mission"
+            android:title="@string/title_recent_mission" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/prefs_more">
+        <PreferenceScreen
+            android:key="donate"
+            android:summary="@string/summary_donate"
+            android:title="@string/title_donate"/>
+        <PreferenceScreen
+            android:key="about"
+
+            android:title="@string/title_about"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>
