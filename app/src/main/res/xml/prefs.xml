@@ -17,11 +17,6 @@
             android:key="show_perm"
             android:summary="@string/summary_show_perm"
             android:title="@string/title_show_perm" />
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="show_recent_mission"
-            android:summary="@string/summary_show_recent_mission"
-            android:title="@string/title_recent_mission" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/prefs_more">
@@ -29,10 +24,6 @@
             android:key="donate"
             android:summary="@string/summary_donate"
             android:title="@string/title_donate"/>
-        <PreferenceScreen
-            android:key="about"
-
-            android:title="@string/title_about"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

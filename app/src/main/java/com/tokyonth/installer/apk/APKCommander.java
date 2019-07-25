@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AndroidRuntimeException;
@@ -50,6 +51,11 @@ public class APKCommander {
                     callback.onApkPreInstall(mApkInfo);
                 }
             });
+
+            if (Build.VERSION.SDK_INT >= 24) {
+                ShellUtils.exec("setenforce 0", true);
+            }
+
             final int retCode = ShellUtils.execWithRoot("pm install -r --user 0 \"" + mApkInfo.getApkFile().getPath() + "\"" + "\n", new ShellUtils.Result() {
                 @Override
                 public void onStdout(final String text) {

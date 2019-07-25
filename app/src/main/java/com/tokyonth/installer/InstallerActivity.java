@@ -10,7 +10,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -36,6 +40,7 @@ import com.tokyonth.installer.apk.ApkInfo;
 import com.tokyonth.installer.apk.ICommanderCallback;
 import com.tokyonth.installer.settings.Prefs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InstallerActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener,
@@ -66,8 +71,10 @@ public class InstallerActivity extends AppCompatActivity implements AppBarLayout
     private Button btnInstall;
     private Button btnSilently;
     private Button btnCancel;
-
     private APKCommander apkCommander;
+
+    private RecyclerView rv_content_view;
+    public CardView cardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +94,7 @@ public class InstallerActivity extends AppCompatActivity implements AppBarLayout
     }
 
     private void initView() {
+        cardView = findViewById(R.id.card_bar);
         toolbar = findViewById(R.id.toolbar);
         mAppBarLayout = findViewById(R.id.appBar_layout);
         layoutAppDetails = findViewById(R.id.layout_app_details);
@@ -114,6 +122,7 @@ public class InstallerActivity extends AppCompatActivity implements AppBarLayout
         btnInstall.setOnClickListener(this);
         btnSilently.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
+
     }
 
     @Override

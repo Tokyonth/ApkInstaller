@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="@dimen/dimen_12">
+    android:padding="8dp">
 
     <ScrollView
         android:layout_marginTop="-8dp"
@@ -26,7 +26,7 @@
                 android:id="@+id/tv_shell_output"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="10dp" />
+                android:padding="8dp" />
 
         </LinearLayout>
 
