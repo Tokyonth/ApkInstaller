@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:text="@string/text_donate_dialog_contact_me"
         android:textColor="#3D3D3B"
-        android:textColorHighlight="#4472CA"
+        android:textColorHighlight="@color/colorAccent"
         android:textIsSelectable="true"
         android:textStyle="bold"
         android:typeface="monospace" />

@@ -20,7 +20,7 @@
             android:launchMode="singleTask"
             android:theme="@style/TkInstallAppTheme"
             android:excludeFromRecents="true"
-            android:name=".InstallerActivity">
+            android:name=".activity.InstallerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />

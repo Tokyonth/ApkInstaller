@@ -1,11 +1,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".InstallerActivity">
+    tools:context=".activity.InstallerActivity">
+
+    <item
+        android:id="@+id/action_night_mode"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_dark_theme"
+        app:showAsAction="always" />
+
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="@string/action_settings"
         android:icon="@drawable/ic_settings"
         app:showAsAction="always" />
+
 </menu>

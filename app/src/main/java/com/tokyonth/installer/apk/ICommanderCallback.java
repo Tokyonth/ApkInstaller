@@ -3,6 +3,7 @@ package com.tokyonth.installer.apk;
 import android.net.Uri;
 
 public interface ICommanderCallback {
+
     void onStartParseApk(Uri uri);
 
     void onApkParsed(ApkInfo apkInfo);
@@ -12,4 +13,5 @@ public interface ICommanderCallback {
     void onApkInstalled(ApkInfo apkInfo, int resultCode);
 
     void onInstallLog(ApkInfo apkInfo, String logText);
+
 }

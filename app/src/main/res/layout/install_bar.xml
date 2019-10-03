@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:layout_marginRight="6dp"
     android:layout_marginLeft="6dp"
-    android:padding="6dp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:padding="6dp">
 
     <Button
         style="?android:attr/buttonBarButtonStyle"
@@ -15,7 +15,7 @@
         android:padding="8dp"
         android:text="@string/install_silently"
         android:textAllCaps="true"
-        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:textColor="@color/colorAccent" />
 
     <LinearLayout

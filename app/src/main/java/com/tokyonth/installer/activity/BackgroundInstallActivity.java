@@ -5,11 +5,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.tokyonth.installer.settings.Prefs;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.apk.APKCommander;
 import com.tokyonth.installer.apk.ApkInfo;
 import com.tokyonth.installer.apk.ICommanderCallback;
+import com.tokyonth.installer.utils.SPUtils;
+import com.tokyonth.installer.utils.ToastUtil;
 
 public class BackgroundInstallActivity extends Activity implements ICommanderCallback {
 
@@ -32,7 +33,8 @@ public class BackgroundInstallActivity extends Activity implements ICommanderCal
     }
 
     private void showToast(String text) {
-        Toast.makeText(BackgroundInstallActivity.this, text, Toast.LENGTH_SHORT).show();
+        ToastUtil.showToast(this, text, Toast.LENGTH_SHORT);
+        //Toast.makeText(BackgroundInstallActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -54,7 +56,7 @@ public class BackgroundInstallActivity extends Activity implements ICommanderCal
     public void onApkInstalled(ApkInfo apkInfo, int resultCode) {
         if (resultCode == 0) {
             showToast(getString(R.string.apk_installed, apkInfo.getAppName()));
-            if (!apkInfo.isFakePath() && Prefs.getPreference(this).getBoolean("auto_delete", false)) {
+            if (!apkInfo.isFakePath() && (boolean)SPUtils.getData("auto_delete", false)) {
                 Toast.makeText(this, getString(R.string.apk_deleteed, apkInfo.getApkFile().getName()), Toast.LENGTH_SHORT).show();
             }
         } else {

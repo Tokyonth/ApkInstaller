@@ -3,19 +3,22 @@ package com.tokyonth.installer.apk;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PermissionGroupInfo;
+import android.content.pm.PermissionInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AndroidRuntimeException;
 
+import com.tokyonth.installer.permissions.PermInfo;
+import com.tokyonth.installer.utils.PathUtils;
 import com.tokyonth.installer.utils.ShellUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class APKCommander {
 
@@ -24,6 +27,7 @@ public class APKCommander {
     private ApkInfo mApkInfo;
     private ICommanderCallback callback;
     private Handler handler;
+    private PermInfo info;
 
     public APKCommander(Context context, Uri uri, ICommanderCallback commanderCallback) {
         this.context = context;
@@ -39,6 +43,10 @@ public class APKCommander {
 
     public ApkInfo getApkInfo() {
         return mApkInfo;
+    }
+
+    public PermInfo getInfo() {
+        return info;
     }
 
     private class InstallApkTask extends Thread {
@@ -87,8 +95,9 @@ public class APKCommander {
 
                 }
             });
-            if (retCode == 0 && mApkInfo.isFakePath())
+            if (retCode == 0 && mApkInfo.isFakePath()) {
                 mApkInfo.getApkFile().delete();
+            }
             handler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -110,8 +119,20 @@ public class APKCommander {
                     }
                 });
                 mApkInfo = new ApkInfo();
-                String apkSourcePath = ContentUriUtils.getPath(context, uri);
-                if (apkSourcePath == null) {
+                info = new PermInfo();
+
+                String classification = ContentUriUtils.getPath(context, uri);
+                String ordinary = PathUtils.getRealFilePath(context, uri);
+
+                String apkSourcePath = (classification == null) ? ordinary : classification;
+
+                if (apkSourcePath.contains("com.tokyonth.installer/files/Download")) {
+                    apkSourcePath = apkSourcePath.replace("com.tokyonth.installer", "com.coolapk.market");
+                }
+                mApkInfo.setApkFile(new File(apkSourcePath));
+
+
+              /*  if (apkSourcePath == null) {
                     mApkInfo.setFakePath(true);
                     File tempFile = new File(context.getExternalCacheDir(), System.currentTimeMillis() + ".apk");
                     try {
@@ -133,7 +154,7 @@ public class APKCommander {
                     mApkInfo.setApkFile(tempFile);
                 } else {
                     mApkInfo.setApkFile(new File(apkSourcePath));
-                }
+                }*/
                 //读取apk的信息
                 PackageManager pm = context.getPackageManager();
                 PackageInfo pkgInfo = pm.getPackageArchiveInfo(mApkInfo.getApkFile().getPath(), PackageManager.GET_PERMISSIONS);
@@ -154,7 +175,14 @@ public class APKCommander {
                         e.printStackTrace();
                         mApkInfo.setHasInstalledApp(false);
                     }
+
                     mApkInfo.setPermissions(pkgInfo.requestedPermissions);
+                    List<String> str_list = new ArrayList<>();
+                    if (pkgInfo.requestedPermissions != null) {
+                        Collections.addAll(str_list, pkgInfo.requestedPermissions);
+                        getPermissionInfo(str_list);
+                    }
+
                 }
                 handler.post(new Runnable() {
                     @Override
@@ -171,8 +199,37 @@ public class APKCommander {
                 });
                 e.printStackTrace();
                 throw new AndroidRuntimeException(e);
-
             }
         }
     }
+
+    private void getPermissionInfo(List<String> permission) {
+
+        List<String> Group = new ArrayList<>();
+        List<String> Label = new ArrayList<>();
+        List<String> Description = new ArrayList<>();
+
+        for (String str : permission) {
+            try {
+                PackageManager packageManager = context.getPackageManager();
+                PermissionInfo permissionInfo = packageManager.getPermissionInfo(str, 0);
+
+                PermissionGroupInfo permissionGroupInfo = packageManager.getPermissionGroupInfo(permissionInfo.group, 0);
+                Group.add(permissionGroupInfo.loadLabel(packageManager).toString());
+
+                String permissionLabel = permissionInfo.loadLabel(packageManager).toString();
+                Label.add(permissionLabel);
+
+                String permissionDescription = permissionInfo.loadDescription(packageManager).toString();
+                Description.add(permissionDescription);
+
+            } catch (PackageManager.NameNotFoundException e) {
+                Description.add("");
+            }
+        }
+        info.setPermissionDescription(Description);
+        info.setPermissionGroup(Group);
+        info.setPermissionLabel(Label);
+    }
+
 }

@@ -10,8 +10,9 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
 public class ContentUriUtils {
-//修改自https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-//原帖：https://stackoverflow.com/questions/19985286/convert-content-uri-to-actual-path-in-android-4-4
+
+    //修改自https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
+    //原帖：https://stackoverflow.com/questions/19985286/convert-content-uri-to-actual-path-in-android-4-4
 
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access
@@ -136,23 +137,20 @@ public class ContentUriUtils {
      * @return The value of the _data column, which is typically a file path.
      * @author paulburke
      */
-    private static String getDataColumn(Context context, Uri uri, String selection,
-                                        String[] selectionArgs) {
+    private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
 
         Cursor cursor = null;
         final String column = MediaStore.MediaColumns.DATA;
-        final String[] projection = {
-                column
-        };
+        final String[] projection = { column };
 
         try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-                    null);
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {
                 DatabaseUtils.dumpCursor(cursor);
                 final int column_index = cursor.getColumnIndexOrThrow(column);
                 return cursor.getString(column_index);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

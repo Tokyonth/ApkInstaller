@@ -125,4 +125,5 @@ public class ApkInfo {
     public String getFileName() {
         return apkFile == null ? null : apkFile.getName();
     }
+
 }

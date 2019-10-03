@@ -140,6 +140,7 @@ public class ShellUtils {
     }
 
     public static class OutputReader extends Thread implements Closeable {
+
         private Output output = null;
         private BufferedReader reader = null;
         private boolean isRunning = false;

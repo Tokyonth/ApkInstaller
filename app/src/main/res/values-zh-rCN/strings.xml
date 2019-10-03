@@ -56,4 +56,11 @@
     <string name="dialog_btn_continue">继续</string>
     <string name="dialog_btn_cancel">取消</string>
     <string name="text_install_complete">完成</string>
+    <string name="title_night_mode">夜间模式</string>
+    <string name="sub_night_mode">暗色主题</string>
+    <string name="text_del_apk">删除安装包</string>
+    <string name="text_size">大小 : </string>
+    <string name="text_clean_cache">清理缓存</string>
+    <string name="text_cache_size">缓存大小 : </string>
+    <string name="clean_complete">清理完成</string>
 </resources>
