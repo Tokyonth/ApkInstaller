@@ -19,7 +19,7 @@
     <string name="info_app_name">应用名称 : </string>
     <string name="info_pkg_name">应用包名 : </string>
     <string name="info_version">版本信息 : </string>
-    <string name="info_installed_version">当前版本 : </string>
+    <string name="info_installed_version">安装版本 : </string>
     <string name="successful">安装成功</string>
     <string name="failed">安装失败</string>
     <string name="back">返回</string>
@@ -59,7 +59,7 @@
     <string name="title_night_mode">夜间模式</string>
     <string name="sub_night_mode">暗色主题</string>
     <string name="text_del_apk">删除安装包</string>
-    <string name="text_size">大小 : </string>
+    <string name="text_size">文件大小 : </string>
     <string name="text_clean_cache">清理缓存</string>
     <string name="text_cache_size">缓存大小 : </string>
     <string name="clean_complete">清理完成</string>

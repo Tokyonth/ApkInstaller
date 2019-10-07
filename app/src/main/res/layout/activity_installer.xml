@@ -33,10 +33,10 @@
 
                     <ImageView
                         android:id="@+id/icon"
-                        android:layout_width="62dp"
-                        android:layout_height="62dp"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="22dp"
+                        android:layout_marginTop="12dp"
                         android:src="@mipmap/ic_launcher_round"
                         android:scaleType="fitXY"
                         app:layout_anchorGravity="center"/>
@@ -47,7 +47,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@android:color/white"
                         android:textSize="24sp"
-                        android:layout_marginTop="18dp"
+                        android:layout_marginTop="16dp"
                         tools:text="@string/app_name"/>
 
                         <TextView
