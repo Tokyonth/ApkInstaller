@@ -20,7 +20,8 @@ public class BackgroundInstallActivity extends Activity implements ICommanderCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getIntent().getData() != null) {
-            apkCommander = new APKCommander(this, getIntent().getData(), this);
+            apkCommander = new APKCommander(this, getIntent().getData(),
+                    this, getReferrer().getHost());
         } else {
             showToast(getString(R.string.unable_to_install_apk));
         }
@@ -34,7 +35,6 @@ public class BackgroundInstallActivity extends Activity implements ICommanderCal
 
     private void showToast(String text) {
         ToastUtil.showToast(this, text, Toast.LENGTH_SHORT);
-        //Toast.makeText(BackgroundInstallActivity.this, text, Toast.LENGTH_SHORT).show();
     }
 
     @Override

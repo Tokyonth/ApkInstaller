@@ -1,21 +1,20 @@
 package com.tokyonth.installer.activity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Vibrator;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.kyleduo.switchbutton.SwitchButton;
 import com.tokyonth.installer.BaseActivity;
 import com.tokyonth.installer.R;
@@ -46,32 +46,28 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class InstallerActivity extends BaseActivity implements ICommanderCallback, View.OnClickListener {
 
     private AppBarLayout mAppBarLayout;
     private TextView tvAppName, tvAppVer;
     private TextView tv_install_msg, tv_apk_size;
     private TextView perm_index, tv_path, tv_ver, tv_pkg;
-
-    private ImageView imgAppIcon,  perm_iv;
+    private ImageView perm_iv, imgAppIcon;
     private ProgressBar progressBar;
-
     private Button btnInstall, btnSilently, btnCancel;
-    private CardView info_card, install_bar;
-
-    private APKCommander apkCommander;
+    private CardView info_card, install_bar, perm_view, install_del_view;
     private RecyclerView main_rv;
-    private PermissionAdapter adapter;
-
-    private LinearLayout ll;
-    private View install_complete_view, perm_view;
+    private LinearLayout perm_ll;
     private SwitchButton sb_auto_del;
 
+    private APKCommander apkCommander;
+    private PermissionAdapter adapter;
+
     private String path_str, apk_name;
-    private List<InfoBean> list_info = new ArrayList<>();
-    private boolean tag = false;
-    private boolean tag_perm = false;
-    private boolean tag_install = false;
+    private String source_app;
+    private List<InfoBean> list_info;
+    private boolean tag = false, tag_perm = false, tag_install = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,9 +85,11 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         } else {
             this.setPermCheck(new PermCheck() {
                 @Override
-                public void isPerm(boolean b) {
-                    if (b) {
-                        apkCommander = new APKCommander(InstallerActivity.this, getIntent().getData(), InstallerActivity.this);
+                public void isPerm(boolean bool) {
+                    if (bool) {
+                        source_app = getReferrer().getHost();
+                        apkCommander = new APKCommander(InstallerActivity.this, getIntent().getData(),
+                                InstallerActivity.this, source_app);
                     }
                 }
             });
@@ -100,39 +98,40 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
     }
 
     private void initView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        main_rv = (RecyclerView) findViewById(R.id.main_rv);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.appBar_layout);
-        tvAppName = (TextView) findViewById(R.id.tv_app_name);
-        tvAppVer = (TextView) findViewById(R.id.tv_app_ver);
-        imgAppIcon = (ImageView) findViewById(R.id.icon);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        btnInstall = (Button) findViewById(R.id.btn_install);
-        btnSilently = (Button) findViewById(R.id.btn_silently);
-        btnCancel = (Button) findViewById(R.id.btn_cancel);
-        info_card = (CardView) findViewById(R.id.info_card);
+        main_rv = findViewById(R.id.main_rv);
+        mAppBarLayout = findViewById(R.id.appBar_layout);
+        tvAppName = findViewById(R.id.tv_app_name);
+        tvAppVer = findViewById(R.id.tv_app_ver);
+        imgAppIcon = findViewById(R.id.icon);
+        progressBar = findViewById(R.id.progressBar);
+        btnInstall = findViewById(R.id.btn_install);
+        btnSilently = findViewById(R.id.btn_silently);
+        btnCancel = findViewById(R.id.btn_cancel);
+        info_card = findViewById(R.id.info_card);
 
-        perm_index = (TextView) findViewById(R.id.tv1);
-        tv_pkg = (TextView) findViewById(R.id.tv_pkg);
-        tv_path = (TextView) findViewById(R.id.tv_path);
-        tv_ver = (TextView) findViewById(R.id.tv_ver);
-        ll = (LinearLayout) findViewById(R.id.perm_ll);
-        perm_iv = (ImageView) findViewById(R.id.perm_iv);
-        install_bar = (CardView) findViewById(R.id.card_bar);
-        tv_install_msg = (TextView) findViewById(R.id.tv_install_msg);
-        perm_view = findViewById(R.id.perm_view);
-        install_complete_view = findViewById(R.id.install_complete_view);
-        sb_auto_del = (SwitchButton) findViewById(R.id.sb_auto_del);
-        tv_apk_size = (TextView) findViewById(R.id.tv_app_size);
+        perm_index = findViewById(R.id.tv1);
+        tv_pkg = findViewById(R.id.tv_pkg);
+        tv_path = findViewById(R.id.tv_path);
+        tv_ver = findViewById(R.id.tv_ver);
+        perm_ll = findViewById(R.id.perm_ll);
+        perm_iv = findViewById(R.id.perm_iv);
+        install_bar = findViewById(R.id.card_bar);
+        tv_install_msg = findViewById(R.id.tv_install_msg);
+        perm_view = findViewById(R.id.card_perm);
+        install_del_view = findViewById(R.id.card_del);
+        sb_auto_del = findViewById(R.id.sb_auto_del);
+        tv_apk_size = findViewById(R.id.tv_app_size);
 
         tvAppName.setText(R.string.parsing);
         btnInstall.setEnabled(true);
         btnInstall.setOnClickListener(this);
         btnSilently.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
-        ll.setOnClickListener(this);
+        perm_ll.setOnClickListener(this);
 
+        list_info = new ArrayList<>();
         adapter = new PermissionAdapter();
         adapter.setList(list_info);
         main_rv.setAdapter(adapter);
@@ -163,6 +162,16 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivityForResult(intent, 100);
             return true;
+        } else if (id == R.id.action_night_mode) {
+            if ((boolean)SPUtils.getData("NIGHT_MODE", false)) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                SPUtils.putData("NIGHT_MODE", false);
+                recreate();
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                SPUtils.putData("NIGHT_MODE", true);
+                recreate();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -195,7 +204,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         Palette.generateAsync(bitmap, new Palette.PaletteAsyncListener() {
             @Override
             public void onGenerated(Palette palette) {
-                Palette.Swatch vibrantSwatch = palette.getVibrantSwatch();
+                Palette.Swatch vibrantSwatch = palette.getLightVibrantSwatch();
                 if (vibrantSwatch != null) {
                     mAppBarLayout.setBackgroundColor(MoreTools.ColorBurn(vibrantSwatch.getRgb()));
                 }
@@ -218,7 +227,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                 tv_ver.setVisibility(View.VISIBLE);
                 tv_ver.append(apkInfo.getInstalledVersion());
 
-                new AlertDialog.Builder(this).setTitle(R.string.dialog_title_tips)
+               /* new AlertDialog.Builder(this).setTitle(R.string.dialog_title_tips)
                         .setMessage(R.string.dialog_msg_tips)
                         .setNegativeButton(R.string.dialog_btn_cancel, new DialogInterface.OnClickListener() {
                             @Override
@@ -228,11 +237,11 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                         })
                         .setPositiveButton(R.string.dialog_btn_continue, null)
                         .setCancelable(false)
-                        .show();
+                        .show();*/
             }
         }
         if ((boolean)SPUtils.getData("show_perm", true)) {
-            ll.setVisibility(View.VISIBLE);
+            perm_view.setVisibility(View.VISIBLE);
             if (apkInfo.getPermissions() != null && apkInfo.getPermissions().length > 0) {
 
                 int i = 0;
@@ -298,12 +307,17 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         btnSilently.setEnabled(false);
         if (resultCode == 0) {
             ToastUtil.showToast(this, getString(R.string.apk_installed, apkInfo.getAppName()), Toast.LENGTH_SHORT);
+            if ((boolean)SPUtils.getData("vibrate", false)) {
+                Vibrator vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+                vibrator.vibrate(800);
+            }
+
             tvAppName.setText(R.string.successful);
             btnInstall.setEnabled(true);
             btnInstall.setText(R.string.open_app);
             btnCancel.setText(R.string.text_install_complete);
             btnSilently.setVisibility(View.GONE);
-            install_complete_view.setVisibility(View.VISIBLE);
+            install_del_view.setVisibility(View.VISIBLE);
         } else {
             tvAppName.setText(R.string.failed);
             btnInstall.setTextColor(Color.GRAY);
@@ -355,9 +369,11 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                 break;
             case R.id.btn_cancel:
                 if ((boolean)SPUtils.getData("auto_delete", false)) {
-                    File file = new File(path_str);
-                    file.delete();
-                    ToastUtil.showToast(this, getString(R.string.apk_deleteed, apk_name), Toast.LENGTH_SHORT);
+                    if (!btnCancel.getText().equals(getResources().getString(R.string.back))) {
+                        File file = new File(path_str);
+                        file.delete();
+                        ToastUtil.showToast(this, getString(R.string.apk_deleteed, apk_name), Toast.LENGTH_SHORT);
+                    }
                 }
                 finish();
                 break;

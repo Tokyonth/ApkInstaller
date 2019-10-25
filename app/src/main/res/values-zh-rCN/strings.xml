@@ -63,4 +63,6 @@
     <string name="text_clean_cache">清理缓存</string>
     <string name="text_cache_size">缓存大小 : </string>
     <string name="clean_complete">清理完成</string>
+    <string name="install_vibrate">安装完成震动</string>
+    <string name="vibrate">震动</string>
 </resources>

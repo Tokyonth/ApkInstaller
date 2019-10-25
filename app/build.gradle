@@ -4,10 +4,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.tokyonth.installer"
-        minSdkVersion 21
+        minSdkVersion 22
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.2"
+        versionCode 15
+        versionName "1.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

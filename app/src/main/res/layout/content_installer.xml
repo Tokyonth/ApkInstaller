@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:visibility="invisible"
+            app:cardBackgroundColor="@color/colorCard"
             app:cardCornerRadius="6dp"
             app:cardElevation="0dp"
             app:cardPreventCornerOverlap="true"
@@ -53,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/info_pkg_name"
-                    android:textColor="#000000"
+                    android:textColor="@color/colorText"
                     android:textIsSelectable="true"
                     android:textStyle="bold" />
 
@@ -66,7 +67,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/info_pkg_name"
-                    android:textColor="#000000"
+                    android:textColor="@color/colorText"
                     android:textIsSelectable="true"
                     android:textStyle="bold" />
 
@@ -79,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/info_apk_path"
-                    android:textColor="#000000"
+                    android:textColor="@color/colorText"
                     android:textIsSelectable="true"
                     android:textStyle="bold" />
 
@@ -93,7 +94,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/text_size"
-                    android:textColor="#000000"
+                    android:textColor="@color/colorText"
                     android:textIsSelectable="true"
                     android:textStyle="bold" />
 
@@ -106,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/info_installed_version"
-                    android:textColor="#000000"
+                    android:textColor="@color/colorText"
                     android:textIsSelectable="true"
                     android:textStyle="bold"
                     android:visibility="gone" />
@@ -115,15 +116,39 @@
 
         </androidx.cardview.widget.CardView>
 
-        <include
-            android:id="@+id/perm_view"
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:id="@+id/card_perm"
             android:visibility="gone"
-            layout="@layout/info_item" />
+            app:cardBackgroundColor="@color/colorCard"
+            app:cardCornerRadius="6dp"
+            app:cardElevation="0dp"
+            app:cardPreventCornerOverlap="true"
+            app:cardUseCompatPadding="true">
 
         <include
-            android:id="@+id/install_complete_view"
+            layout="@layout/info_item" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:id="@+id/card_del"
             android:visibility="gone"
-            layout="@layout/layout_insted_content" />
+            app:cardBackgroundColor="@color/colorCard"
+            app:cardCornerRadius="6dp"
+            app:cardElevation="0dp"
+            app:cardPreventCornerOverlap="true"
+            app:cardUseCompatPadding="true">
+
+        <include
+            layout="@layout/layout_del_content" />
+
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 

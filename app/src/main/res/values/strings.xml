@@ -62,4 +62,6 @@
     <string name="text_clean_cache">Clean Cache</string>
     <string name="text_cache_size">Cache Size:</string>
     <string name="clean_complete">Clean complete</string>
+    <string name="install_vibrate">Installation completed vibration</string>
+    <string name="vibrate">Vibrate</string>
 </resources>

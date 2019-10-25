@@ -10,12 +10,17 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AndroidRuntimeException;
+import android.util.Log;
 
 import com.tokyonth.installer.permissions.PermInfo;
 import com.tokyonth.installer.utils.PathUtils;
 import com.tokyonth.installer.utils.ShellUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,10 +34,13 @@ public class APKCommander {
     private Handler handler;
     private PermInfo info;
 
-    public APKCommander(Context context, Uri uri, ICommanderCallback commanderCallback) {
+    private String source_app;
+
+    public APKCommander(Context context, Uri uri, ICommanderCallback commanderCallback, String source_app) {
         this.context = context;
         this.uri = uri;
         this.callback = commanderCallback;
+        this.source_app = source_app;
         handler = new Handler(Looper.getMainLooper());
         new ParseApkTask().start();
     }
@@ -123,16 +131,13 @@ public class APKCommander {
 
                 String classification = ContentUriUtils.getPath(context, uri);
                 String ordinary = PathUtils.getRealFilePath(context, uri);
-
                 String apkSourcePath = (classification == null) ? ordinary : classification;
 
-                if (apkSourcePath.contains("com.tokyonth.installer/files/Download")) {
-                    apkSourcePath = apkSourcePath.replace("com.tokyonth.installer", "com.coolapk.market");
+                String package_name = "com.tokyonth.installer";
+                if (apkSourcePath.contains(package_name)) {
+                    apkSourcePath = apkSourcePath.replace(package_name, source_app);
                 }
-                mApkInfo.setApkFile(new File(apkSourcePath));
-
-
-              /*  if (apkSourcePath == null) {
+                if (apkSourcePath.contains("/data/data")) {
                     mApkInfo.setFakePath(true);
                     File tempFile = new File(context.getExternalCacheDir(), System.currentTimeMillis() + ".apk");
                     try {
@@ -151,11 +156,10 @@ public class APKCommander {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    mApkInfo.setApkFile(tempFile);
-                } else {
-                    mApkInfo.setApkFile(new File(apkSourcePath));
-                }*/
-                //读取apk的信息
+                    apkSourcePath = tempFile.getPath();
+                }
+                mApkInfo.setApkFile(new File(apkSourcePath));
+
                 PackageManager pm = context.getPackageManager();
                 PackageInfo pkgInfo = pm.getPackageArchiveInfo(mApkInfo.getApkFile().getPath(), PackageManager.GET_PERMISSIONS);
                 if (pkgInfo != null) {

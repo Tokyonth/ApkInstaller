@@ -11,11 +11,20 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar_layout"
         android:layout_width="match_parent"
-        android:layout_height="256dp"
+        android:layout_height="260dp"
         android:fitsSystemWindows="true"
         android:background="@color/colorAccent"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:elevation="0dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <View
+                android:background="@color/night_layer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -25,40 +34,43 @@
                 app:title=" "
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/toolbar"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <com.tokyonth.installer.ui.CircleImageView
+                    android:id="@+id/icon"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="12dp"
+                    android:src="@mipmap/ic_launcher_round"
+                    android:scaleType="fitXY"
+                    app:layout_anchorGravity="center"/>
+
+                <TextView
+                    android:id="@+id/tv_app_name"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical">
+                    android:textColor="@android:color/white"
+                    android:textSize="22sp"
+                    android:layout_marginTop="16dp"
+                    tools:text="@string/app_name"/>
 
-                    <ImageView
-                        android:id="@+id/icon"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="12dp"
-                        android:src="@mipmap/ic_launcher_round"
-                        android:scaleType="fitXY"
-                        app:layout_anchorGravity="center"/>
+                <TextView
+                    android:id="@+id/tv_app_ver"
+                    android:layout_marginTop="6dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    tools:text="@string/info_version"/>
 
-                    <TextView
-                        android:id="@+id/tv_app_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@android:color/white"
-                        android:textSize="24sp"
-                        android:layout_marginTop="16dp"
-                        tools:text="@string/app_name"/>
+            </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/tv_app_ver"
-                            android:layout_marginTop="6dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@android:color/white"
-                            tools:text="@string/info_version"/>
-
-                </LinearLayout>
+        </RelativeLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -73,6 +85,7 @@
         android:layout_gravity="bottom"
         android:id="@+id/card_bar"
         android:visibility="gone"
+        app:cardBackgroundColor="@color/colorCard"
         app:cardCornerRadius="6dp"
         app:cardElevation="6dp"
         app:cardPreventCornerOverlap="true"

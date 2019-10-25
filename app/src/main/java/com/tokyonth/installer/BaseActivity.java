@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.tokyonth.installer.utils.ToastUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public interface PermCheck {
-        void isPerm(boolean b);
+        void isPerm(boolean bool);
     }
 
     public void checkPermission() {
@@ -57,7 +59,7 @@ public class BaseActivity extends AppCompatActivity {
             if (grantResults.length > 0) {
                 for (int result : grantResults) {
                     if (result != PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(this, R.string.no_permissions, Toast.LENGTH_SHORT).show();
+                        ToastUtil.showToast(this, getResources().getString(R.string.no_permissions), Toast.LENGTH_SHORT);
                         finish();
                         return;
                     }
@@ -65,7 +67,7 @@ public class BaseActivity extends AppCompatActivity {
                 permCheck.isPerm(true);
             } else {
                 permCheck.isPerm(false);
-                Toast.makeText(this, R.string.no_permissions, Toast.LENGTH_SHORT).show();
+                ToastUtil.showToast(this, getResources().getString(R.string.no_permissions), Toast.LENGTH_SHORT);
                 finish();
             }
         }

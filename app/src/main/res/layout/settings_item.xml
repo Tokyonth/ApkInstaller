@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
+    app:cardBackgroundColor="@color/colorCard"
     app:cardCornerRadius="6dp"
     app:cardElevation="0dp"
     app:cardPreventCornerOverlap="true"
@@ -25,6 +26,7 @@
                 android:id="@+id/iv0"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
+                android:tint="@color/colorText"
                 android:src="@drawable/ic_speed_progress" />
 
             <LinearLayout
@@ -39,7 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/title_display_progress_bar"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/colorText"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -68,6 +70,7 @@
             <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
+                android:tint="@color/colorText"
                 android:src="@drawable/ic_permission" />
 
             <LinearLayout
@@ -82,7 +85,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/title_show_perm"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/colorText"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -102,9 +105,8 @@
         </LinearLayout>
 
         <LinearLayout
-            android:visibility="gone"
             android:background="?android:attr/selectableItemBackground"
-            android:id="@+id/clean"
+            android:id="@+id/vibrate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center|start"
@@ -114,19 +116,21 @@
             <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:src="@drawable/ic_delete" />
+                android:tint="@color/colorText"
+                android:src="@drawable/ic_vibrate" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/text_clean_cache"
-                    android:textColor="@android:color/black"
+                    android:text="@string/vibrate"
+                    android:textColor="@color/colorText"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -135,47 +139,14 @@
                     android:layout_marginTop="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/text_cache_size" />
+                    android:text="@string/install_vibrate" />
 
             </LinearLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:visibility="gone"
-            android:id="@+id/donate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center|start"
-            android:orientation="horizontal"
-            android:padding="12dp">
-
-            <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_donation" />
-
-            <LinearLayout
+            <CheckBox
+                android:id="@+id/cb_vibrate"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/title_donate"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_marginTop="4dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/summary_donate" />
-
-            </LinearLayout>
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

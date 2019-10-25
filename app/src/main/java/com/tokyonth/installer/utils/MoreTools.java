@@ -1,5 +1,7 @@
 package com.tokyonth.installer.utils;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -33,6 +35,17 @@ public class MoreTools {
         // 把 drawable 内容画到画布中
         drawable.draw(canvas);
         return bitmap;
+    }
+
+    public static String getApplicationNameByPackageName(Context context, String packageName) {
+        PackageManager pm = context.getPackageManager();
+        String Name;
+        try {
+            Name = pm.getApplicationLabel(pm.getApplicationInfo(packageName,PackageManager.GET_META_DATA)).toString();
+        } catch (PackageManager.NameNotFoundException e) {
+            Name = null ;
+        }
+        return Name;
     }
 
 }

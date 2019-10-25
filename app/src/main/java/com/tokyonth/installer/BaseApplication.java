@@ -3,6 +3,8 @@ package com.tokyonth.installer;
 import android.app.Application;
 import android.content.Context;
 
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.tokyonth.installer.utils.SPUtils;
 
 public class BaseApplication extends Application {
@@ -14,6 +16,13 @@ public class BaseApplication extends Application {
         super.onCreate();
         context = getApplicationContext();
         SPUtils.getInstance(this, "conf");
+
+        boolean bool = (boolean)SPUtils.getData("NIGHT_MODE", false);
+        if (bool) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
     }
 
     public static Context getContext(){
