@@ -1,4 +1,4 @@
-package com.tokyonth.installer.apk;
+package com.tokyonth.installer.helper;
 
 import android.content.ContentUris;
 import android.content.Context;

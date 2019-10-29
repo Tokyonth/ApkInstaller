@@ -1,12 +1,8 @@
-package com.tokyonth.installer.apk;
+package com.tokyonth.installer.bean;
 
 import android.graphics.drawable.Drawable;
 
 import java.io.File;
-
-/**
- * Created by Bave on 2018/2/2.
- */
 
 public class ApkInfo {
 

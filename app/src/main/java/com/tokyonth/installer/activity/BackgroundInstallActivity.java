@@ -7,10 +7,12 @@ import android.widget.Toast;
 
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.apk.APKCommander;
-import com.tokyonth.installer.apk.ApkInfo;
+import com.tokyonth.installer.bean.ApkInfo;
 import com.tokyonth.installer.apk.ICommanderCallback;
 import com.tokyonth.installer.utils.SPUtils;
 import com.tokyonth.installer.utils.ToastUtil;
+
+import java.util.Objects;
 
 public class BackgroundInstallActivity extends Activity implements ICommanderCallback {
 
@@ -21,7 +23,7 @@ public class BackgroundInstallActivity extends Activity implements ICommanderCal
         super.onCreate(savedInstanceState);
         if (getIntent().getData() != null) {
             apkCommander = new APKCommander(this, getIntent().getData(),
-                    this, getReferrer().getHost());
+                    this, Objects.requireNonNull(getReferrer()).getHost());
         } else {
             showToast(getString(R.string.unable_to_install_apk));
         }
@@ -57,7 +59,7 @@ public class BackgroundInstallActivity extends Activity implements ICommanderCal
         if (resultCode == 0) {
             showToast(getString(R.string.apk_installed, apkInfo.getAppName()));
             if (!apkInfo.isFakePath() && (boolean)SPUtils.getData("auto_delete", false)) {
-                Toast.makeText(this, getString(R.string.apk_deleteed, apkInfo.getApkFile().getName()), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.apk_deleted, apkInfo.getApkFile().getName()), Toast.LENGTH_SHORT).show();
             }
         } else {
             showToast(getString(R.string.install_failed, apkInfo.getAppName()));

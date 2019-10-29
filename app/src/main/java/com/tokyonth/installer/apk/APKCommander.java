@@ -10,10 +10,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AndroidRuntimeException;
-import android.util.Log;
 
+import com.tokyonth.installer.bean.ApkInfo;
+import com.tokyonth.installer.helper.ContentUriUtils;
 import com.tokyonth.installer.permissions.PermInfo;
-import com.tokyonth.installer.utils.PathUtils;
+import com.tokyonth.installer.helper.PathUtils;
 import com.tokyonth.installer.utils.ShellUtils;
 
 import java.io.File;
@@ -69,7 +70,7 @@ public class APKCommander {
             });
 
             if (Build.VERSION.SDK_INT >= 24) {
-                ShellUtils.exec("setenforce 0", true);
+                ShellUtils.execWithRoot("setenforce permissive");
             }
 
             final int retCode = ShellUtils.execWithRoot("pm install -r --user 0 \"" + mApkInfo.getApkFile().getPath() + "\"" + "\n", new ShellUtils.Result() {

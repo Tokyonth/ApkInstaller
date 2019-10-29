@@ -6,8 +6,8 @@ android {
         applicationId "com.tokyonth.installer"
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 15
-        versionName "1.5"
+        versionCode 17
+        versionName "1.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -24,7 +24,7 @@ dependencies {
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'com.kyleduo.switchbutton:library:2.0.0'
 

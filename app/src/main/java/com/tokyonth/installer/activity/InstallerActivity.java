@@ -1,24 +1,31 @@
 package com.tokyonth.installer.activity;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Vibrator;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -31,10 +38,12 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.kyleduo.switchbutton.SwitchButton;
 import com.tokyonth.installer.BaseActivity;
 import com.tokyonth.installer.R;
+import com.tokyonth.installer.helper.VerHelper;
+import com.tokyonth.installer.ui.CustomDialog;
 import com.tokyonth.installer.ui.TouchRecyclerViewScroll;
 import com.tokyonth.installer.adapter.PermissionAdapter;
 import com.tokyonth.installer.apk.APKCommander;
-import com.tokyonth.installer.apk.ApkInfo;
+import com.tokyonth.installer.bean.ApkInfo;
 import com.tokyonth.installer.apk.ICommanderCallback;
 import com.tokyonth.installer.bean.InfoBean;
 import com.tokyonth.installer.utils.FileUtils;
@@ -45,6 +54,7 @@ import com.tokyonth.installer.utils.ToastUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class InstallerActivity extends BaseActivity implements ICommanderCallback, View.OnClickListener {
@@ -58,7 +68,6 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
     private Button btnInstall, btnSilently, btnCancel;
     private CardView info_card, install_bar, perm_view, install_del_view;
     private RecyclerView main_rv;
-    private LinearLayout perm_ll;
     private SwitchButton sb_auto_del;
 
     private APKCommander apkCommander;
@@ -69,6 +78,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
     private List<InfoBean> list_info;
     private boolean tag = false, tag_perm = false, tag_install = false;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,7 +97,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                 @Override
                 public void isPerm(boolean bool) {
                     if (bool) {
-                        source_app = getReferrer().getHost();
+                        source_app = Objects.requireNonNull(getReferrer()).getHost();
                         apkCommander = new APKCommander(InstallerActivity.this, getIntent().getData(),
                                 InstallerActivity.this, source_app);
                     }
@@ -115,7 +125,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         tv_pkg = findViewById(R.id.tv_pkg);
         tv_path = findViewById(R.id.tv_path);
         tv_ver = findViewById(R.id.tv_ver);
-        perm_ll = findViewById(R.id.perm_ll);
+        LinearLayout perm_ll = findViewById(R.id.perm_ll);
         perm_iv = findViewById(R.id.perm_iv);
         install_bar = findViewById(R.id.card_bar);
         tv_install_msg = findViewById(R.id.tv_install_msg);
@@ -196,7 +206,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         }
     }
 
-    private void initDetails(ApkInfo apkInfo) {
+    private void initDetails(final ApkInfo apkInfo) {
         tvAppName.setText(apkInfo.getAppName());
         tvAppVer.setText(apkInfo.getVersion());
 
@@ -218,7 +228,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
 
         apk_name = apkInfo.getAppName();
         path_str = apkInfo.getApkFile().getPath();
-        tv_apk_size.setText(getResources().getString(R.string.text_size) + FileUtils.byteToString(FileUtils.getFileSize(path_str)));
+        tv_apk_size.setText(getResources().getString(R.string.text_size, FileUtils.byteToString(FileUtils.getFileSize(path_str))));
 
         if (!tag) {
             tv_pkg.append(apkInfo.getPackageName());
@@ -227,18 +237,40 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                 tv_ver.setVisibility(View.VISIBLE);
                 tv_ver.append(apkInfo.getInstalledVersion());
 
-               /* new AlertDialog.Builder(this).setTitle(R.string.dialog_title_tips)
-                        .setMessage(R.string.dialog_msg_tips)
-                        .setNegativeButton(R.string.dialog_btn_cancel, new DialogInterface.OnClickListener() {
+                CardView cardView = findViewById(R.id.tip_card);
+                TextView tv = findViewById(R.id.tv_ver_tip);
+
+                TranslateAnimation translateAnimation = new TranslateAnimation(-200, 0, 0, 0);
+                translateAnimation.setDuration(500);
+                cardView.setAnimation(translateAnimation);
+                cardView.startAnimation(translateAnimation);
+                cardView.setVisibility(View.VISIBLE);
+
+                switch (VerHelper.CheckVer(apkInfo.getVersionCode(),  apkInfo.getInstalledVersionCode())) {
+                    case 3:
+                        tv.setText(R.string.text_equal_ver);
+                        break;
+                    case 2:
+                        tv.setText(R.string.text_low_ver);
+                        final CustomDialog dialog = new CustomDialog(this);
+                        dialog.setTitle(getResources().getString(R.string.dialog_text_title));
+                        dialog.setMessage(getResources().getString(R.string.low_ver_msg));
+                        dialog.setNoOnclickListener(getResources().getString(R.string.dialog_ok), new CustomDialog.onNoOnclickListener() {
                             @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                finish();
+                            public void onNoClick() {
+                                dialog.dismiss();
                             }
-                        })
-                        .setPositiveButton(R.string.dialog_btn_continue, null)
-                        .setCancelable(false)
-                        .show();*/
+                        });
+                        dialog.setCancelable(false);
+                        dialog.create();
+                        dialog.show();
+                        break;
+                    case 1:
+                        tv.setText(R.string.text_new_ver);
+                        break;
+                }
             }
+
         }
         if ((boolean)SPUtils.getData("show_perm", true)) {
             perm_view.setVisibility(View.VISIBLE);
@@ -255,7 +287,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
             perm_view.setVisibility(View.GONE);
         }
         adapter.notifyDataSetChanged();
-        perm_index.setText(getResources().getString(R.string.app_permissions) + "(" + adapter.getItemCount() + ")");
+        perm_index.setText(getResources().getString(R.string.app_permissions, String.valueOf(adapter.getItemCount())));
     }
 
     @Override
@@ -268,7 +300,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
     @Override
     public void onStartParseApk(Uri uri) {
         btnInstall.setVisibility(View.GONE);
-        tv_install_msg.setText(getString(R.string.parsing) + " : " + uri.toString());
+        tv_install_msg.setText(getString(R.string.parsing, uri.toString()));
     }
 
     @Override
@@ -322,6 +354,32 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
             tvAppName.setText(R.string.failed);
             btnInstall.setTextColor(Color.GRAY);
             btnSilently.setTextColor(Color.GRAY);
+            final CustomDialog dialog = new CustomDialog(this);
+            dialog.setTitle(getResources().getString(R.string.dialog_text_title));
+            dialog.setMessage(getResources().getString(R.string.use_system_pkg));
+            dialog.setYesOnclickListener(getResources().getString(R.string.dialog_ok), new CustomDialog.onYesOnclickListener() {
+                @Override
+                public void onYesClick() {
+                    Intent intent = new Intent();
+                    ComponentName cn = new ComponentName("com.android.packageinstaller","com.android.packageinstaller.InstallStart");
+                    intent.setComponent(cn);
+                    Uri apkUri = FileProvider.getUriForFile(InstallerActivity.this, "com.tokyonth.installer.provider",
+                            new File(path_str));
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                    startActivity(intent);
+                    finish();
+                }
+            });
+            dialog.setNoOnclickListener(getResources().getString(R.string.dialog_btn_cancel), new CustomDialog.onNoOnclickListener() {
+                @Override
+                public void onNoClick() {
+                    dialog.dismiss();
+                }
+            });
+            dialog.setCancelable(false);
+            dialog.create();
+            dialog.show();
         }
         progressBar.setVisibility(View.GONE);
         install_bar.setVisibility(View.VISIBLE);
@@ -372,7 +430,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                     if (!btnCancel.getText().equals(getResources().getString(R.string.back))) {
                         File file = new File(path_str);
                         file.delete();
-                        ToastUtil.showToast(this, getString(R.string.apk_deleteed, apk_name), Toast.LENGTH_SHORT);
+                        ToastUtil.showToast(this, getString(R.string.apk_deleted, apk_name), Toast.LENGTH_SHORT);
                     }
                 }
                 finish();

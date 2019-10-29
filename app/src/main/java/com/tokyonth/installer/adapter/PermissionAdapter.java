@@ -54,11 +54,11 @@ public class PermissionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         private TextView tv_des;
         private TextView tv_des_div;
 
-        public PermissionHolder(@NonNull View itemView) {
+        PermissionHolder(@NonNull View itemView) {
             super(itemView);
-            tv_perm = (TextView) itemView.findViewById(R.id.tv_perm);
-            tv_des = (TextView) itemView.findViewById(R.id.tv_des);
-            tv_des_div = (TextView) itemView.findViewById(R.id.tv_des_div);
+            tv_perm = itemView.findViewById(R.id.tv_perm);
+            tv_des = itemView.findViewById(R.id.tv_des);
+            tv_des_div = itemView.findViewById(R.id.tv_des_div);
         }
     }
 

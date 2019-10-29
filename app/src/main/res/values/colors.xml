@@ -7,4 +7,5 @@
     <color name="colorCard">#FFFFFF</color>
     <color name="colorBG">#f5f5f5</color>
     <color name="night_layer">#0000</color>
+    <color name="colorline">#E4E4E4</color>
 </resources>

@@ -1,13 +1,17 @@
 package com.tokyonth.installer.activity;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.utils.SPUtils;
@@ -43,6 +47,17 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        TextView tv = findViewById(R.id.tv_version);
+        PackageManager pm = this.getPackageManager();
+
+        try {
+            PackageInfo pi = pm.getPackageInfo(this.getPackageName(), 0);
+            String appVersion = pi.versionName;
+            tv.append(appVersion);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
         cb_show_progress_bar = findViewById(R.id.cb_show_progress_bar);
         cb_show_perm = findViewById(R.id.cb_show_perm);
         cb_vibration = findViewById(R.id.cb_vibrate);

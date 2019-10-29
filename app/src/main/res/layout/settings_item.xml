@@ -20,12 +20,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="12dp">
+            android:padding="10dp">
 
             <ImageView
                 android:id="@+id/iv0"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:tint="@color/colorText"
                 android:src="@drawable/ic_speed_progress" />
 
@@ -42,11 +42,11 @@
                     android:layout_height="wrap_content"
                     android:text="@string/title_display_progress_bar"
                     android:textColor="@color/colorText"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp" />
 
                 <TextView
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
+                    android:textSize="12sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/summary_display_progress_bar" />
@@ -65,11 +65,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="12dp">
+            android:padding="10dp">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:tint="@color/colorText"
                 android:src="@drawable/ic_permission" />
 
@@ -86,13 +86,13 @@
                     android:layout_height="wrap_content"
                     android:text="@string/title_show_perm"
                     android:textColor="@color/colorText"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp" />
 
                 <TextView
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="12sp"
                     android:text="@string/summary_show_perm" />
 
             </LinearLayout>
@@ -111,11 +111,11 @@
             android:layout_height="wrap_content"
             android:gravity="center|start"
             android:orientation="horizontal"
-            android:padding="12dp">
+            android:padding="10dp">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:tint="@color/colorText"
                 android:src="@drawable/ic_vibrate" />
 
@@ -131,12 +131,12 @@
                     android:layout_height="wrap_content"
                     android:text="@string/vibrate"
                     android:textColor="@color/colorText"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/tv_cache_size"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
+                    android:textSize="12sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/install_vibrate" />
