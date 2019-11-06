@@ -1,8 +1,9 @@
 package com.tokyonth.installer.activity;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -21,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Vibrator;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,7 +37,9 @@ import android.widget.Toast;
 import com.google.android.material.appbar.AppBarLayout;
 import com.kyleduo.switchbutton.SwitchButton;
 import com.tokyonth.installer.BaseActivity;
+import com.tokyonth.installer.Config;
 import com.tokyonth.installer.R;
+import com.tokyonth.installer.adapter.ActAdapter;
 import com.tokyonth.installer.helper.VerHelper;
 import com.tokyonth.installer.ui.CustomDialog;
 import com.tokyonth.installer.ui.TouchRecyclerViewScroll;
@@ -62,21 +64,23 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
     private AppBarLayout mAppBarLayout;
     private TextView tvAppName, tvAppVer;
     private TextView tv_install_msg, tv_apk_size;
-    private TextView perm_index, tv_path, tv_ver, tv_pkg;
-    private ImageView perm_iv, imgAppIcon;
+    private TextView perm_index, act_index, tv_path, tv_ver, tv_pkg;
+    private ImageView perm_iv, act_iv, imgAppIcon;
     private ProgressBar progressBar;
     private Button btnInstall, btnSilently, btnCancel;
-    private CardView info_card, install_bar, perm_view, install_del_view;
-    private RecyclerView main_rv;
+    private CardView info_card, install_bar, perm_view, install_del_view, act_card;
+    private RecyclerView act_rv, perm_rv;
     private SwitchButton sb_auto_del;
 
     private APKCommander apkCommander;
-    private PermissionAdapter adapter;
+    private PermissionAdapter perm_adapter;
+    private ActAdapter act_adapter;
 
     private String path_str, apk_name;
     private String source_app;
     private List<InfoBean> list_info;
-    private boolean tag = false, tag_perm = false, tag_install = false;
+    private List<String> list_act;
+    private boolean tag = false, tag_perm = false, tag_act = false, tag_install = false;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -110,7 +114,9 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
     private void initView() {
         Toolbar toolbar =  findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        main_rv = findViewById(R.id.main_rv);
+        perm_rv = findViewById(R.id.perm_rv);
+        act_rv = findViewById(R.id.act_rv);
+
         mAppBarLayout = findViewById(R.id.appBar_layout);
         tvAppName = findViewById(R.id.tv_app_name);
         tvAppVer = findViewById(R.id.tv_app_ver);
@@ -121,18 +127,26 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         btnCancel = findViewById(R.id.btn_cancel);
         info_card = findViewById(R.id.info_card);
 
-        perm_index = findViewById(R.id.tv1);
+        perm_index = findViewById(R.id.tv_perm_index);
+        act_index = findViewById(R.id.tv_act_index);
+
         tv_pkg = findViewById(R.id.tv_pkg);
         tv_path = findViewById(R.id.tv_path);
         tv_ver = findViewById(R.id.tv_ver);
-        LinearLayout perm_ll = findViewById(R.id.perm_ll);
         perm_iv = findViewById(R.id.perm_iv);
+        act_iv = findViewById(R.id.act_iv);
+
         install_bar = findViewById(R.id.card_bar);
         tv_install_msg = findViewById(R.id.tv_install_msg);
         perm_view = findViewById(R.id.card_perm);
+        act_card = findViewById(R.id.card_act);
+
         install_del_view = findViewById(R.id.card_del);
         sb_auto_del = findViewById(R.id.sb_auto_del);
         tv_apk_size = findViewById(R.id.tv_app_size);
+
+        LinearLayout perm_ll = findViewById(R.id.perm_ll);
+        LinearLayout act_ll = findViewById(R.id.act_ll);
 
         tvAppName.setText(R.string.parsing);
         btnInstall.setEnabled(true);
@@ -140,13 +154,23 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         btnSilently.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
         perm_ll.setOnClickListener(this);
+        act_ll.setOnClickListener(this);
 
         list_info = new ArrayList<>();
-        adapter = new PermissionAdapter();
-        adapter.setList(list_info);
-        main_rv.setAdapter(adapter);
-        main_rv.setLayoutManager(new LinearLayoutManager(this));
-        main_rv.setOnScrollListener(new TouchRecyclerViewScroll(install_bar));
+        perm_adapter = new PermissionAdapter();
+        perm_adapter.setList(list_info);
+        perm_rv.setAdapter(perm_adapter);
+        perm_rv.setLayoutManager(new LinearLayoutManager(this));
+        perm_rv.setOnScrollListener(new TouchRecyclerViewScroll(install_bar));
+
+        list_act = new ArrayList<>();
+        act_adapter = new ActAdapter();
+        act_adapter.setList(list_act);
+        act_rv.setLayoutManager(new LinearLayoutManager(this));
+        act_rv.setAdapter(act_adapter);
+        act_rv.setOnScrollListener(new TouchRecyclerViewScroll(install_bar));
+
+
         sb_auto_del.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -223,6 +247,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
 
         info_card.setVisibility(View.VISIBLE);
         perm_view.setVisibility(View.VISIBLE);
+        act_card.setVisibility(View.VISIBLE);
         install_bar.setVisibility(View.VISIBLE);
         imgAppIcon.setImageDrawable(apkInfo.getIcon());
 
@@ -274,6 +299,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         }
         if ((boolean)SPUtils.getData("show_perm", true)) {
             perm_view.setVisibility(View.VISIBLE);
+            act_card.setVisibility(View.VISIBLE);
             if (apkInfo.getPermissions() != null && apkInfo.getPermissions().length > 0) {
 
                 int i = 0;
@@ -283,11 +309,22 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                     }
                 }
             }
+
         } else {
             perm_view.setVisibility(View.GONE);
         }
-        adapter.notifyDataSetChanged();
-        perm_index.setText(getResources().getString(R.string.app_permissions, String.valueOf(adapter.getItemCount())));
+
+        if ((boolean)SPUtils.getData("show_act", true)) {
+            if (apkInfo.getActivities() != null && apkInfo.getActivities().size() > 0) {
+                list_act.addAll(apkInfo.getActivities());
+            }
+        } else {
+            act_card.setVisibility(View.GONE);
+        }
+        perm_adapter.notifyDataSetChanged();
+        act_adapter.notifyDataSetChanged();
+        perm_index.setText(getResources().getString(R.string.app_permissions, String.valueOf(perm_adapter.getItemCount())));
+        act_index.setText(getResources().getString(R.string.app_act, String.valueOf(act_adapter.getItemCount())));
     }
 
     @Override
@@ -300,7 +337,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
     @Override
     public void onStartParseApk(Uri uri) {
         btnInstall.setVisibility(View.GONE);
-        tv_install_msg.setText(getString(R.string.parsing, uri.toString()));
+        tv_install_msg.setText(R.string.parsing);
     }
 
     @Override
@@ -323,6 +360,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
     @Override
     public void onApkPreInstall(ApkInfo apkInfo) {
         perm_view.setVisibility(View.GONE);
+        act_card.setVisibility(View.GONE);
         tvAppName.setText(R.string.installing);
         tv_install_msg.setText("");
 
@@ -361,9 +399,23 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                 @Override
                 public void onYesClick() {
                     Intent intent = new Intent();
-                    ComponentName cn = new ComponentName("com.android.packageinstaller","com.android.packageinstaller.InstallStart");
+                    String act = "";
+                    String sys_pkg_name;
+                    if ((boolean)SPUtils.getData("use_sys_pkg", false)) {
+                        sys_pkg_name = (String) SPUtils.getData("sys_pkg_name",Config.SYS_PKG_NAME);
+                    } else {
+                        sys_pkg_name = Config.SYS_PKG_NAME;
+                    }
+                    try {
+                        PackageManager packageManager = getPackageManager();
+                        PackageInfo packageInfo = packageManager.getPackageInfo(sys_pkg_name, PackageManager.GET_ACTIVITIES);
+                        act = packageInfo.activities[0].name;
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    ComponentName cn = new ComponentName(sys_pkg_name, act);
                     intent.setComponent(cn);
-                    Uri apkUri = FileProvider.getUriForFile(InstallerActivity.this, "com.tokyonth.installer.provider",
+                    Uri apkUri = FileProvider.getUriForFile(InstallerActivity.this, getPackageName() + ".provider",
                             new File(path_str));
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
@@ -416,13 +468,24 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                 break;
             case R.id.perm_ll:
                 if (tag_perm) {
-                    main_rv.setVisibility(View.GONE);
+                    perm_rv.setVisibility(View.GONE);
                     perm_iv.setImageResource(R.drawable.ic_arrow_right);
                     tag_perm = false;
                 } else {
-                    main_rv.setVisibility(View.VISIBLE);
+                    perm_rv.setVisibility(View.VISIBLE);
                     perm_iv.setImageResource(R.drawable.ic_arrow_open);
                     tag_perm = true;
+                }
+                break;
+            case R.id.act_ll:
+                if (tag_act) {
+                    act_rv.setVisibility(View.GONE);
+                    act_iv.setImageResource(R.drawable.ic_arrow_right);
+                    tag_act = false;
+                } else {
+                    act_rv.setVisibility(View.VISIBLE);
+                    act_iv.setImageResource(R.drawable.ic_arrow_open);
+                    tag_act = true;
                 }
                 break;
             case R.id.btn_cancel:

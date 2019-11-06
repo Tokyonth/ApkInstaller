@@ -4,7 +4,7 @@
     <string name="install">Install</string>
     <string name="parse_apk_failed">Cannot parse apk file :%s</string>
     <string name="install_in_background">Silently Install Under ROOT</string>
-    <string name="parsing">Parsing :%s</string>
+    <string name="parsing">Parsing…</string>
     <string name="action_settings">Settings</string>
     <string name="prefs_more">More</string>
     <string name="title_about">About</string>
@@ -63,4 +63,12 @@
     <string name="text_equal_ver">Equal Version</string>
     <string name="no_permissions">No Permissions</string>
     <string name="use_system_pkg">Installation failed. Do you want to use the system package installer to install?</string>
+    <string name="app_act">APP ACT : (%s)</string>
+    <string name="title_show_act">Activity</string>
+    <string name="summary_show_act">Show Activity List</string>
+    <string name="text_input_sys_pkg">Click to enter the package name of the system package installer</string>
+    <string name="text_sys_pkg_tips">Enable when the installer cannot call the system own installer</string>
+    <string name="text_hint_input_pkg">Please enter package name</string>
+    <string name="text_title_input">Input</string>
+    <string name="text_input_empty">Input content is empty</string>
 </resources>

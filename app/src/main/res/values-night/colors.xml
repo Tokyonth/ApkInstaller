@@ -8,4 +8,5 @@
     <color name="colorBG">#FF1E1F23</color>
     <color name="night_layer">#A12E2E2E</color>
     <color name="colorline">#0000</color>
+    <color name="colorSvg">#FFFFFF</color>
 </resources>

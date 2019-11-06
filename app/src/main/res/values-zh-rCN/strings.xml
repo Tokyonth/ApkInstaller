@@ -10,7 +10,7 @@
     <string name="summary_show_recent_mission">是否在最近任务显示</string>
     <string name="parse_apk_failed">无法解析 %s</string>
     <string name="install_in_background">静默安装</string>
-    <string name="parsing">解析中 :%s</string>
+    <string name="parsing">解析中…</string>
     <string name="install_failed">%s 安装失败</string>
     <string name="apk_installed">%s 已安装</string>
     <string name="start_install">开始安装 %s</string>
@@ -64,4 +64,12 @@
     <string name="text_equal_ver">相同版本</string>
     <string name="no_permissions">没有权限</string>
     <string name="use_system_pkg">安装失败，是否使用系统打包安装程序进行安装？</string>
+    <string name="app_act">活动组件 : (%s)</string>
+    <string name="title_show_act">活动组件</string>
+    <string name="summary_show_act">显示Activity列表</string>
+    <string name="text_input_sys_pkg">点击输入系统打包安装程序的包名</string>
+    <string name="text_sys_pkg_tips">当安装器无法调用系统自带安装程序时启用</string>
+    <string name="text_hint_input_pkg">请输入包名</string>
+    <string name="text_title_input">输入</string>
+    <string name="text_input_empty">输入内容为空</string>
 </resources>

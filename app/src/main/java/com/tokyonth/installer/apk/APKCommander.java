@@ -1,6 +1,7 @@
 package com.tokyonth.installer.apk;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionGroupInfo;
@@ -10,6 +11,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AndroidRuntimeException;
+import android.util.Log;
 
 import com.tokyonth.installer.bean.ApkInfo;
 import com.tokyonth.installer.helper.ContentUriUtils;
@@ -135,8 +137,25 @@ public class APKCommander {
                 String apkSourcePath = (classification == null) ? ordinary : classification;
 
                 String package_name = "com.tokyonth.installer";
+                assert apkSourcePath != null;
+                PackageManager pms = context.getPackageManager();
+                String appVersion = null;
+                String appCode = null;
+
+                try {
+                    PackageInfo pi = pms.getPackageInfo(package_name, 0);
+                    appVersion = pi.versionName;
+                    appCode = String.valueOf(pi.versionCode);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+
                 if (apkSourcePath.contains(package_name)) {
                     apkSourcePath = apkSourcePath.replace(package_name, source_app);
+                    if (apkSourcePath.contains(source_app + "-" + appVersion + "-" + appCode)) {
+                        apkSourcePath = apkSourcePath.replace(source_app + "-" + appVersion + "-" + appCode,
+                                package_name + "-" + appVersion + "-" + appCode);
+                    }
                 }
                 if (apkSourcePath.contains("/data/data")) {
                     mApkInfo.setFakePath(true);
@@ -161,6 +180,7 @@ public class APKCommander {
                 }
                 mApkInfo.setApkFile(new File(apkSourcePath));
 
+                List<String> act = new ArrayList<>();
                 PackageManager pm = context.getPackageManager();
                 PackageInfo pkgInfo = pm.getPackageArchiveInfo(mApkInfo.getApkFile().getPath(), PackageManager.GET_PERMISSIONS);
                 if (pkgInfo != null) {
@@ -171,6 +191,13 @@ public class APKCommander {
                     mApkInfo.setVersionName(pkgInfo.versionName);
                     mApkInfo.setVersionCode(pkgInfo.versionCode);
                     mApkInfo.setIcon(pkgInfo.applicationInfo.loadIcon(pm));
+
+                    PackageInfo act_packageInfo = pm.getPackageArchiveInfo(mApkInfo.getApkFile().getPath(), PackageManager.GET_ACTIVITIES);
+                    for (ActivityInfo activity : act_packageInfo.activities) {
+                        act.add(activity.name);
+                    }
+                    mApkInfo.setActivities(act);
+
                     try {
                         PackageInfo installedPkgInfo = pm.getPackageInfo(mApkInfo.getPackageName(), 0);
                         mApkInfo.setInstalledVersionName(installedPkgInfo.versionName);

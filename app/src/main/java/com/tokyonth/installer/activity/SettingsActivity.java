@@ -9,18 +9,28 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+import com.kyleduo.switchbutton.SwitchButton;
+import com.tokyonth.installer.Config;
 import com.tokyonth.installer.R;
+import com.tokyonth.installer.ui.CustomDialog;
 import com.tokyonth.installer.utils.SPUtils;
+import com.tokyonth.installer.utils.ToastUtil;
+
+import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private CheckBox cb_show_progress_bar;
-    private CheckBox cb_show_perm;
-    private CheckBox cb_vibration;
+    private SwitchButton cb_show_progress_bar;
+    private SwitchButton cb_show_perm;
+    private SwitchButton cb_vibration;
+    private SwitchButton cb_show_act;
+    private SwitchButton cb_use_sys_pkg;
+    private TextView tv_sys_pkg_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +68,12 @@ public class SettingsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        tv_sys_pkg_name = findViewById(R.id.tv_pkg_name);
         cb_show_progress_bar = findViewById(R.id.cb_show_progress_bar);
         cb_show_perm = findViewById(R.id.cb_show_perm);
         cb_vibration = findViewById(R.id.cb_vibrate);
+        cb_show_act = findViewById(R.id.cb_show_act);
+        cb_use_sys_pkg = findViewById(R.id.cb_use_sys_pkg);
 
         cb_show_perm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -82,6 +95,16 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
         });
+        cb_show_act.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    SPUtils.putData("show_act", true);
+                } else {
+                    SPUtils.putData("show_act", false);
+                }
+            }
+        });
         cb_vibration.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -90,6 +113,47 @@ public class SettingsActivity extends AppCompatActivity {
                 } else {
                     SPUtils.putData("vibrate", false);
                 }
+            }
+        });
+        cb_use_sys_pkg.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    SPUtils.putData("use_sys_pkg", true);
+                } else {
+                    SPUtils.putData("use_sys_pkg", false);
+                }
+            }
+        });
+
+        findViewById(R.id.card_pkg).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                View inView = View.inflate(SettingsActivity.this, R.layout.layout_input_pkg, null);
+                final TextInputEditText edit = inView.findViewById(R.id.et_sys_pkg_name);
+                final CustomDialog dialog = new CustomDialog(SettingsActivity.this);
+                dialog.setCustView(inView);
+                dialog.setTitle(getResources().getString(R.string.text_title_input));
+                dialog.setYesOnclickListener(getResources().getString(R.string.dialog_ok), new CustomDialog.onYesOnclickListener() {
+                    @Override
+                    public void onYesClick() {
+                        String str = Objects.requireNonNull(edit.getText()).toString().trim();
+                        if (str.isEmpty()) {
+                            ToastUtil.showToast(SettingsActivity.this, getResources().getString(R.string.text_input_empty), Toast.LENGTH_SHORT);
+                        } else {
+                            SPUtils.putData("sys_pkg_name", str);
+                            tv_sys_pkg_name.setText(str);
+                        }
+                    }
+                });
+                dialog.setNoOnclickListener(getResources().getString(R.string.dialog_btn_cancel), new CustomDialog.onNoOnclickListener() {
+                    @Override
+                    public void onNoClick() {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.create();
+                dialog.show();
             }
         });
 
@@ -108,10 +172,26 @@ public class SettingsActivity extends AppCompatActivity {
             cb_show_perm.setChecked(false);
         }
 
+        if ((boolean)SPUtils.getData("show_act", true)) {
+            cb_show_act.setChecked(true);
+        } else {
+            cb_show_act.setChecked(false);
+        }
+
         if ((boolean)SPUtils.getData("vibrate", false)) {
             cb_vibration.setChecked(true);
         } else {
             cb_vibration.setChecked(false);
+        }
+
+        if ((boolean)SPUtils.getData("use_sys_pkg", false)) {
+            cb_use_sys_pkg.setChecked(true);
+        } else {
+            cb_use_sys_pkg.setChecked(false);
+        }
+
+        if (!SPUtils.getData("sys_pkg_name", Config.SYS_PKG_NAME).equals(Config.SYS_PKG_NAME)) {
+            tv_sys_pkg_name.setText(SPUtils.getData("sys_pkg_name", Config.SYS_PKG_NAME).toString());
         }
     }
 

@@ -129,7 +129,24 @@
             app:cardUseCompatPadding="true">
 
         <include
-            layout="@layout/info_item" />
+            layout="@layout/layout_perm_info" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:id="@+id/card_act"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/colorCard"
+            app:cardCornerRadius="6dp"
+            app:cardElevation="0dp"
+            app:cardPreventCornerOverlap="true"
+            app:cardUseCompatPadding="true">
+
+            <include
+                layout="@layout/layout_act_info" />
 
         </androidx.cardview.widget.CardView>
 

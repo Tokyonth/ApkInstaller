@@ -3,6 +3,7 @@ package com.tokyonth.installer.bean;
 import android.graphics.drawable.Drawable;
 
 import java.io.File;
+import java.util.List;
 
 public class ApkInfo {
 
@@ -16,7 +17,17 @@ public class ApkInfo {
     private String installedVersionName;
     private int installedVersionCode;
     private boolean isFakePath;
+
     private String[] permissions;
+    private List<String> activities;
+
+    public List<String> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<String> activities) {
+        this.activities = activities;
+    }
 
     public boolean isHasInstalledApp() {
         return hasInstalledApp;

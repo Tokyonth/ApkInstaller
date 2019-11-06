@@ -55,6 +55,7 @@
                     android:padding="12dp"
                     android:layout_marginStart="26dp"
                     android:gravity="center"
+                    android:textStyle="bold"
                     tools:text="@string/text_new_ver"/>
 
             </androidx.cardview.widget.CardView>

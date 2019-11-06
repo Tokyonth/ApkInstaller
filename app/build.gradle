@@ -6,8 +6,8 @@ android {
         applicationId "com.tokyonth.installer"
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 17
-        versionName "1.7"
+        versionCode 19
+        versionName "1.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
