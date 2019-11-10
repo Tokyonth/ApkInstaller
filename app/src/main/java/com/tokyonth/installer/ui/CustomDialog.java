@@ -75,7 +75,6 @@ public class CustomDialog extends Dialog {
         initData();
         //初始化界面控件的事件
         initEvent();
-
     }
 
 

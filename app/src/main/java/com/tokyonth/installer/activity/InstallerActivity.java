@@ -175,9 +175,9 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    SPUtils.putData("auto_delete", true);
+                    SPUtils.putData(Config.SP_AUTO_DEL, true);
                 } else {
-                    SPUtils.putData("auto_delete", false);
+                    SPUtils.putData(Config.SP_AUTO_DEL, false);
                 }
             }
         });
@@ -197,13 +197,13 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
             startActivityForResult(intent, 100);
             return true;
         } else if (id == R.id.action_night_mode) {
-            if ((boolean)SPUtils.getData("NIGHT_MODE", false)) {
+            if ((boolean)SPUtils.getData(Config.SP_NIGHT_MODE, false)) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                SPUtils.putData("NIGHT_MODE", false);
+                SPUtils.putData(Config.SP_NIGHT_MODE, false);
                 recreate();
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                SPUtils.putData("NIGHT_MODE", true);
+                SPUtils.putData(Config.SP_NIGHT_MODE, true);
                 recreate();
             }
         }
@@ -214,7 +214,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         if (apkCommander != null && apkCommander.getApkInfo() != null && apkCommander.getApkInfo().getApkFile() != null) {
             initDetails(apkCommander.getApkInfo());
         }
-        if ((boolean)SPUtils.getData("auto_delete", false)) {
+        if ((boolean)SPUtils.getData(Config.SP_AUTO_DEL, false)) {
             sb_auto_del.setChecked(true);
         } else {
             sb_auto_del.setChecked(false);
@@ -297,14 +297,14 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
             }
 
         }
-        if ((boolean)SPUtils.getData("show_perm", true)) {
+        if ((boolean)SPUtils.getData(Config.SP_SHOW_PERM, true)) {
             perm_view.setVisibility(View.VISIBLE);
             act_card.setVisibility(View.VISIBLE);
             if (apkInfo.getPermissions() != null && apkInfo.getPermissions().length > 0) {
 
                 int i = 0;
                 for (String perm : apkInfo.getPermissions()) {
-                    if (!tag && (boolean)SPUtils.getData("show_perm", true)) {
+                    if (!tag && (boolean)SPUtils.getData(Config.SP_SHOW_PERM, true)) {
                         list_info.add(new InfoBean(perm, apkCommander.getInfo().getPermissionDescription().get(i++)));
                     }
                 }
@@ -314,7 +314,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
             perm_view.setVisibility(View.GONE);
         }
 
-        if ((boolean)SPUtils.getData("show_act", true)) {
+        if ((boolean)SPUtils.getData(Config.SP_SHOW_ACT, true)) {
             if (apkInfo.getActivities() != null && apkInfo.getActivities().size() > 0) {
                 list_act.addAll(apkInfo.getActivities());
             }
@@ -365,7 +365,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         tv_install_msg.setText("");
 
         progressBar.setVisibility(
-                (boolean)SPUtils.getData("show_progress_bar", true) ?
+                (boolean)SPUtils.getData(Config.SP_PROGRESS, true) ?
                         View.VISIBLE : View.INVISIBLE);
         install_bar.setVisibility(View.INVISIBLE);
     }
@@ -377,7 +377,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
         btnSilently.setEnabled(false);
         if (resultCode == 0) {
             ToastUtil.showToast(this, getString(R.string.apk_installed, apkInfo.getAppName()), Toast.LENGTH_SHORT);
-            if ((boolean)SPUtils.getData("vibrate", false)) {
+            if ((boolean)SPUtils.getData(Config.SP_VIBRATE, false)) {
                 Vibrator vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
                 vibrator.vibrate(800);
             }
@@ -401,8 +401,8 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                     Intent intent = new Intent();
                     String act = "";
                     String sys_pkg_name;
-                    if ((boolean)SPUtils.getData("use_sys_pkg", false)) {
-                        sys_pkg_name = (String) SPUtils.getData("sys_pkg_name",Config.SYS_PKG_NAME);
+                    if ((boolean)SPUtils.getData(Config.SP_USE_SYS_PKG, false)) {
+                        sys_pkg_name = (String) SPUtils.getData(Config.SYS_PKG_NAME, Config.SYS_PKG_NAME);
                     } else {
                         sys_pkg_name = Config.SYS_PKG_NAME;
                     }
@@ -415,10 +415,10 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                     }
                     ComponentName cn = new ComponentName(sys_pkg_name, act);
                     intent.setComponent(cn);
-                    Uri apkUri = FileProvider.getUriForFile(InstallerActivity.this, getPackageName() + ".provider",
+                    Uri apkUri = FileProvider.getUriForFile(InstallerActivity.this, Config.PROVIDER_STR,
                             new File(path_str));
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+                    intent.setDataAndType(apkUri, Config.URI_DATA_TYPE);
                     startActivity(intent);
                     finish();
                 }
@@ -489,7 +489,7 @@ public class InstallerActivity extends BaseActivity implements ICommanderCallbac
                 }
                 break;
             case R.id.btn_cancel:
-                if ((boolean)SPUtils.getData("auto_delete", false)) {
+                if ((boolean)SPUtils.getData(Config.SP_AUTO_DEL, false)) {
                     if (!btnCancel.getText().equals(getResources().getString(R.string.back))) {
                         File file = new File(path_str);
                         file.delete();

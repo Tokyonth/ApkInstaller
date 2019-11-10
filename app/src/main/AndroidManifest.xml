@@ -5,7 +5,7 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
@@ -16,14 +16,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-
         <activity
+            android:name=".activity.InstallerActivity"
+            android:excludeFromRecents="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/InstallAppThemeLight"
-            android:excludeFromRecents="true"
-            android:name=".activity.InstallerActivity">
+            android:theme="@style/InstallAppThemeLight">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />
@@ -41,11 +40,11 @@
             android:icon="@mipmap/ic_launcher"
             android:label="@string/install_in_background"
             android:launchMode="singleTask"
-            android:theme="@android:style/Theme.NoDisplay">
-        </activity>
+            android:theme="@android:style/Theme.NoDisplay"/>
         <activity
             android:name=".activity.SettingsActivity"
             android:theme="@style/InstallAppThemeLight" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.tokyonth.installer.provider"
@@ -53,8 +52,9 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
+
     </application>
 
 </manifest>

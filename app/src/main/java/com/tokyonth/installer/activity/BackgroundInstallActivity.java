@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.tokyonth.installer.Config;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.apk.APKCommander;
 import com.tokyonth.installer.bean.ApkInfo;
@@ -58,7 +59,7 @@ public class BackgroundInstallActivity extends Activity implements ICommanderCal
     public void onApkInstalled(ApkInfo apkInfo, int resultCode) {
         if (resultCode == 0) {
             showToast(getString(R.string.apk_installed, apkInfo.getAppName()));
-            if (!apkInfo.isFakePath() && (boolean)SPUtils.getData("auto_delete", false)) {
+            if (!apkInfo.isFakePath() && (boolean)SPUtils.getData(Config.SP_AUTO_DEL, false)) {
                 Toast.makeText(this, getString(R.string.apk_deleted, apkInfo.getApkFile().getName()), Toast.LENGTH_SHORT).show();
             }
         } else {

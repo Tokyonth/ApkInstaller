@@ -15,9 +15,9 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
-        SPUtils.getInstance(this, "conf");
+        SPUtils.getInstance(this, Config.SP_FILE_NAME);
 
-        boolean bool = (boolean)SPUtils.getData("NIGHT_MODE", false);
+        boolean bool = (boolean)SPUtils.getData(Config.SP_NIGHT_MODE, false);
         if (bool) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {

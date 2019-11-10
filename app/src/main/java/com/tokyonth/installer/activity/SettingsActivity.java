@@ -40,7 +40,7 @@ public class SettingsActivity extends AppCompatActivity {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
         Toolbar toolbar = findViewById(R.id.toolbar);
-        if ((boolean)SPUtils.getData("NIGHT_MODE", false)) {
+        if ((boolean)SPUtils.getData(Config.SP_NIGHT_MODE, false)) {
             toolbar.setNavigationIcon(R.drawable.ic_title_arrow_left_night);
         } else {
             toolbar.setNavigationIcon(R.drawable.ic_title_arrow_left);
@@ -79,9 +79,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    SPUtils.putData("show_perm", true);
+                    SPUtils.putData(Config.SP_SHOW_PERM, true);
                 } else {
-                    SPUtils.putData("show_perm", false);
+                    SPUtils.putData(Config.SP_SHOW_PERM, false);
                 }
             }
         });
@@ -89,9 +89,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    SPUtils.putData("show_progress_bar", true);
+                    SPUtils.putData(Config.SP_PROGRESS, true);
                 } else {
-                    SPUtils.putData("show_progress_bar", false);
+                    SPUtils.putData(Config.SP_PROGRESS, false);
                 }
             }
         });
@@ -99,9 +99,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    SPUtils.putData("show_act", true);
+                    SPUtils.putData(Config.SP_SHOW_ACT, true);
                 } else {
-                    SPUtils.putData("show_act", false);
+                    SPUtils.putData(Config.SP_SHOW_ACT, false);
                 }
             }
         });
@@ -109,9 +109,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    SPUtils.putData("vibrate", true);
+                    SPUtils.putData(Config.SP_VIBRATE, true);
                 } else {
-                    SPUtils.putData("vibrate", false);
+                    SPUtils.putData(Config.SP_VIBRATE, false);
                 }
             }
         });
@@ -119,9 +119,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (b) {
-                    SPUtils.putData("use_sys_pkg", true);
+                    SPUtils.putData(Config.SP_USE_SYS_PKG, true);
                 } else {
-                    SPUtils.putData("use_sys_pkg", false);
+                    SPUtils.putData(Config.SP_USE_SYS_PKG, false);
                 }
             }
         });
@@ -141,7 +141,7 @@ public class SettingsActivity extends AppCompatActivity {
                         if (str.isEmpty()) {
                             ToastUtil.showToast(SettingsActivity.this, getResources().getString(R.string.text_input_empty), Toast.LENGTH_SHORT);
                         } else {
-                            SPUtils.putData("sys_pkg_name", str);
+                            SPUtils.putData(Config.SYS_PKG_NAME, str);
                             tv_sys_pkg_name.setText(str);
                         }
                     }
@@ -160,38 +160,38 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initSettings() {
-        if ((boolean)SPUtils.getData("show_progress_bar", true)) {
+        if ((boolean)SPUtils.getData(Config.SP_PROGRESS, true)) {
             cb_show_progress_bar.setChecked(true);
         } else {
             cb_show_progress_bar.setChecked(false);
         }
 
-        if ((boolean)SPUtils.getData("show_perm", true)) {
+        if ((boolean)SPUtils.getData(Config.SP_SHOW_PERM, true)) {
             cb_show_perm.setChecked(true);
         } else {
             cb_show_perm.setChecked(false);
         }
 
-        if ((boolean)SPUtils.getData("show_act", true)) {
+        if ((boolean)SPUtils.getData(Config.SP_SHOW_ACT, true)) {
             cb_show_act.setChecked(true);
         } else {
             cb_show_act.setChecked(false);
         }
 
-        if ((boolean)SPUtils.getData("vibrate", false)) {
+        if ((boolean)SPUtils.getData(Config.SP_VIBRATE, false)) {
             cb_vibration.setChecked(true);
         } else {
             cb_vibration.setChecked(false);
         }
 
-        if ((boolean)SPUtils.getData("use_sys_pkg", false)) {
+        if ((boolean)SPUtils.getData(Config.SP_USE_SYS_PKG, false)) {
             cb_use_sys_pkg.setChecked(true);
         } else {
             cb_use_sys_pkg.setChecked(false);
         }
 
-        if (!SPUtils.getData("sys_pkg_name", Config.SYS_PKG_NAME).equals(Config.SYS_PKG_NAME)) {
-            tv_sys_pkg_name.setText(SPUtils.getData("sys_pkg_name", Config.SYS_PKG_NAME).toString());
+        if (!SPUtils.getData(Config.SYS_PKG_NAME, Config.SYS_PKG_NAME).equals(Config.SYS_PKG_NAME)) {
+            tv_sys_pkg_name.setText(SPUtils.getData(Config.SYS_PKG_NAME, Config.SYS_PKG_NAME).toString());
         }
     }
 

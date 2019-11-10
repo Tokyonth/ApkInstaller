@@ -11,8 +11,8 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AndroidRuntimeException;
-import android.util.Log;
 
+import com.tokyonth.installer.Config;
 import com.tokyonth.installer.bean.ApkInfo;
 import com.tokyonth.installer.helper.ContentUriUtils;
 import com.tokyonth.installer.permissions.PermInfo;
@@ -72,10 +72,10 @@ public class APKCommander {
             });
 
             if (Build.VERSION.SDK_INT >= 24) {
-                ShellUtils.execWithRoot("setenforce permissive");
+                ShellUtils.execWithRoot(Config.SELINUX_COMMAND);
             }
 
-            final int retCode = ShellUtils.execWithRoot("pm install -r --user 0 \"" + mApkInfo.getApkFile().getPath() + "\"" + "\n", new ShellUtils.Result() {
+            final int retCode = ShellUtils.execWithRoot(Config.INSTALL_COMMAND + "\"" + mApkInfo.getApkFile().getPath() + "\"" + "\n", new ShellUtils.Result() {
                 @Override
                 public void onStdout(final String text) {
                     handler.post(new Runnable() {
@@ -136,30 +136,29 @@ public class APKCommander {
                 String ordinary = PathUtils.getRealFilePath(context, uri);
                 String apkSourcePath = (classification == null) ? ordinary : classification;
 
-                String package_name = "com.tokyonth.installer";
                 assert apkSourcePath != null;
                 PackageManager pms = context.getPackageManager();
                 String appVersion = null;
                 String appCode = null;
 
                 try {
-                    PackageInfo pi = pms.getPackageInfo(package_name, 0);
+                    PackageInfo pi = pms.getPackageInfo(Config.PKG_NAME, 0);
                     appVersion = pi.versionName;
                     appCode = String.valueOf(pi.versionCode);
                 } catch (PackageManager.NameNotFoundException e) {
                     e.printStackTrace();
                 }
 
-                if (apkSourcePath.contains(package_name)) {
-                    apkSourcePath = apkSourcePath.replace(package_name, source_app);
+                if (apkSourcePath.contains(Config.PKG_NAME)) {
+                    apkSourcePath = apkSourcePath.replace(Config.PKG_NAME, source_app);
                     if (apkSourcePath.contains(source_app + "-" + appVersion + "-" + appCode)) {
                         apkSourcePath = apkSourcePath.replace(source_app + "-" + appVersion + "-" + appCode,
-                                package_name + "-" + appVersion + "-" + appCode);
+                                Config.PKG_NAME + "-" + appVersion + "-" + appCode);
                     }
                 }
-                if (apkSourcePath.contains("/data/data")) {
+                if (apkSourcePath.contains(Config.DATA_PATH_PERFIX)) {
                     mApkInfo.setFakePath(true);
-                    File tempFile = new File(context.getExternalCacheDir(), System.currentTimeMillis() + ".apk");
+                    File tempFile = new File(context.getExternalCacheDir(), System.currentTimeMillis() + Config.APK_POSTFIX);
                     try {
                         InputStream is = context.getContentResolver().openInputStream(uri);
                         if (is != null) {
