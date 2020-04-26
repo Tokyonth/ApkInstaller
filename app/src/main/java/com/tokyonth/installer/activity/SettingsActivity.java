@@ -1,206 +1,117 @@
 package com.tokyonth.installer.activity;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.kyleduo.switchbutton.SwitchButton;
-import com.tokyonth.installer.Config;
+import com.tokyonth.installer.Contents;
 import com.tokyonth.installer.R;
-import com.tokyonth.installer.ui.CustomDialog;
-import com.tokyonth.installer.utils.SPUtils;
-import com.tokyonth.installer.utils.ToastUtil;
+import com.tokyonth.installer.adapter.SettingsAdapter;
+import com.tokyonth.installer.widget.CustomizeDialog;
+import com.tokyonth.installer.bean.SettingsBean;
+import com.tokyonth.installer.utils.helper.AppUtils;
+import com.tokyonth.installer.utils.file.FileUtils;
+import com.tokyonth.installer.utils.file.SPUtils;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private SwitchButton cb_show_progress_bar;
-    private SwitchButton cb_show_perm;
-    private SwitchButton cb_vibration;
-    private SwitchButton cb_show_act;
-    private SwitchButton cb_use_sys_pkg;
-    private TextView tv_sys_pkg_name;
+    private SwitchButton switchButtonUseSysPkg;
+    private TextView textViewSysPkgName;
+    private TextView textViewApkCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-        }
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        if ((boolean)SPUtils.getData(Config.SP_NIGHT_MODE, false)) {
-            toolbar.setNavigationIcon(R.drawable.ic_title_arrow_left_night);
-        } else {
-            toolbar.setNavigationIcon(R.drawable.ic_title_arrow_left);
-        }
-        setSupportActionBar(toolbar);
-        setTitle(null);
-        androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null){
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        initView();
+        initViewData();
         initSettings();
     }
 
-    private void initView() {
-        TextView tv = findViewById(R.id.tv_version);
-        PackageManager pm = this.getPackageManager();
+    private void initViewData() {
+        ArrayList<SettingsBean> settingsBeanArrayList = new ArrayList<>();
+        settingsBeanArrayList.add(new SettingsBean(getString(R.string.title_show_perm),
+                getString(R.string.summary_show_perm),
+                R.drawable.ic_verified_user_24px, getResources().getColor(R.color.color0)));
+        settingsBeanArrayList.add(new SettingsBean(getString(R.string.title_show_act),
+                getString(R.string.summary_show_act),
+                R.drawable.ic_widgets_24px, getResources().getColor(R.color.color1)));
+        settingsBeanArrayList.add(new SettingsBean(getString(R.string.vibrate),
+                getString(R.string.install_vibrate),
+                R.drawable.ic_waves_24px, getResources().getColor(R.color.color2)));
 
-        try {
-            PackageInfo pi = pm.getPackageInfo(this.getPackageName(), 0);
-            String appVersion = pi.versionName;
-            tv.append(appVersion);
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
+        SettingsAdapter adapter = new SettingsAdapter(settingsBeanArrayList);
+        RecyclerView rvSettings = findViewById(R.id.rv_settings_item);
+        rvSettings.setLayoutManager(new LinearLayoutManager(this));
+        rvSettings.setAdapter(adapter);
+        adapter.setOnItemClick((view, pos, bool) -> {
+            switch (pos) {
+                case 0:
+                    SPUtils.putData(Contents.SP_SHOW_PERM, bool);
+                    break;
+                case 1:
+                    SPUtils.putData(Contents.SP_SHOW_ACT, bool);
+                    break;
+                case 2:
+                    SPUtils.putData(Contents.SP_VIBRATE, bool);
+                    break;
+            }
+        });
+        TextView textViewVersion = findViewById(R.id.tv_version);
+        textViewVersion.append(AppUtils.getVersionName(this));
 
-        tv_sys_pkg_name = findViewById(R.id.tv_pkg_name);
-        cb_show_progress_bar = findViewById(R.id.cb_show_progress_bar);
-        cb_show_perm = findViewById(R.id.cb_show_perm);
-        cb_vibration = findViewById(R.id.cb_vibrate);
-        cb_show_act = findViewById(R.id.cb_show_act);
-        cb_use_sys_pkg = findViewById(R.id.cb_use_sys_pkg);
+        textViewApkCache = findViewById(R.id.tv_apk_cache);
+        textViewSysPkgName = findViewById(R.id.tv_pkg_name);
+        switchButtonUseSysPkg = findViewById(R.id.cb_use_sys_pkg);
+        switchButtonUseSysPkg.setOnCheckedChangeListener((compoundButton, isChecked) -> SPUtils.putData(Contents.SP_USE_SYS_PKG, isChecked));
 
-        cb_show_perm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    SPUtils.putData(Config.SP_SHOW_PERM, true);
-                } else {
-                    SPUtils.putData(Config.SP_SHOW_PERM, false);
-                }
-            }
-        });
-        cb_show_progress_bar.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    SPUtils.putData(Config.SP_PROGRESS, true);
-                } else {
-                    SPUtils.putData(Config.SP_PROGRESS, false);
-                }
-            }
-        });
-        cb_show_act.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    SPUtils.putData(Config.SP_SHOW_ACT, true);
-                } else {
-                    SPUtils.putData(Config.SP_SHOW_ACT, false);
-                }
-            }
-        });
-        cb_vibration.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    SPUtils.putData(Config.SP_VIBRATE, true);
-                } else {
-                    SPUtils.putData(Config.SP_VIBRATE, false);
-                }
-            }
-        });
-        cb_use_sys_pkg.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    SPUtils.putData(Config.SP_USE_SYS_PKG, true);
-                } else {
-                    SPUtils.putData(Config.SP_USE_SYS_PKG, false);
-                }
-            }
+        String cacheSize = FileUtils.byteToString(FileUtils.getFileOrFolderSize(new File(Contents.CACHE_APK_DIR)));
+        textViewApkCache.setText(getString(R.string.text_apk_cache, cacheSize));
+
+        findViewById(R.id.card_apk_cache).setOnClickListener(view -> {
+            FileUtils.deleteFolderFile(Contents.CACHE_APK_DIR, true);
+            Snackbar.make(findViewById(R.id.coordinator_layout) ,getString(R.string.text_apk_cache_complete), Snackbar.LENGTH_SHORT).show();
+            textViewApkCache.setText(getString(R.string.text_apk_cache, cacheSize));
         });
 
-        findViewById(R.id.card_pkg).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                View inView = View.inflate(SettingsActivity.this, R.layout.layout_input_pkg, null);
-                final TextInputEditText edit = inView.findViewById(R.id.et_sys_pkg_name);
-                final CustomDialog dialog = new CustomDialog(SettingsActivity.this);
-                dialog.setCustView(inView);
-                dialog.setTitle(getResources().getString(R.string.text_title_input));
-                dialog.setYesOnclickListener(getResources().getString(R.string.dialog_ok), new CustomDialog.onYesOnclickListener() {
-                    @Override
-                    public void onYesClick() {
-                        String str = Objects.requireNonNull(edit.getText()).toString().trim();
-                        if (str.isEmpty()) {
-                            ToastUtil.showToast(SettingsActivity.this, getResources().getString(R.string.text_input_empty), Toast.LENGTH_SHORT);
-                        } else {
-                            SPUtils.putData(Config.SYS_PKG_NAME, str);
-                            tv_sys_pkg_name.setText(str);
-                        }
-                    }
-                });
-                dialog.setNoOnclickListener(getResources().getString(R.string.dialog_btn_cancel), new CustomDialog.onNoOnclickListener() {
-                    @Override
-                    public void onNoClick() {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.create();
-                dialog.show();
-            }
-        });
+        findViewById(R.id.card_pkg).setOnClickListener(view -> {
+            View inView = View.inflate(SettingsActivity.this, R.layout.layout_input_pkg, null);
+            final TextInputEditText edit = inView.findViewById(R.id.et_sys_pkg_name);
 
+            CustomizeDialog.getInstance(this)
+            .setTitle(R.string.text_title_input)
+            .setView(inView)
+            .setPositiveButton(R.string.dialog_ok, (dialog, which) -> {
+                String str = Objects.requireNonNull(edit.getText()).toString().trim();
+                if (str.isEmpty()) {
+                    Snackbar.make(findViewById(R.id.coordinator_layout) ,getString(R.string.text_input_empty), Snackbar.LENGTH_SHORT).show();
+                } else {
+                    SPUtils.putData(Contents.SYS_PKG_NAME, str);
+                    textViewSysPkgName.setText(str);
+                }
+            })
+            .setNegativeButton(R.string.dialog_btn_cancel, null)
+            .setCancelable(false).create().show();
+        });
     }
 
     private void initSettings() {
-        if ((boolean)SPUtils.getData(Config.SP_PROGRESS, true)) {
-            cb_show_progress_bar.setChecked(true);
-        } else {
-            cb_show_progress_bar.setChecked(false);
+        boolean useSysPkg = (boolean)SPUtils.getData(Contents.SP_USE_SYS_PKG, false);
+        switchButtonUseSysPkg.setChecked(useSysPkg);
+        if (!SPUtils.getData(Contents.SYS_PKG_NAME, Contents.SYS_PKG_NAME).equals(Contents.SYS_PKG_NAME)) {
+            textViewSysPkgName.setText(SPUtils.getData(Contents.SYS_PKG_NAME, Contents.SYS_PKG_NAME).toString());
         }
-
-        if ((boolean)SPUtils.getData(Config.SP_SHOW_PERM, true)) {
-            cb_show_perm.setChecked(true);
-        } else {
-            cb_show_perm.setChecked(false);
-        }
-
-        if ((boolean)SPUtils.getData(Config.SP_SHOW_ACT, true)) {
-            cb_show_act.setChecked(true);
-        } else {
-            cb_show_act.setChecked(false);
-        }
-
-        if ((boolean)SPUtils.getData(Config.SP_VIBRATE, false)) {
-            cb_vibration.setChecked(true);
-        } else {
-            cb_vibration.setChecked(false);
-        }
-
-        if ((boolean)SPUtils.getData(Config.SP_USE_SYS_PKG, false)) {
-            cb_use_sys_pkg.setChecked(true);
-        } else {
-            cb_use_sys_pkg.setChecked(false);
-        }
-
-        if (!SPUtils.getData(Config.SYS_PKG_NAME, Config.SYS_PKG_NAME).equals(Config.SYS_PKG_NAME)) {
-            tv_sys_pkg_name.setText(SPUtils.getData(Config.SYS_PKG_NAME, Config.SYS_PKG_NAME).toString());
-        }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
     }
 
 }
+

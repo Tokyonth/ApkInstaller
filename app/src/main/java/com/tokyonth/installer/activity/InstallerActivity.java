@@ -1,503 +1,385 @@
 package com.tokyonth.installer.activity;
 
-import android.content.ComponentName;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.cardview.widget.CardView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.FileProvider;
+import androidx.databinding.DataBindingUtil;
 import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Vibrator;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.animation.TranslateAnimation;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
 import com.kyleduo.switchbutton.SwitchButton;
-import com.tokyonth.installer.BaseActivity;
-import com.tokyonth.installer.Config;
+import com.tokyonth.installer.base.BaseActivity;
+import com.tokyonth.installer.Contents;
 import com.tokyonth.installer.R;
-import com.tokyonth.installer.adapter.ActAdapter;
-import com.tokyonth.installer.helper.VerHelper;
-import com.tokyonth.installer.ui.CustomDialog;
-import com.tokyonth.installer.ui.TouchRecyclerViewScroll;
+import com.tokyonth.installer.adapter.ActivityAdapter;
+import com.tokyonth.installer.bean.InitializeApk;
+import com.tokyonth.installer.databinding.ActivityInstallerBinding;
+import com.tokyonth.installer.widget.CustomizeDialog;
+import com.tokyonth.installer.utils.helper.AppUtils;
+import com.tokyonth.installer.utils.helper.VersionHelper;
 import com.tokyonth.installer.adapter.PermissionAdapter;
 import com.tokyonth.installer.apk.APKCommander;
-import com.tokyonth.installer.bean.ApkInfo;
-import com.tokyonth.installer.apk.ICommanderCallback;
-import com.tokyonth.installer.bean.InfoBean;
-import com.tokyonth.installer.utils.FileUtils;
-import com.tokyonth.installer.utils.MoreTools;
-import com.tokyonth.installer.utils.SPUtils;
-import com.tokyonth.installer.utils.ToastUtil;
+import com.tokyonth.installer.bean.ApkInfoBean;
+import com.tokyonth.installer.apk.CommanderCallback;
+import com.tokyonth.installer.bean.permissions.PermFullBean;
+import com.tokyonth.installer.widget.ProgressDrawable;
+import com.tokyonth.installer.utils.ParsingContentUtil;
+import com.tokyonth.installer.utils.file.FileUtils;
+import com.tokyonth.installer.utils.helper.AssemblyUtils;
+import com.tokyonth.installer.utils.file.SPUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
-@SuppressWarnings("ResultOfMethodCallIgnored")
-public class InstallerActivity extends BaseActivity implements ICommanderCallback, View.OnClickListener {
+public class InstallerActivity extends BaseActivity implements CommanderCallback {
 
-    private AppBarLayout mAppBarLayout;
-    private TextView tvAppName, tvAppVer;
-    private TextView tv_install_msg, tv_apk_size;
-    private TextView perm_index, act_index, tv_path, tv_ver, tv_pkg;
-    private ImageView perm_iv, act_iv, imgAppIcon;
-    private ProgressBar progressBar;
-    private Button btnInstall, btnSilently, btnCancel;
-    private CardView info_card, install_bar, perm_view, install_del_view, act_card;
-    private RecyclerView act_rv, perm_rv;
+    private CardView perm_view;
+    private CardView act_card;
+    private RecyclerView act_rv;
+    private RecyclerView perm_rv;
     private SwitchButton sb_auto_del;
 
+    private ArrayList<PermFullBean> permFullBeanArrayList;
+    private ArrayList<String> actStringArrayList;
+    private ProgressDrawable progressDrawable;
+    private PermissionAdapter permAdapter;
+    private ActivityAdapter actAdapter;
     private APKCommander apkCommander;
-    private PermissionAdapter perm_adapter;
-    private ActAdapter act_adapter;
 
-    private String path_str, apk_name;
-    private String source_app;
-    private List<InfoBean> list_info;
-    private List<String> list_act;
-    private boolean tag = false, tag_perm = false, tag_act = false, tag_install = false;
+    private String apkFilePath;
+    private String apkFileName;
+    private String apkSource;
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    private boolean showPerm = false;
+    private boolean showActivity = false;
+    private boolean installComplete = false;
+
+    private Uri uriData;
+    private InitializeApk initializeApk;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
-        setContentView(R.layout.activity_installer);
+    public int setActivityView() {
+        return R.layout.activity_installer;
+    }
 
+    @Override
+    public void initActivity() {
         initView();
-        loadSettings();
-        if (getIntent().getData() == null) {
-            finish();
-        } else {
-            this.setPermCheck(new PermCheck() {
-                @Override
-                public void isPerm(boolean bool) {
-                    if (bool) {
-                        source_app = Objects.requireNonNull(getReferrer()).getHost();
-                        apkCommander = new APKCommander(InstallerActivity.this, getIntent().getData(),
-                                InstallerActivity.this, source_app);
-                    }
-                }
-            });
-            checkPermission();
-        }
+        initData();
     }
 
     private void initView() {
-        Toolbar toolbar =  findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         perm_rv = findViewById(R.id.perm_rv);
         act_rv = findViewById(R.id.act_rv);
-
-        mAppBarLayout = findViewById(R.id.appBar_layout);
-        tvAppName = findViewById(R.id.tv_app_name);
-        tvAppVer = findViewById(R.id.tv_app_ver);
-        imgAppIcon = findViewById(R.id.icon);
-        progressBar = findViewById(R.id.progressBar);
-        btnInstall = findViewById(R.id.btn_install);
-        btnSilently = findViewById(R.id.btn_silently);
-        btnCancel = findViewById(R.id.btn_cancel);
-        info_card = findViewById(R.id.info_card);
-
-        perm_index = findViewById(R.id.tv_perm_index);
-        act_index = findViewById(R.id.tv_act_index);
-
-        tv_pkg = findViewById(R.id.tv_pkg);
-        tv_path = findViewById(R.id.tv_path);
-        tv_ver = findViewById(R.id.tv_ver);
-        perm_iv = findViewById(R.id.perm_iv);
-        act_iv = findViewById(R.id.act_iv);
-
-        install_bar = findViewById(R.id.card_bar);
-        tv_install_msg = findViewById(R.id.tv_install_msg);
         perm_view = findViewById(R.id.card_perm);
         act_card = findViewById(R.id.card_act);
-
-        install_del_view = findViewById(R.id.card_del);
         sb_auto_del = findViewById(R.id.sb_auto_del);
-        tv_apk_size = findViewById(R.id.tv_app_size);
+    }
 
-        LinearLayout perm_ll = findViewById(R.id.perm_ll);
-        LinearLayout act_ll = findViewById(R.id.act_ll);
+    private void initData() {
+        ActivityInstallerBinding viewDataBinding = DataBindingUtil.setContentView(this, setActivityView());
+        initializeApk = new InitializeApk();
+        initializeApk.setCancelStr(getString(R.string.text_cancel_installation));
+        initializeApk.setInstallIcon(getDrawable(R.drawable.ic_archive_24px));
+        initializeApk.setInstallText(getString(R.string.install));
 
-        tvAppName.setText(R.string.parsing);
-        btnInstall.setEnabled(true);
-        btnInstall.setOnClickListener(this);
-        btnSilently.setOnClickListener(this);
-        btnCancel.setOnClickListener(this);
-        perm_ll.setOnClickListener(this);
-        act_ll.setOnClickListener(this);
 
-        list_info = new ArrayList<>();
-        perm_adapter = new PermissionAdapter();
-        perm_adapter.setList(list_info);
-        perm_rv.setAdapter(perm_adapter);
+
+        viewDataBinding.setInitializeApk(initializeApk);
+        uriData = getIntent().getData();
+        apkSource = ParsingContentUtil.reflectGetReferrer(this);
+        apkCommander = new APKCommander(InstallerActivity.this, uriData, this, apkSource);
+        permFullBeanArrayList = new ArrayList<>();
+        actStringArrayList = new ArrayList<>();
+        permAdapter = new PermissionAdapter(permFullBeanArrayList, this);
+        actAdapter = new ActivityAdapter(actStringArrayList);
         perm_rv.setLayoutManager(new LinearLayoutManager(this));
-        perm_rv.setOnScrollListener(new TouchRecyclerViewScroll(install_bar));
-
-        list_act = new ArrayList<>();
-        act_adapter = new ActAdapter();
-        act_adapter.setList(list_act);
         act_rv.setLayoutManager(new LinearLayoutManager(this));
-        act_rv.setAdapter(act_adapter);
-        act_rv.setOnScrollListener(new TouchRecyclerViewScroll(install_bar));
+        perm_rv.setAdapter(permAdapter);
+        act_rv.setAdapter(actAdapter);
+        sb_auto_del.setOnCheckedChangeListener((buttonView, isChecked) -> SPUtils.putData(Contents.SP_AUTO_DEL, isChecked));
+    }
+
+    private void setViewStatus() {
+        int isShowPerm = (boolean)SPUtils.getData(Contents.SP_SHOW_PERM, true) ? View.VISIBLE : View.GONE;
+        perm_view.setVisibility(isShowPerm);
+        int isShowAct = (boolean)SPUtils.getData(Contents.SP_SHOW_ACT, true) ? View.VISIBLE : View.GONE;
+        act_card.setVisibility(isShowAct);
+        boolean isAutoDel = (boolean)SPUtils.getData(Contents.SP_AUTO_DEL, false);
+        sb_auto_del.setChecked(isAutoDel);
+    }
+
+    private void initDetails(final ApkInfoBean apkInfo) {
+        initializeApk.setBottomAppVisibility(true);
+        initializeApk.setApkIcon(apkInfo.getIcon());
+        initializeApk.setSourceApkIcon(AppUtils.getApplicationIconByPackageName(this, apkSource));
+
+        Bitmap bitmap = AssemblyUtils.DrawableToBitmap(apkInfo.getIcon());
+        Palette.generateAsync(bitmap, palette -> {
+            assert palette != null;
+            Palette.Swatch vibrantSwatch = palette.getLightVibrantSwatch();
+            int color;
+            if (vibrantSwatch != null) {
+                color = AssemblyUtils.ColorBurn(vibrantSwatch.getRgb());
+            } else {
+                color = getResources().getColor(R.color.colorAccent);
+            }
+            initializeApk.setApkVersionTipsColor(color);
+            AppBarLayout targetView = findViewById(R.id.app_bar_layout);
+            final int width = targetView.getMeasuredWidth();
+            final int height = targetView.getMeasuredHeight();
+            Animator animator = ViewAnimationUtils.createCircularReveal(targetView, width/2, height/2, 0, height);
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    super.onAnimationStart(animation);
+                    targetView.setBackgroundColor(color);
+                }
+            });
+            animator.setDuration(500);
+            animator.start();
+        });
+
+        apkFileName = apkInfo.getAppName();
+        apkFilePath = apkInfo.getApkFile().getPath();
+        perm_view.setVisibility(View.VISIBLE);
+        act_card.setVisibility(View.VISIBLE);
 
 
-        sb_auto_del.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    SPUtils.putData(Config.SP_AUTO_DEL, true);
-                } else {
-                    SPUtils.putData(Config.SP_AUTO_DEL, false);
+        initializeApk.setApkName(apkInfo.getAppName());
+        initializeApk.setApkVersion(apkInfo.getVersion());
+        initializeApk.setApkSource(getString(R.string.text_apk_source, AppUtils.getApplicationNameByPackageName(this, apkSource)));
+        initializeApk.setApkInstallMsg(getResources().getString(R.string.info_pkg_name) + apkInfo.getPackageName() + "\n" +
+                getResources().getString(R.string.info_apk_path) + apkFilePath + "\n" +
+                getResources().getString(R.string.text_size, FileUtils.byteToString(FileUtils.getFileSize(apkFilePath))));
+        if (apkInfo.hasInstalledApp()) {
+            initializeApk.appendApkInstallMsg("\n" + getResources().getString(R.string.info_installed_version) + apkInfo.getInstalledVersion());
+
+            CardView cardView = findViewById(R.id.tip_card);
+            cardView.setAlpha(0.70f);
+            TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, -200, 0);
+            translateAnimation.setDuration(500);
+            cardView.setAnimation(translateAnimation);
+            cardView.startAnimation(translateAnimation);
+            cardView.setVisibility(View.VISIBLE);
+            initializeApk.setApkVersionTips(VersionHelper.CheckVer(this, apkInfo.getVersionCode(), apkInfo.getInstalledVersionCode()));
+        }
+
+        if ((boolean)SPUtils.getData(Contents.SP_SHOW_PERM, true)) {
+            perm_view.setVisibility(View.VISIBLE);
+            if (apkInfo.getPermissions() != null && apkInfo.getPermissions().length > 0) {
+                for (int i = 0; i < apkInfo.getPermissions().length; i++) {
+                    if ((boolean)SPUtils.getData(Contents.SP_SHOW_PERM, true)) {
+                        permFullBeanArrayList.add(new PermFullBean(apkInfo.getPermissions()[i],
+                                apkCommander.getPermInfo().getPermissionGroup().get(i),
+                                apkCommander.getPermInfo().getPermissionDescription().get(i),
+                                apkCommander.getPermInfo().getPermissionLabel().get(i)));
+                    }
                 }
             }
-        });
+        } else {
+            perm_view.setVisibility(View.GONE);
+        }
+        if ((boolean)SPUtils.getData(Contents.SP_SHOW_ACT, true)) {
+            act_card.setVisibility(View.VISIBLE);
+            if (apkInfo.getActivities() != null && apkInfo.getActivities().size() > 0) {
+                actStringArrayList.addAll(apkInfo.getActivities());
+            }
+        } else {
+            act_card.setVisibility(View.GONE);
+        }
+        permAdapter.notifyDataSetChanged();
+        actAdapter.notifyDataSetChanged();
+
+        initializeApk.setPermIndex(getString(R.string.app_permissions, String.valueOf(permAdapter.getItemCount())));
+        initializeApk.setActIndex(getString(R.string.app_act, String.valueOf(actAdapter.getItemCount())));
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.settings_menu, menu);
-        return true;
+    public void onStartParseApk(Uri uri) {
+        initializeApk.setInstallVisibility(false);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivityForResult(intent, 100);
-            return true;
-        } else if (id == R.id.action_night_mode) {
-            if ((boolean)SPUtils.getData(Config.SP_NIGHT_MODE, false)) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                SPUtils.putData(Config.SP_NIGHT_MODE, false);
-                recreate();
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                SPUtils.putData(Config.SP_NIGHT_MODE, true);
-                recreate();
+    public void onApkParsed(ApkInfoBean apkInfo) {
+        if (apkInfo != null && !TextUtils.isEmpty(apkInfo.getPackageName())) {
+            initDetails(apkInfo);
+            initializeApk.setInstallVisibility(true);
+        } else {
+            Uri uri = getIntent().getData();
+            String str = null;
+            if (uri != null) {
+                str = uri.toString();
+            }
+            initializeApk.setApkInstallMsg(getString(R.string.parse_apk_failed, str));
+        }
+    }
+
+    @Override
+    public void onApkPreInstall(ApkInfoBean apkInfo) {
+        findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
+        perm_view.setVisibility(View.GONE);
+        act_card.setVisibility(View.GONE);
+        initializeApk.setInstallEnable(false);
+        initializeApk.setCancelVisibility(false);
+        initializeApk.setSilentlyVisibility(false);
+
+        progressDrawable = new ProgressDrawable();
+        progressDrawable.putColor(Color.WHITE);
+        progressDrawable.animatorDuration(1500);
+        progressDrawable.start();
+        initializeApk.setInstallIcon(progressDrawable);
+        initializeApk.setInstallText(getString(R.string.installing));
+        initializeApk.setApkInstallMsg("");
+    }
+
+    @Override
+    public void onApkInstalled(ApkInfoBean apkInfo, int resultCode) {
+        if (resultCode == 0) {
+            findViewById(R.id.card_del).setVisibility(View.VISIBLE);
+            showToast(getString(R.string.apk_installed, apkInfo.getAppName()));
+            if ((boolean)SPUtils.getData(Contents.SP_VIBRATE, false)) {
+                Vibrator vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+                assert vibrator != null;
+                vibrator.vibrate(800);
+            }
+            progressDrawable.stop();
+            initializeApk.setApkName(getString(R.string.successful));
+            initializeApk.setInstallIcon(getDrawable(R.drawable.ic_offline_bolt_24px));
+            initializeApk.setInstallText(getString(R.string.open_app));
+            initializeApk.setInstallEnable(true);
+            initializeApk.setCancelVisibility(true);
+            initializeApk.setCancelStr(getString(R.string.back));
+        } else {
+            progressDrawable.stop();
+            initializeApk.setInstallIcon(getDrawable(R.drawable.ic_cancel_24px));
+            initializeApk.setInstallText(getString(R.string.failed));
+            initializeApk.setApkName(getString(R.string.failed));
+            initializeApk.setCancelVisibility(true);
+
+            CustomizeDialog.getInstance(this)
+            .setTitle(R.string.dialog_text_title)
+            .setMessage(R.string.use_system_pkg)
+            .setPositiveButton(R.string.dialog_ok, (dialog, which) -> {
+                AssemblyUtils.StartSystemPkgInstall(InstallerActivity.this, apkFilePath);
+                finish();
+            })
+            .setNegativeButton(R.string.dialog_btn_cancel, null)
+            .setCancelable(false).create().show();
+        }
+        findViewById(R.id.progressBar).setVisibility(View.GONE);
+        installComplete = true;
+    }
+
+    @Override
+    public void onInstallLog(ApkInfoBean apkInfo, String logText) {
+        initializeApk.appendApkInstallMsg(logText);
+    }
+
+    private void isAutoDel() {
+        if ((boolean)SPUtils.getData(Contents.SP_AUTO_DEL, false)) {
+            if (new File(apkFilePath).delete()) {
+                showToast(getString(R.string.apk_deleted, apkFileName));
             }
         }
-        return super.onOptionsItemSelected(item);
     }
 
-    private void loadSettings() {
-        if (apkCommander != null && apkCommander.getApkInfo() != null && apkCommander.getApkInfo().getApkFile() != null) {
-            initDetails(apkCommander.getApkInfo());
-        }
-        if ((boolean)SPUtils.getData(Config.SP_AUTO_DEL, false)) {
-            sb_auto_del.setChecked(true);
+    public void installFab(View view) {
+        if (installComplete) {
+            startActivity(getPackageManager().getLaunchIntentForPackage(apkCommander.getApkInfo().getPackageName()));
+            isAutoDel();
+            finish();
         } else {
-            sb_auto_del.setChecked(false);
+            apkCommander.startInstall();
         }
+    }
+
+    public void cancelButton(View view) {
+        isAutoDel();
+        finish();
+    }
+
+    public void silentlyButton(View view) {
+        Intent intent = new Intent(InstallerActivity.this, SilentlyInstallActivity.class);
+        intent.setData(uriData);
+        intent.putExtra("apkSource", apkSource);
+        startActivity(intent);
+        finish();
+    }
+
+    public void isShowPerm(View view) {
+        if (showPerm) {
+            perm_rv.setVisibility(View.GONE);
+            initializeApk.setPermArrowDirect(R.drawable.ic_arrow_right);
+            showPerm = false;
+        } else {
+            perm_rv.setVisibility(View.VISIBLE);
+            initializeApk.setPermArrowDirect(R.drawable.ic_arrow_open);
+            showPerm = true;
+        }
+    }
+
+    public void isShowAct(View view) {
+        if (showActivity) {
+            act_rv.setVisibility(View.GONE);
+            initializeApk.setActArrowDirect(R.drawable.ic_arrow_right);
+            showActivity = false;
+        } else {
+            act_rv.setVisibility(View.VISIBLE);
+            initializeApk.setActArrowDirect(R.drawable.ic_arrow_open);
+            showActivity = true;
+        }
+    }
+
+    public void isNightMode(View view) {
+        if ((boolean)SPUtils.getData(Contents.SP_NIGHT_MODE, false)) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            SPUtils.putData(Contents.SP_NIGHT_MODE, false);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            SPUtils.putData(Contents.SP_NIGHT_MODE, true);
+        }
+    }
+
+    public void settingsButton(View view) {
+        Intent intent_settings = new Intent(this, SettingsActivity.class);
+        startActivityForResult(intent_settings, 100);
+    }
+
+    public void toSourceApkSettings(View view) {
+        AppUtils.toSelfSetting(this, apkSource);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        tag = true;
-        if (!tag_install) {
-            loadSettings();
-        }
-    }
-
-    private void initDetails(final ApkInfo apkInfo) {
-        tvAppName.setText(apkInfo.getAppName());
-        tvAppVer.setText(apkInfo.getVersion());
-
-        Bitmap bitmap = MoreTools.DrawableToBitmap(apkInfo.getIcon());
-        Palette.generateAsync(bitmap, new Palette.PaletteAsyncListener() {
-            @Override
-            public void onGenerated(Palette palette) {
-                Palette.Swatch vibrantSwatch = palette.getLightVibrantSwatch();
-                if (vibrantSwatch != null) {
-                    mAppBarLayout.setBackgroundColor(MoreTools.ColorBurn(vibrantSwatch.getRgb()));
-                }
-            }
-        });
-
-        info_card.setVisibility(View.VISIBLE);
-        perm_view.setVisibility(View.VISIBLE);
-        act_card.setVisibility(View.VISIBLE);
-        install_bar.setVisibility(View.VISIBLE);
-        imgAppIcon.setImageDrawable(apkInfo.getIcon());
-
-        apk_name = apkInfo.getAppName();
-        path_str = apkInfo.getApkFile().getPath();
-        tv_apk_size.setText(getResources().getString(R.string.text_size, FileUtils.byteToString(FileUtils.getFileSize(path_str))));
-
-        if (!tag) {
-            tv_pkg.append(apkInfo.getPackageName());
-            tv_path.append(path_str);
-            if (apkInfo.hasInstalledApp()) {
-                tv_ver.setVisibility(View.VISIBLE);
-                tv_ver.append(apkInfo.getInstalledVersion());
-
-                CardView cardView = findViewById(R.id.tip_card);
-                TextView tv = findViewById(R.id.tv_ver_tip);
-
-                TranslateAnimation translateAnimation = new TranslateAnimation(-200, 0, 0, 0);
-                translateAnimation.setDuration(500);
-                cardView.setAnimation(translateAnimation);
-                cardView.startAnimation(translateAnimation);
-                cardView.setVisibility(View.VISIBLE);
-
-                switch (VerHelper.CheckVer(apkInfo.getVersionCode(),  apkInfo.getInstalledVersionCode())) {
-                    case 3:
-                        tv.setText(R.string.text_equal_ver);
-                        break;
-                    case 2:
-                        tv.setText(R.string.text_low_ver);
-                        final CustomDialog dialog = new CustomDialog(this);
-                        dialog.setTitle(getResources().getString(R.string.dialog_text_title));
-                        dialog.setMessage(getResources().getString(R.string.low_ver_msg));
-                        dialog.setNoOnclickListener(getResources().getString(R.string.dialog_ok), new CustomDialog.onNoOnclickListener() {
-                            @Override
-                            public void onNoClick() {
-                                dialog.dismiss();
-                            }
-                        });
-                        dialog.setCancelable(false);
-                        dialog.create();
-                        dialog.show();
-                        break;
-                    case 1:
-                        tv.setText(R.string.text_new_ver);
-                        break;
-                }
-            }
-
-        }
-        if ((boolean)SPUtils.getData(Config.SP_SHOW_PERM, true)) {
-            perm_view.setVisibility(View.VISIBLE);
-            act_card.setVisibility(View.VISIBLE);
-            if (apkInfo.getPermissions() != null && apkInfo.getPermissions().length > 0) {
-
-                int i = 0;
-                for (String perm : apkInfo.getPermissions()) {
-                    if (!tag && (boolean)SPUtils.getData(Config.SP_SHOW_PERM, true)) {
-                        list_info.add(new InfoBean(perm, apkCommander.getInfo().getPermissionDescription().get(i++)));
-                    }
-                }
-            }
-
-        } else {
-            perm_view.setVisibility(View.GONE);
-        }
-
-        if ((boolean)SPUtils.getData(Config.SP_SHOW_ACT, true)) {
-            if (apkInfo.getActivities() != null && apkInfo.getActivities().size() > 0) {
-                list_act.addAll(apkInfo.getActivities());
-            }
-        } else {
-            act_card.setVisibility(View.GONE);
-        }
-        perm_adapter.notifyDataSetChanged();
-        act_adapter.notifyDataSetChanged();
-        perm_index.setText(getResources().getString(R.string.app_permissions, String.valueOf(perm_adapter.getItemCount())));
-        act_index.setText(getResources().getString(R.string.app_act, String.valueOf(act_adapter.getItemCount())));
+        if (installComplete)
+            setViewStatus();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (apkCommander.getApkInfo() != null && apkCommander.getApkInfo().isFakePath())
-            apkCommander.getApkInfo().getApkFile().delete();
-    }
-
-    @Override
-    public void onStartParseApk(Uri uri) {
-        btnInstall.setVisibility(View.GONE);
-        tv_install_msg.setText(R.string.parsing);
-    }
-
-    @Override
-    public void onApkParsed(ApkInfo apkInfo) {
-        list_info.clear();
-        if (apkInfo != null && !TextUtils.isEmpty(apkInfo.getPackageName())) {
-            initDetails(apkInfo);
-            btnInstall.setVisibility(View.VISIBLE);
-            tv_install_msg.setVisibility(View.GONE);
-        } else {
-            Uri uri = getIntent().getData();
-            String s = null;
-            if (uri != null) {
-                s = uri.toString();
+        if (apkCommander.getApkInfo() != null && apkCommander.getApkInfo().isFakePath()) {
+            if (!apkCommander.getApkInfo().getApkFile().delete()) {
+                Log.e("InstallerActivity", "failed to delete！");
             }
-            tv_install_msg.setText(getString(R.string.parse_apk_failed, s));
-        }
-    }
-
-    @Override
-    public void onApkPreInstall(ApkInfo apkInfo) {
-        perm_view.setVisibility(View.GONE);
-        act_card.setVisibility(View.GONE);
-        tvAppName.setText(R.string.installing);
-        tv_install_msg.setText("");
-
-        progressBar.setVisibility(
-                (boolean)SPUtils.getData(Config.SP_PROGRESS, true) ?
-                        View.VISIBLE : View.INVISIBLE);
-        install_bar.setVisibility(View.INVISIBLE);
-    }
-
-    @Override
-    public void onApkInstalled(ApkInfo apkInfo, int resultCode) {
-        getString(R.string.install_finished_with_result_code, resultCode);
-        btnInstall.setEnabled(false);
-        btnSilently.setEnabled(false);
-        if (resultCode == 0) {
-            ToastUtil.showToast(this, getString(R.string.apk_installed, apkInfo.getAppName()), Toast.LENGTH_SHORT);
-            if ((boolean)SPUtils.getData(Config.SP_VIBRATE, false)) {
-                Vibrator vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
-                vibrator.vibrate(800);
-            }
-
-            tvAppName.setText(R.string.successful);
-            btnInstall.setEnabled(true);
-            btnInstall.setText(R.string.open_app);
-            btnCancel.setText(R.string.text_install_complete);
-            btnSilently.setVisibility(View.GONE);
-            install_del_view.setVisibility(View.VISIBLE);
-        } else {
-            tvAppName.setText(R.string.failed);
-            btnInstall.setTextColor(Color.GRAY);
-            btnSilently.setTextColor(Color.GRAY);
-            final CustomDialog dialog = new CustomDialog(this);
-            dialog.setTitle(getResources().getString(R.string.dialog_text_title));
-            dialog.setMessage(getResources().getString(R.string.use_system_pkg));
-            dialog.setYesOnclickListener(getResources().getString(R.string.dialog_ok), new CustomDialog.onYesOnclickListener() {
-                @Override
-                public void onYesClick() {
-                    Intent intent = new Intent();
-                    String act = "";
-                    String sys_pkg_name;
-                    if ((boolean)SPUtils.getData(Config.SP_USE_SYS_PKG, false)) {
-                        sys_pkg_name = (String) SPUtils.getData(Config.SYS_PKG_NAME, Config.SYS_PKG_NAME);
-                    } else {
-                        sys_pkg_name = Config.SYS_PKG_NAME;
-                    }
-                    try {
-                        PackageManager packageManager = getPackageManager();
-                        PackageInfo packageInfo = packageManager.getPackageInfo(sys_pkg_name, PackageManager.GET_ACTIVITIES);
-                        act = packageInfo.activities[0].name;
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    ComponentName cn = new ComponentName(sys_pkg_name, act);
-                    intent.setComponent(cn);
-                    Uri apkUri = FileProvider.getUriForFile(InstallerActivity.this, Config.PROVIDER_STR,
-                            new File(path_str));
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    intent.setDataAndType(apkUri, Config.URI_DATA_TYPE);
-                    startActivity(intent);
-                    finish();
-                }
-            });
-            dialog.setNoOnclickListener(getResources().getString(R.string.dialog_btn_cancel), new CustomDialog.onNoOnclickListener() {
-                @Override
-                public void onNoClick() {
-                    dialog.dismiss();
-                }
-            });
-            dialog.setCancelable(false);
-            dialog.create();
-            dialog.show();
-        }
-        progressBar.setVisibility(View.GONE);
-        install_bar.setVisibility(View.VISIBLE);
-        tag_install = true;
-    }
-
-    @Override
-    public void onInstallLog(ApkInfo apkInfo, String logText) {
-        tv_install_msg.setVisibility(View.VISIBLE);
-        tv_pkg.setVisibility(View.GONE);
-        tv_path.setVisibility(View.GONE);
-        tv_ver.setVisibility(View.GONE);
-        tv_apk_size.setVisibility(View.GONE);
-        tv_install_msg.append(logText + "\n");
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_install:
-                if (btnInstall.getText().toString().equalsIgnoreCase(getString(R.string.open_app))) {
-                    Intent intent = getPackageManager().getLaunchIntentForPackage(apkCommander.getApkInfo().getPackageName());
-                    startActivity(intent);
-                    finish();
-                } else {
-                    apkCommander.startInstall();
-                }
-                break;
-            case R.id.btn_silently:
-                Intent intent = new Intent(this, BackgroundInstallActivity.class);
-                intent.setData(getIntent().getData());
-                startActivity(intent);
-                finish();
-                break;
-            case R.id.perm_ll:
-                if (tag_perm) {
-                    perm_rv.setVisibility(View.GONE);
-                    perm_iv.setImageResource(R.drawable.ic_arrow_right);
-                    tag_perm = false;
-                } else {
-                    perm_rv.setVisibility(View.VISIBLE);
-                    perm_iv.setImageResource(R.drawable.ic_arrow_open);
-                    tag_perm = true;
-                }
-                break;
-            case R.id.act_ll:
-                if (tag_act) {
-                    act_rv.setVisibility(View.GONE);
-                    act_iv.setImageResource(R.drawable.ic_arrow_right);
-                    tag_act = false;
-                } else {
-                    act_rv.setVisibility(View.VISIBLE);
-                    act_iv.setImageResource(R.drawable.ic_arrow_open);
-                    tag_act = true;
-                }
-                break;
-            case R.id.btn_cancel:
-                if ((boolean)SPUtils.getData(Config.SP_AUTO_DEL, false)) {
-                    if (!btnCancel.getText().equals(getResources().getString(R.string.back))) {
-                        File file = new File(path_str);
-                        file.delete();
-                        ToastUtil.showToast(this, getString(R.string.apk_deleted, apk_name), Toast.LENGTH_SHORT);
-                    }
-                }
-                finish();
-                break;
         }
     }
 

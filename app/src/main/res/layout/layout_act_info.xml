@@ -1,42 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <LinearLayout
-        android:id="@+id/act_ll"
+    <data>
+        <variable
+            name="InitializeApk"
+            type="com.tokyonth.installer.bean.InitializeApk" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_act"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="12dp">
+        android:layout_margin="4dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/colorCard"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
 
-        <TextView
-            android:id="@+id/tv_act_index"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/app_act"
-            android:textColor="@color/colorText"
-            android:textStyle="bold" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".activity.InstallerActivity">
 
-        <ImageView
-            android:id="@+id/act_iv"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/act_ll"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow_right"
-            android:tint="@color/colorText"/>
+            android:gravity="center"
+            android:padding="12dp"
+            android:onClick="isShowAct"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@{InitializeApk.actIndex}"
+                android:textColor="@color/colorText"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@{InitializeApk.actArrowDirect}"
+                android:tint="@color/colorText" />
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/act_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            android:fadingEdge="none"
+            android:overScrollMode="never" />
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/act_rv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:visibility="gone" />
-
-</LinearLayout>
-
-
+    </com.google.android.material.card.MaterialCardView>
+</layout>

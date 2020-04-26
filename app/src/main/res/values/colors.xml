@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#f5f5f5</color>
-    <color name="colorPrimaryDark">#f5f5f5</color>
+    <color name="colorPrimary">#EFF0F4</color>
+    <color name="colorPrimaryDark">#EFF0F4</color>
     <color name="colorAccent">#2196F3</color>
-    <color name="colorText">#000000</color>
+    <color name="colorText">#444444</color>
+    <color name="colorTextSub">#757575</color>
     <color name="colorCard">#FFFFFF</color>
-    <color name="colorBG">#f5f5f5</color>
-    <color name="night_layer">#0000</color>
-    <color name="colorline">#E4E4E4</color>
+    <color name="colorToastBackGround">#313236</color>
+    <color name="colorBackGround">#EFF0F4</color>
+    <color name="colorNightLayer">#00FFFFFF</color>
+    <color name="colorLine">#E4E4E4</color>
     <color name="colorSvg">#444444</color>
+
+    <color name="color0">#673AB7</color>
+    <color name="color1">#009688</color>
+    <color name="color2">#F44336</color>
 </resources>

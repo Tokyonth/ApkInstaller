@@ -1,22 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:orientation="horizontal"
-    android:padding="12dp">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:layout_width="0dp"
+    <data>
+        <variable
+            name="InitializeApk"
+            type="com.tokyonth.installer.bean.InitializeApk" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_del"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/text_del_apk"
-        android:textColor="@color/colorText"
-        android:textStyle="bold" />
+        android:layout_margin="4dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="@color/colorCard"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
 
-    <com.kyleduo.switchbutton.SwitchButton
-        android:id="@+id/sb_auto_del"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/text_del_apk"
+                android:textColor="@color/colorText"
+                android:textStyle="bold" />
+
+            <com.kyleduo.switchbutton.SwitchButton
+                android:id="@+id/sb_auto_del"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

@@ -6,10 +6,6 @@
     <string name="install_in_background">Silently Install Under ROOT</string>
     <string name="parsing">Parsing…</string>
     <string name="action_settings">Settings</string>
-    <string name="prefs_more">More</string>
-    <string name="title_about">About</string>
-    <string name="title_recent_mission">Recent Mission</string>
-    <string name="summary_show_recent_mission">Is it displayed in the latest task?</string>
     <string name="install_failed">%s install failed</string>
     <string name="apk_installed">%s has been installed</string>
     <string name="start_install">Start install %s</string>
@@ -27,8 +23,6 @@
     <string name="install_silently">Silently</string>
     <string name="unable_to_install_apk">Unable to install apk</string>
     <string name="open_app">OPEN</string>
-    <string name="summary_display_progress_bar">Display progress bar while installing</string>
-    <string name="title_display_progress_bar">Display progress bar</string>
     <string name="title_progress_failure">Failure</string>
     <string name="title_progress_success">Success</string>
     <string name="summary_auto_delete">Automatically remove the installation package after successful installation</string>
@@ -54,7 +48,6 @@
     <string name="vibrate">Vibrate</string>
     <string name="dialog_text_title">Tips</string>
     <string name="dialog_text_msg">Msg</string>
-    <string name="sign_error">The signature of the currently installed application is inconsistent. You need to uninstall the installed version to continue the installation.</string>
     <string name="uninstall">Uninstall</string>
     <string name="dialog_ok">OK</string>
     <string name="low_ver_msg">Installing old version, some devices not support degraded installation, which may cause installation failure!</string>
@@ -71,4 +64,21 @@
     <string name="text_hint_input_pkg">Please enter package name</string>
     <string name="text_title_input">Input</string>
     <string name="text_input_empty">Input content is empty</string>
+    <string name="dialog_no_longer_prompt">No longer prompt</string>
+    <string name="text_apk_source">Source:%s</string>
+    <string name="text_apk_source_more">Click to view details</string>
+    <string name="text_apk_cache">APK Installation package cache size:%s\nClick please</string>
+    <string name="text_apk_cache_complete">Clean up!</string>
+    <string name="text_cancel_installation">Cancel</string>
+    <string name="text_follow_system">Follow system</string>
+    <string name="text_follow_system_sub">Follow system night mode</string>
+    <string name="text_settings_version">Version : </string>
+    <string name="text_settings_author">Author : TOKYONTH</string>
+    <string name="text_settings_pkg">com.android.packageinstaller</string>
+    <string name="text_i_know">I Know</string>
+    <string name="text_no_description">No corresponding description</string>
+    <string name="text_uninstall">Uninstall</string>
+    <string name="text_confirm_uninstall_app">Are you sure you want to uninstall %s?</string>
+    <string name="text_uninstall_complete">Uninstallation complete!</string>
+    <string name="text_uninstall_failure">Uninstall failed!</string>
 </resources>

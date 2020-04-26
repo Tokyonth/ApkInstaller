@@ -1,125 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinator_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorBG"
-    android:fitsSystemWindows="true">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBar_layout"
+    <data>
+        <variable
+            name="InitializeApk"
+            type="com.tokyonth.installer.bean.InitializeApk" />
+    </data>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="260dp"
-        android:fitsSystemWindows="true"
-        android:background="@color/colorAccent"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        app:elevation="0dp">
+        android:layout_height="match_parent"
+        android:background="@color/colorBackGround"
+        tools:context=".activity.InstallerActivity">
 
-        <RelativeLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/icon_card"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="-4dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="4dp"
+            app:cardBackgroundColor="@color/colorCard"
+            app:cardPreventCornerOverlap="true"
+            app:cardUseCompatPadding="true"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp">
 
-            <View
-                android:background="@color/night_layer"
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/app_bar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="240dp"
+                android:background="@color/colorCard"
+                android:theme="@style/AppTheme.AppBarOverlay"
+                app:elevation="0dp">
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_marginTop="24dp"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:title=" "
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginStart="-42dp"
-                android:id="@+id/tip_card"
-                android:visibility="invisible"
-                app:cardBackgroundColor="@color/colorCard"
-                app:cardCornerRadius="32dp"
-                app:cardElevation="2dp"
-                app:cardPreventCornerOverlap="true"
-                app:cardUseCompatPadding="true">
-
-                <TextView
-                    android:id="@+id/tv_ver_tip"
-                    android:textColor="@color/colorText"
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="12dp"
-                    android:layout_marginStart="26dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    tools:text="@string/text_new_ver"/>
+                    android:gravity="center">
 
-            </androidx.cardview.widget.CardView>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/colorNightLayer" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/toolbar"
-                android:gravity="center"
-                android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
 
-                <com.tokyonth.installer.ui.CircleImageView
-                    android:id="@+id/icon"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="12dp"
-                    android:src="@mipmap/ic_launcher_round"
-                    android:scaleType="fitXY"
-                    app:layout_anchorGravity="center"/>
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="@string/title_night_mode"
+                            android:onClick="isNightMode"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_opacity_24px"
+                            android:tint="@android:color/white" />
 
-                <TextView
-                    android:id="@+id/tv_app_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    android:textSize="22sp"
-                    android:layout_marginTop="16dp"
-                    tools:text="@string/app_name"/>
+                        <ImageButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:backgroundTintMode="src_in"
+                            android:contentDescription="@string/action_settings"
+                            android:onClick="settingsButton"
+                            android:padding="6dp"
+                            android:src="@drawable/ic_settings_24px"
+                            android:tint="@android:color/white" />
 
-                <TextView
-                    android:id="@+id/tv_app_ver"
-                    android:layout_marginTop="6dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@android:color/white"
-                    tools:text="@string/info_version"/>
+                    </LinearLayout>
 
-            </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical">
 
-        </RelativeLayout>
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/tip_card"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="invisible"
+                            app:cardBackgroundColor="@color/colorCard"
+                            app:cardCornerRadius="32dp"
+                            app:cardElevation="0.5dp"
+                            app:cardPreventCornerOverlap="true"
+                            app:cardUseCompatPadding="true">
 
-    </com.google.android.material.appbar.AppBarLayout>
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:paddingLeft="26dp"
+                                android:paddingTop="10dp"
+                                android:paddingRight="26dp"
+                                android:paddingBottom="10dp"
+                                android:text="@{InitializeApk.apkVersionTips}"
+                                android:textColor="@{InitializeApk.apkVersionTipsColor}" />
 
-    <include layout="@layout/content_installer"/>
+                        </com.google.android.material.card.MaterialCardView>
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_margin="12dp"
-        android:layout_gravity="bottom"
-        android:id="@+id/card_bar"
-        android:visibility="gone"
-        app:cardBackgroundColor="@color/colorCard"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="6dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true">
+                        <ImageView
+                            android:layout_width="58dp"
+                            android:layout_height="58dp"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="8dp"
+                            android:scaleType="fitXY"
+                            android:src="@{InitializeApk.apkIcon}"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="@{InitializeApk.apkName}"
+                            android:textColor="@android:color/white"
+                            android:textSize="22sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="@{InitializeApk.apkVersion}"
+                            android:textColor="@android:color/white" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </com.google.android.material.appbar.AppBarLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
         <include
-            layout="@layout/install_bar"/>
+            layout="@layout/content_installer"
+            app:InitializeApk="@{InitializeApk}" />
 
-    </androidx.cardview.widget.CardView>
+    </RelativeLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
