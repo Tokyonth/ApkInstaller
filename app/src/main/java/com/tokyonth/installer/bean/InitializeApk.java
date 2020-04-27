@@ -1,12 +1,9 @@
 package com.tokyonth.installer.bean;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
-import androidx.databinding.BindingConversion;
 
 import com.tokyonth.installer.BR;
 
@@ -91,9 +88,6 @@ public class InitializeApk extends BaseObservable {
     }
 
     private boolean bottomAppVisibility = false;
-
-
-
 
 
     @Bindable

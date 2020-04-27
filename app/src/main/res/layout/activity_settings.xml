@@ -2,9 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/coordinator_layout"
     android:orientation="vertical"
     android:background="@color/colorBackGround"
-    android:id="@+id/coordinator_layout"
     tools:context=".activity.SettingsActivity">
 
     <TextView
