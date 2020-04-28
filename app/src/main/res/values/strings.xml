@@ -79,6 +79,6 @@
     <string name="text_no_description">No corresponding description</string>
     <string name="text_uninstall">Uninstall</string>
     <string name="text_confirm_uninstall_app">Are you sure you want to uninstall %s?</string>
-    <string name="text_uninstall_complete">Uninstallation complete!</string>
+    <string name="text_uninstall_complete">Uninstall complete!</string>
     <string name="text_uninstall_failure">Uninstall failed!</string>
 </resources>

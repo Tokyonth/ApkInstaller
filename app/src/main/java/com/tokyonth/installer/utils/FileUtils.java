@@ -1,4 +1,4 @@
-package com.tokyonth.installer.utils.file;
+package com.tokyonth.installer.utils;
 
 import android.text.TextUtils;
 import android.util.Log;

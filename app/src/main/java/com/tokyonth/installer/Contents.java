@@ -17,7 +17,7 @@ public class Contents {
     public static String SE_LINUX_COMMAND = "setenforce permissive";
     public static String INSTALL_COMMAND = "pm install -r --user 0 ";
     public static String UNINSTALL_COMMAND = "pm uninstall -k --user 0 ";
-    public static String SP_NO_TIP_VERSION = "no_version_tips";
+    public static String SP_NO_TIP_VERSION = "not_show_version_tips";
     public static String CACHE_APK_DIR = "/storage/emulated/0/Android/data/com.tokyonth.installer/cache/";
     public static String MT2_PKG_NAME = "bin.mt.plus";
 

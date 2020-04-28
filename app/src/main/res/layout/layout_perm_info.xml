@@ -1,25 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <data>
-        <variable
-            name="InitializeApk"
-            type="com.tokyonth.installer.bean.InitializeApk" />
-    </data>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_perm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="@color/colorCard"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="0dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true">
+    android:id="@+id/card_perm"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:visibility="gone"
+    app:cardBackgroundColor="@color/colorCard"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,24 +26,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:onClick="isShowPerm"
             android:orientation="horizontal"
             android:padding="12dp"
-            android:onClick="isShowPerm">
+            tools:ignore="UnusedAttribute,UseCompoundDrawables">
 
             <TextView
+                android:id="@+id/tv_perm_quantity"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@{InitializeApk.permIndex}"
                 android:textColor="@color/colorText"
                 android:textStyle="bold" />
 
             <ImageView
+                android:id="@+id/iv_perm_arrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@{InitializeApk.permArrowDirect}"
-                android:contentDescription="@string/app_name"
-                android:tint="@color/colorText" />
+                android:tint="@color/colorText"
+                android:src="@drawable/ic_arrow_right"
+                tools:ignore="ContentDescription" />
 
         </LinearLayout>
 
@@ -59,12 +54,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:visibility="gone"
             android:fadingEdge="none"
-            android:overScrollMode="never" />
+            android:overScrollMode="never"
+            android:visibility="gone" />
 
     </LinearLayout>
 
-    </com.google.android.material.card.MaterialCardView>
-
-</layout>
+</com.google.android.material.card.MaterialCardView>

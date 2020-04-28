@@ -1,4 +1,4 @@
-package com.tokyonth.installer.utils.helper;
+package com.tokyonth.installer.utils;
 
 import android.content.Context;
 import android.content.Intent;

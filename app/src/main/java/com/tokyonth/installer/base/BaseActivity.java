@@ -14,9 +14,9 @@ import androidx.core.content.ContextCompat;
 
 import com.tokyonth.installer.Contents;
 import com.tokyonth.installer.R;
-import com.tokyonth.installer.utils.file.SPUtils;
-import com.tokyonth.installer.utils.ui.StatusBarColorUtils;
-import com.tokyonth.installer.utils.ui.ToastUtil;
+import com.tokyonth.installer.utils.SPUtils;
+import com.tokyonth.installer.utils.StatusBarColorUtils;
+import com.tokyonth.installer.utils.ToastUtil;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -36,7 +36,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             finish();
         } else {
             if (checkPermission()) {
-                initActivity();
+                initActivity(savedInstanceState);
             } else {
                 Toast.makeText(this, getResources().getString(R.string.no_permissions), Toast.LENGTH_SHORT).show();
                 finish();
@@ -46,7 +46,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public abstract int setActivityView();
 
-    public abstract void initActivity();
+    public abstract void initActivity(@Nullable Bundle savedInstanceState);
 
     public boolean checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

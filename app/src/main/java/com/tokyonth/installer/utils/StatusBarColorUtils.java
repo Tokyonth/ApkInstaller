@@ -1,4 +1,4 @@
-package com.tokyonth.installer.utils.ui;
+package com.tokyonth.installer.utils;
 
 import android.app.Activity;
 import android.os.Build;
@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
  * Created by wangchende on 15-9-7.
  */
 public class StatusBarColorUtils {
+
     private static Method mSetStatusBarColorIcon;
     private static Method mSetStatusBarDarkIcon;
     private static Field mStatusBarColorFiled;
@@ -48,7 +49,7 @@ public class StatusBarColorUtils {
      *
      * @param color 颜色
      * @param level 级别
-     * @return
+     * @return 是否偏黑色
      */
     public static boolean isBlackColor(int color, int level) {
         int grey = toGrey(color);
@@ -59,7 +60,7 @@ public class StatusBarColorUtils {
      * 颜色转换成灰度值
      *
      * @param rgb 颜色
-     * @return　灰度值
+     * @return 灰度值
      */
     public static int toGrey(int rgb) {
         int blue = rgb & 0x000000FF;
@@ -146,8 +147,8 @@ public class StatusBarColorUtils {
     /**
      * 设置状态栏颜色
      *
-     * @param view
-     * @param dark
+     * @param view view
+     * @param dark isDark
      */
     private static void setStatusBarDarkIcon(View view, boolean dark) {
         int oldVis = view.getSystemUiVisibility();
@@ -165,8 +166,8 @@ public class StatusBarColorUtils {
     /**
      * 设置状态栏颜色
      *
-     * @param window
-     * @param color
+     * @param window window
+     * @param color color
      */
     private static void setStatusBarColor(Window window, int color) {
         WindowManager.LayoutParams winParams = window.getAttributes();

@@ -1,48 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_del"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:visibility="gone"
+    app:cardBackgroundColor="@color/colorCard"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="true">
 
-    <data>
-        <variable
-            name="InitializeApk"
-            type="com.tokyonth.installer.bean.InitializeApk" />
-    </data>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_del"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="@color/colorCard"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="0dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true">
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="12dp">
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="12dp">
+            android:layout_weight="1"
+            android:text="@string/text_del_apk"
+            android:textColor="@color/colorText"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/text_del_apk"
-                android:textColor="@color/colorText"
-                android:textStyle="bold" />
+        <com.kyleduo.switchbutton.SwitchButton
+            android:id="@+id/sb_auto_del"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-            <com.kyleduo.switchbutton.SwitchButton
-                android:id="@+id/sb_auto_del"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+    </LinearLayout>
 
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-</layout>
+</com.google.android.material.card.MaterialCardView>

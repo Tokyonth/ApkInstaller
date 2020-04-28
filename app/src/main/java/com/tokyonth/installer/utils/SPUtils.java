@@ -1,4 +1,4 @@
-package com.tokyonth.installer.utils.file;
+package com.tokyonth.installer.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

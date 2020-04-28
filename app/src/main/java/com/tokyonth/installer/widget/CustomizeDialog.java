@@ -5,7 +5,7 @@ import android.content.Context;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tokyonth.installer.Contents;
 import com.tokyonth.installer.R;
-import com.tokyonth.installer.utils.file.SPUtils;
+import com.tokyonth.installer.utils.SPUtils;
 
 public class CustomizeDialog extends MaterialAlertDialogBuilder {
 

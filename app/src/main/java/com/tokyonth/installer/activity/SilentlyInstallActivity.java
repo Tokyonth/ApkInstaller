@@ -1,7 +1,10 @@
 package com.tokyonth.installer.activity;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import com.tokyonth.installer.Contents;
 import com.tokyonth.installer.R;
@@ -9,7 +12,7 @@ import com.tokyonth.installer.apk.APKCommander;
 import com.tokyonth.installer.base.BaseActivity;
 import com.tokyonth.installer.bean.ApkInfoBean;
 import com.tokyonth.installer.apk.CommanderCallback;
-import com.tokyonth.installer.utils.file.SPUtils;
+import com.tokyonth.installer.utils.SPUtils;
 
 public class SilentlyInstallActivity extends BaseActivity implements CommanderCallback {
 
@@ -21,7 +24,7 @@ public class SilentlyInstallActivity extends BaseActivity implements CommanderCa
     }
 
     @Override
-    public void initActivity() {
+    public void initActivity(@Nullable Bundle savedInstanceState) {
         if (getIntent().getData() != null) {
             String apkSource = getIntent().getStringExtra("apkSource");
             apkCommander = new APKCommander(this, getIntent().getData(), this, apkSource);
@@ -50,7 +53,7 @@ public class SilentlyInstallActivity extends BaseActivity implements CommanderCa
     public void onApkInstalled(ApkInfoBean apkInfo, int resultCode) {
         if (resultCode == 0) {
             showToast(getString(R.string.apk_installed, apkInfo.getAppName()));
-            if (!apkInfo.isFakePath() && (boolean)SPUtils.getData(Contents.SP_AUTO_DEL, false)) {
+            if (!apkInfo.isFakePath() && (boolean) SPUtils.getData(Contents.SP_AUTO_DEL, false)) {
                 showToast(getString(R.string.apk_deleted, apkInfo.getApkFile().getName()));
             }
         } else {

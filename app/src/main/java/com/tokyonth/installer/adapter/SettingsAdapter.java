@@ -12,7 +12,7 @@ import com.kyleduo.switchbutton.SwitchButton;
 import com.tokyonth.installer.Contents;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.bean.SettingsBean;
-import com.tokyonth.installer.utils.file.SPUtils;
+import com.tokyonth.installer.utils.SPUtils;
 import com.tokyonth.installer.widget.BurnRoundView;
 
 import java.util.ArrayList;

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class ActivityAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private ArrayList<String> list;
-    
+
     public ActivityAdapter(ArrayList<String> list) {
         this.list = list;
     }

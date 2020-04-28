@@ -16,7 +16,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         app:burnColor="@color/colorAccent"
-        app:burnSrc="@drawable/abc_vector_test"
+        app:burnSrc="@drawable/ic_settings_24px"
         tools:ignore="PrivateResource" />
 
     <LinearLayout

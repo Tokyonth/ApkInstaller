@@ -7,7 +7,7 @@ import android.content.Context;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.tokyonth.installer.Contents;
-import com.tokyonth.installer.utils.file.SPUtils;
+import com.tokyonth.installer.utils.SPUtils;
 
 public class BaseApplication extends Application {
 

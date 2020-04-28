@@ -1,4 +1,4 @@
-package com.tokyonth.installer.utils.file;
+package com.tokyonth.installer.utils;
 // Copyright (C) 2018 Bave Lee
 // This file is part of Quick-Android.
 // https://github.com/Crixec/Quick-Android

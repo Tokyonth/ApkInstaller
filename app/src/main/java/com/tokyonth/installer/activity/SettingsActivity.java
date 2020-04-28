@@ -1,6 +1,7 @@
 package com.tokyonth.installer.activity;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,11 +15,12 @@ import com.kyleduo.switchbutton.SwitchButton;
 import com.tokyonth.installer.Contents;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.adapter.SettingsAdapter;
+import com.tokyonth.installer.utils.StatusBarColorUtils;
 import com.tokyonth.installer.widget.CustomizeDialog;
 import com.tokyonth.installer.bean.SettingsBean;
-import com.tokyonth.installer.utils.helper.AppUtils;
-import com.tokyonth.installer.utils.file.FileUtils;
-import com.tokyonth.installer.utils.file.SPUtils;
+import com.tokyonth.installer.utils.AppUtils;
+import com.tokyonth.installer.utils.FileUtils;
+import com.tokyonth.installer.utils.SPUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,6 +35,8 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusBarColorUtils.setStatusBarDarkIcon(this,
+                !(boolean) SPUtils.getData(Contents.SP_NIGHT_MODE, false));
         setContentView(R.layout.activity_settings);
         initViewData();
         initSettings();
@@ -80,7 +84,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         findViewById(R.id.card_apk_cache).setOnClickListener(view -> {
             FileUtils.deleteFolderFile(Contents.CACHE_APK_DIR, true);
-            Snackbar.make(findViewById(R.id.coordinator_layout) ,getString(R.string.text_apk_cache_complete), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.text_apk_cache_complete), Snackbar.LENGTH_SHORT).show();
             textViewApkCache.setText(getString(R.string.text_apk_cache, cacheSize));
         });
 
@@ -89,24 +93,24 @@ public class SettingsActivity extends AppCompatActivity {
             final TextInputEditText edit = inView.findViewById(R.id.et_sys_pkg_name);
 
             CustomizeDialog.getInstance(this)
-            .setTitle(R.string.text_title_input)
-            .setView(inView)
-            .setPositiveButton(R.string.dialog_ok, (dialog, which) -> {
-                String str = Objects.requireNonNull(edit.getText()).toString().trim();
-                if (str.isEmpty()) {
-                    Snackbar.make(findViewById(R.id.coordinator_layout) ,getString(R.string.text_input_empty), Snackbar.LENGTH_SHORT).show();
-                } else {
-                    SPUtils.putData(Contents.SYS_PKG_NAME, str);
-                    textViewSysPkgName.setText(str);
-                }
-            })
-            .setNegativeButton(R.string.dialog_btn_cancel, null)
-            .setCancelable(false).create().show();
+                    .setTitle(R.string.text_title_input)
+                    .setView(inView)
+                    .setPositiveButton(R.string.dialog_ok, (dialog, which) -> {
+                        String str = Objects.requireNonNull(edit.getText()).toString().trim();
+                        if (str.isEmpty()) {
+                            Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.text_input_empty), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            SPUtils.putData(Contents.SYS_PKG_NAME, str);
+                            textViewSysPkgName.setText(str);
+                        }
+                    })
+                    .setNegativeButton(R.string.dialog_btn_cancel, null)
+                    .setCancelable(false).create().show();
         });
     }
 
     private void initSettings() {
-        boolean useSysPkg = (boolean)SPUtils.getData(Contents.SP_USE_SYS_PKG, false);
+        boolean useSysPkg = (boolean) SPUtils.getData(Contents.SP_USE_SYS_PKG, false);
         switchButtonUseSysPkg.setChecked(useSysPkg);
         if (!SPUtils.getData(Contents.SYS_PKG_NAME, Contents.SYS_PKG_NAME).equals(Contents.SYS_PKG_NAME)) {
             textViewSysPkgName.setText(SPUtils.getData(Contents.SYS_PKG_NAME, Contents.SYS_PKG_NAME).toString());
@@ -114,4 +118,3 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
 }
-

@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.tokyonth.installer.Contents;
 import com.tokyonth.installer.bean.ApkInfoBean;
-import com.tokyonth.installer.utils.file.ShellUtils;
+import com.tokyonth.installer.utils.ShellUtils;
 
 public class InstallApkTask extends Thread {
 
@@ -49,8 +49,7 @@ public class InstallApkTask extends Thread {
             }
         });
         if (retCode == 0 && mApkInfo.isFakePath()) {
-            boolean bool = mApkInfo.getApkFile().delete();
-            if (!bool) {
+            if (!mApkInfo.getApkFile().delete()) {
                 Log.e("InstallApkTask", "failed to delete！");
             }
         }
@@ -58,4 +57,3 @@ public class InstallApkTask extends Thread {
     }
 
 }
-

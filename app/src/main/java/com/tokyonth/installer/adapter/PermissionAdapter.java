@@ -10,9 +10,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.bean.permissions.PermFullBean;
+import com.tokyonth.installer.widget.CustomizeDialog;
 
 import java.util.ArrayList;
 
@@ -49,11 +49,11 @@ public class PermissionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 String lab = bean.getLab() == null ? context.getResources().getString(R.string.text_no_description) : bean.getLab();
                 String des = bean.getDes() == null ? context.getResources().getString(R.string.text_no_description) : bean.getDes();
 
-                MaterialAlertDialogBuilder dialogBuilder = new MaterialAlertDialogBuilder(context);
-                dialogBuilder.setTitle(group);
-                dialogBuilder.setMessage(bean.getPerm() + "\n" + lab + "\n" + des);
-                dialogBuilder.setPositiveButton(R.string.dialog_ok, null);
-                dialogBuilder.setCancelable(false).create().show();
+                CustomizeDialog.getInstance(context)
+                        .setTitle(group)
+                        .setMessage(bean.getPerm() + "\n" + lab + "\n" + des)
+                        .setPositiveButton(R.string.dialog_ok, null)
+                        .setCancelable(false).create().show();
             });
         }
     }

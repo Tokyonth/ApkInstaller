@@ -33,9 +33,9 @@ public class FileProviderPathUtil {
         if (path == null) {
             return getFileFromContentUri(context, uri).getPath();
         } if (Objects.equals(referrer, Contents.MT2_PKG_NAME)) {
-            return getPathFromInputStreamUri(context, uri, "FormMT2Apk.apk");
+            return getPathFromInputStreamUri(context, uri, "fake.apk");
         } if (path.contains(Contents.DATA_PATH_PREFIX)) {
-            return getPathFromInputStreamUri(context, uri, "FormDataApk.apk");
+            return getPathFromInputStreamUri(context, uri, "fake.apk");
         } else {
             return path;
         }
@@ -116,8 +116,6 @@ public class FileProviderPathUtil {
         String filePath = null;
 
         if (uri.getAuthority() != null) {
-
-
 
           //  APKCommander.mApkInfo.setFakePath(true);
             try {

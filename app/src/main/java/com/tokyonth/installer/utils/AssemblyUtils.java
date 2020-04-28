@@ -1,4 +1,4 @@
-package com.tokyonth.installer.utils.helper;
+package com.tokyonth.installer.utils;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,12 +11,11 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
 import com.tokyonth.installer.Contents;
-import com.tokyonth.installer.utils.file.SPUtils;
+import com.tokyonth.installer.utils.SPUtils;
 
 import java.io.File;
 

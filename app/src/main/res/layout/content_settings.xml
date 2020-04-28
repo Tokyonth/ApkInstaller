@@ -109,8 +109,8 @@
                 android:layout_height="18dp"
                 android:layout_margin="6dp"
                 android:tint="@color/colorSvg"
-                android:contentDescription="@string/app_name"
-                android:src="@drawable/ic_error_24px"/>
+                android:src="@drawable/ic_error_24px"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:textColor="@color/colorTextSub"
