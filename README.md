@@ -11,6 +11,9 @@
 - APK权限与Activity显示
 - 兼容AndroidQ设备
 
+### 软件借鉴、使用了bavelee的PokeInstaller代码。
+[GITHUB](https://github.com/bavelee/PokeInstaller)
+
 ## 以下为软件截图
 
 |  ![ApkInstaller 截图](screenshot/1.jpg)  | ![ApkInstaller 截图](screenshot/2.jpg)  |  ![ApkInstaller 截图](screenshot/3.jpg)  |
