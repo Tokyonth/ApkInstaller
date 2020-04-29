@@ -13,8 +13,6 @@
 
 ## 以下为软件截图
 
-![ApkInstaller 截图](screenshot/1.jpg)
-![ApkInstaller 截图](screenshot/2.jpg)
-![ApkInstaller 截图](screenshot/3.jpg)
-![ApkInstaller 截图](screenshot/4.jpg)
-![ApkInstaller 截图](screenshot/5.png)
+|  ![ApkInstaller 截图](screenshot/1.jpg)  | ![ApkInstaller 截图](screenshot/2.jpg)  |  ![ApkInstaller 截图](screenshot/3.jpg)  |
+| :----: | :----: | :----: |
+| ![ApkInstaller 截图](screenshot/4.jpg) | ![ApkInstaller 截图](screenshot/5.png) |  |
