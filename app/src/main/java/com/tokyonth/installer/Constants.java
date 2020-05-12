@@ -1,6 +1,6 @@
 package com.tokyonth.installer;
 
-public class Contents {
+public class Constants {
 
     private static String PKG_NAME = "com.tokyonth.installer";
     public static String SP_FILE_NAME = "conf";
