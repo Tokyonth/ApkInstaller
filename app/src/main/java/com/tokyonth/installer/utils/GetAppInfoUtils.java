@@ -10,7 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 
-public class AppUtils {
+public class GetAppInfoUtils {
 
     public static void toSelfSetting(Context context, String str) {
         Intent mIntent = new Intent();

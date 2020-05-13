@@ -9,13 +9,17 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.net.Uri;
 
+import androidx.annotation.DrawableRes;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
-import com.tokyonth.installer.Contents;
-import com.tokyonth.installer.utils.SPUtils;
+import com.tokyonth.installer.Constants;
 
 import java.io.File;
 
@@ -43,14 +47,29 @@ public class AssemblyUtils {
         return bitmap;
     }
 
+    public static Bitmap getBitmapFromDrawable(Context context, @DrawableRes int drawableId) {
+        Drawable drawable = ContextCompat.getDrawable(context, drawableId);
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        } else if (drawable instanceof VectorDrawable || drawable instanceof VectorDrawableCompat) {
+            Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            drawable.draw(canvas);
+            return bitmap;
+        } else {
+            throw new IllegalArgumentException("unsupported drawable type");
+        }
+    }
+
     public static void StartSystemPkgInstall(Context context, String filePath) {
         Intent intent = new Intent();
         String act = null;
         String sysPkgName;
-        if ((boolean) SPUtils.getData(Contents.SP_USE_SYS_PKG, false)) {
-            sysPkgName = (String) SPUtils.getData(Contents.SYS_PKG_NAME, Contents.SYS_PKG_NAME);
+        if ((boolean) SPUtils.getData(Constants.SP_USE_SYS_PKG, false)) {
+            sysPkgName = (String) SPUtils.getData(Constants.SYS_PKG_NAME, Constants.SYS_PKG_NAME);
         } else {
-            sysPkgName = Contents.SYS_PKG_NAME;
+            sysPkgName = Constants.SYS_PKG_NAME;
         }
         try {
             PackageManager packageManager = context.getPackageManager();
@@ -62,10 +81,10 @@ public class AssemblyUtils {
         assert act != null;
         ComponentName cn = new ComponentName(sysPkgName, act);
         intent.setComponent(cn);
-        Uri apkUri = FileProvider.getUriForFile(context, Contents.PROVIDER_STR,
+        Uri apkUri = FileProvider.getUriForFile(context, Constants.PROVIDER_STR,
                 new File(filePath));
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.setDataAndType(apkUri, Contents.URI_DATA_TYPE);
+        intent.setDataAndType(apkUri, Constants.URI_DATA_TYPE);
         context.startActivity(intent);
     }
 

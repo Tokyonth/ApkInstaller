@@ -2,8 +2,8 @@ package com.tokyonth.installer;
 
 public class Constants {
 
-    private static String PKG_NAME = "com.tokyonth.installer";
-    public static String SP_FILE_NAME = "conf";
+    public static String PKG_NAME = "com.tokyonth.installer";
+    public static String SP_FILE_NAME = "config";
     public static String SYS_PKG_NAME = "com.android.packageinstaller";
     public static String SP_AUTO_DEL = "auto_delete";
     public static String SP_NIGHT_MODE = "night_mode";
@@ -17,7 +17,7 @@ public class Constants {
     public static String SE_LINUX_COMMAND = "setenforce permissive";
     public static String INSTALL_COMMAND = "pm install -r --user 0 ";
     public static String UNINSTALL_COMMAND = "pm uninstall -k --user 0 ";
-    public static String SP_NO_TIP_VERSION = "not_show_version_tips";
+    public static String SP_NOT_TIP_VERSION = "not_show_version_tips";
     public static String CACHE_APK_DIR = "/storage/emulated/0/Android/data/com.tokyonth.installer/cache/";
     public static String MT2_PKG_NAME = "bin.mt.plus";
 

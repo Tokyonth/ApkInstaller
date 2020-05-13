@@ -12,13 +12,13 @@ import android.widget.TextView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.kyleduo.switchbutton.SwitchButton;
-import com.tokyonth.installer.Contents;
+import com.tokyonth.installer.Constants;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.adapter.SettingsAdapter;
 import com.tokyonth.installer.utils.StatusBarColorUtils;
 import com.tokyonth.installer.widget.CustomizeDialog;
 import com.tokyonth.installer.bean.SettingsBean;
-import com.tokyonth.installer.utils.AppUtils;
+import com.tokyonth.installer.utils.GetAppInfoUtils;
 import com.tokyonth.installer.utils.FileUtils;
 import com.tokyonth.installer.utils.SPUtils;
 
@@ -36,7 +36,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StatusBarColorUtils.setStatusBarDarkIcon(this,
-                !(boolean) SPUtils.getData(Contents.SP_NIGHT_MODE, false));
+                !(boolean) SPUtils.getData(Constants.SP_NIGHT_MODE, false));
         setContentView(R.layout.activity_settings);
         initViewData();
         initSettings();
@@ -61,29 +61,29 @@ public class SettingsActivity extends AppCompatActivity {
         adapter.setOnItemClick((view, pos, bool) -> {
             switch (pos) {
                 case 0:
-                    SPUtils.putData(Contents.SP_SHOW_PERM, bool);
+                    SPUtils.putData(Constants.SP_SHOW_PERM, bool);
                     break;
                 case 1:
-                    SPUtils.putData(Contents.SP_SHOW_ACT, bool);
+                    SPUtils.putData(Constants.SP_SHOW_ACT, bool);
                     break;
                 case 2:
-                    SPUtils.putData(Contents.SP_VIBRATE, bool);
+                    SPUtils.putData(Constants.SP_VIBRATE, bool);
                     break;
             }
         });
         TextView textViewVersion = findViewById(R.id.tv_version);
-        textViewVersion.append(AppUtils.getVersionName(this));
+        textViewVersion.append(GetAppInfoUtils.getVersionName(this));
 
         textViewApkCache = findViewById(R.id.tv_apk_cache);
         textViewSysPkgName = findViewById(R.id.tv_pkg_name);
         switchButtonUseSysPkg = findViewById(R.id.cb_use_sys_pkg);
-        switchButtonUseSysPkg.setOnCheckedChangeListener((compoundButton, isChecked) -> SPUtils.putData(Contents.SP_USE_SYS_PKG, isChecked));
+        switchButtonUseSysPkg.setOnCheckedChangeListener((compoundButton, isChecked) -> SPUtils.putData(Constants.SP_USE_SYS_PKG, isChecked));
 
-        String cacheSize = FileUtils.byteToString(FileUtils.getFileOrFolderSize(new File(Contents.CACHE_APK_DIR)));
+        String cacheSize = FileUtils.byteToString(FileUtils.getFileOrFolderSize(new File(Constants.CACHE_APK_DIR)));
         textViewApkCache.setText(getString(R.string.text_apk_cache, cacheSize));
 
         findViewById(R.id.card_apk_cache).setOnClickListener(view -> {
-            FileUtils.deleteFolderFile(Contents.CACHE_APK_DIR, true);
+            FileUtils.deleteFolderFile(Constants.CACHE_APK_DIR, true);
             Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.text_apk_cache_complete), Snackbar.LENGTH_SHORT).show();
             textViewApkCache.setText(getString(R.string.text_apk_cache, cacheSize));
         });
@@ -100,7 +100,7 @@ public class SettingsActivity extends AppCompatActivity {
                         if (str.isEmpty()) {
                             Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.text_input_empty), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            SPUtils.putData(Contents.SYS_PKG_NAME, str);
+                            SPUtils.putData(Constants.SYS_PKG_NAME, str);
                             textViewSysPkgName.setText(str);
                         }
                     })
@@ -110,10 +110,10 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initSettings() {
-        boolean useSysPkg = (boolean) SPUtils.getData(Contents.SP_USE_SYS_PKG, false);
+        boolean useSysPkg = (boolean) SPUtils.getData(Constants.SP_USE_SYS_PKG, false);
         switchButtonUseSysPkg.setChecked(useSysPkg);
-        if (!SPUtils.getData(Contents.SYS_PKG_NAME, Contents.SYS_PKG_NAME).equals(Contents.SYS_PKG_NAME)) {
-            textViewSysPkgName.setText(SPUtils.getData(Contents.SYS_PKG_NAME, Contents.SYS_PKG_NAME).toString());
+        if (!SPUtils.getData(Constants.SYS_PKG_NAME, Constants.SYS_PKG_NAME).equals(Constants.SYS_PKG_NAME)) {
+            textViewSysPkgName.setText(SPUtils.getData(Constants.SYS_PKG_NAME, Constants.SYS_PKG_NAME).toString());
         }
     }
 

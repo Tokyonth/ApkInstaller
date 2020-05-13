@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kyleduo.switchbutton.SwitchButton;
-import com.tokyonth.installer.Contents;
+import com.tokyonth.installer.Constants;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.bean.SettingsBean;
 import com.tokyonth.installer.utils.SPUtils;
@@ -51,13 +51,13 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((CommonViewHolder) holder).switchBtn.setOnCheckedChangeListener((compoundButton, isChecked) -> onItemSwitchClick.onItemClick(compoundButton, position, isChecked));
             switch (position) {
                 case 0:
-                    ((CommonViewHolder) holder).switchBtn.setChecked((boolean)SPUtils.getData(Contents.SP_SHOW_PERM, true));
+                    ((CommonViewHolder) holder).switchBtn.setChecked((boolean)SPUtils.getData(Constants.SP_SHOW_PERM, true));
                     break;
                 case 1:
-                    ((CommonViewHolder) holder).switchBtn.setChecked((boolean)SPUtils.getData(Contents.SP_SHOW_ACT, true));
+                    ((CommonViewHolder) holder).switchBtn.setChecked((boolean)SPUtils.getData(Constants.SP_SHOW_ACT, true));
                     break;
                 case 2:
-                    ((CommonViewHolder) holder).switchBtn.setChecked((boolean)SPUtils.getData(Contents.SP_VIBRATE, false));
+                    ((CommonViewHolder) holder).switchBtn.setChecked((boolean)SPUtils.getData(Constants.SP_VIBRATE, false));
                     break;
             }
         }

@@ -30,12 +30,12 @@ import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.kyleduo.switchbutton.SwitchButton;
 import com.tokyonth.installer.base.BaseActivity;
-import com.tokyonth.installer.Contents;
+import com.tokyonth.installer.Constants;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.adapter.ActivityAdapter;
 import com.tokyonth.installer.widget.CircleImageView;
 import com.tokyonth.installer.widget.CustomizeDialog;
-import com.tokyonth.installer.utils.AppUtils;
+import com.tokyonth.installer.utils.GetAppInfoUtils;
 import com.tokyonth.installer.utils.VersionHelper;
 import com.tokyonth.installer.adapter.PermissionAdapter;
 import com.tokyonth.installer.apk.APKCommander;
@@ -128,15 +128,15 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
         act_rv.setLayoutManager(new LinearLayoutManager(this));
         perm_rv.setAdapter(permAdapter);
         act_rv.setAdapter(actAdapter);
-        sb_auto_del.setOnCheckedChangeListener((buttonView, isChecked) -> SPUtils.putData(Contents.SP_AUTO_DEL, isChecked));
+        sb_auto_del.setOnCheckedChangeListener((buttonView, isChecked) -> SPUtils.putData(Constants.SP_AUTO_DEL, isChecked));
     }
 
     private void setViewStatus() {
-        int isShowPerm = (boolean) SPUtils.getData(Contents.SP_SHOW_PERM, true) ? View.VISIBLE : View.GONE;
+        int isShowPerm = (boolean) SPUtils.getData(Constants.SP_SHOW_PERM, true) ? View.VISIBLE : View.GONE;
         perm_view.setVisibility(isShowPerm);
-        int isShowAct = (boolean) SPUtils.getData(Contents.SP_SHOW_ACT, true) ? View.VISIBLE : View.GONE;
+        int isShowAct = (boolean) SPUtils.getData(Constants.SP_SHOW_ACT, true) ? View.VISIBLE : View.GONE;
         act_card.setVisibility(isShowAct);
-        boolean isAutoDel = (boolean) SPUtils.getData(Contents.SP_AUTO_DEL, false);
+        boolean isAutoDel = (boolean) SPUtils.getData(Constants.SP_AUTO_DEL, false);
         sb_auto_del.setChecked(isAutoDel);
     }
 
@@ -145,8 +145,8 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
         ImageView ivAppIcon = findViewById(R.id.iv_app_icon);
         ivAppIcon.setImageDrawable(apkInfo.getIcon());
         bottomAppBar.setVisibility(View.VISIBLE);
-        tvApkSource.setText(getString(R.string.text_apk_source, AppUtils.getApplicationNameByPackageName(this, apkSource)));
-        apkSourceIcon.setImageDrawable(AppUtils.getApplicationIconByPackageName(this, apkSource));
+        tvApkSource.setText(getString(R.string.text_apk_source, GetAppInfoUtils.getApplicationNameByPackageName(this, apkSource)));
+        apkSourceIcon.setImageDrawable(GetAppInfoUtils.getApplicationIconByPackageName(this, apkSource));
 
         Bitmap bitmap = AssemblyUtils.DrawableToBitmap(apkInfo.getIcon());
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
@@ -182,7 +182,6 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
         perm_view.setVisibility(View.VISIBLE);
         act_card.setVisibility(View.VISIBLE);
 
-
         tvAppName.setText(apkInfo.getAppName());
         tvAppVersion.setText(apkInfo.getVersion());
 
@@ -191,7 +190,6 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
                 getResources().getString(R.string.text_size, FileUtils.byteToString(FileUtils.getFileSize(apkFilePath))));
         if (apkInfo.hasInstalledApp()) {
             tvInstallMsg.append("\n" + getResources().getString(R.string.info_installed_version) + apkInfo.getInstalledVersion());
-
             CardView cardView = findViewById(R.id.tip_card);
             cardView.setAlpha(0.70f);
             TranslateAnimation translateAnimation = new TranslateAnimation(0, 0, -200, 0);
@@ -202,11 +200,11 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
             tvVersionTips.setText(VersionHelper.CheckVer(this, apkInfo.getVersionCode(), apkInfo.getInstalledVersionCode()));
         }
 
-        if ((boolean) SPUtils.getData(Contents.SP_SHOW_PERM, true)) {
+        if ((boolean) SPUtils.getData(Constants.SP_SHOW_PERM, true)) {
             perm_view.setVisibility(View.VISIBLE);
             if (apkInfo.getPermissions() != null && apkInfo.getPermissions().length > 0) {
                 for (int i = 0; i < apkInfo.getPermissions().length; i++) {
-                    if ((boolean) SPUtils.getData(Contents.SP_SHOW_PERM, true)) {
+                    if ((boolean) SPUtils.getData(Constants.SP_SHOW_PERM, true)) {
                         permFullBeanArrayList.add(new PermFullBean(apkInfo.getPermissions()[i],
                                 apkCommander.getPermInfo().getPermissionGroup().get(i),
                                 apkCommander.getPermInfo().getPermissionDescription().get(i),
@@ -217,7 +215,7 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
         } else {
             perm_view.setVisibility(View.GONE);
         }
-        if ((boolean) SPUtils.getData(Contents.SP_SHOW_ACT, true)) {
+        if ((boolean) SPUtils.getData(Constants.SP_SHOW_ACT, true)) {
             act_card.setVisibility(View.VISIBLE);
             if (apkInfo.getActivities() != null && apkInfo.getActivities().size() > 0) {
                 actStringArrayList.addAll(apkInfo.getActivities());
@@ -277,7 +275,7 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
         if (resultCode == 0) {
             findViewById(R.id.card_del).setVisibility(View.VISIBLE);
             showToast(getString(R.string.apk_installed, apkInfo.getAppName()));
-            if ((boolean) SPUtils.getData(Contents.SP_VIBRATE, false)) {
+            if ((boolean) SPUtils.getData(Constants.SP_VIBRATE, false)) {
                 Vibrator vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
                 assert vibrator != null;
                 vibrator.vibrate(800);
@@ -316,7 +314,7 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
     }
 
     private void isAutoDel() {
-        if ((boolean) SPUtils.getData(Contents.SP_AUTO_DEL, false)) {
+        if ((boolean) SPUtils.getData(Constants.SP_AUTO_DEL, false)) {
             if (new File(apkFilePath).delete()) {
                 showToast(getString(R.string.apk_deleted, apkFileName));
             }
@@ -373,12 +371,12 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
     }
 
     public void isNightMode(View view) {
-        if ((boolean) SPUtils.getData(Contents.SP_NIGHT_MODE, false)) {
+        if ((boolean) SPUtils.getData(Constants.SP_NIGHT_MODE, false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            SPUtils.putData(Contents.SP_NIGHT_MODE, false);
+            SPUtils.putData(Constants.SP_NIGHT_MODE, false);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            SPUtils.putData(Contents.SP_NIGHT_MODE, true);
+            SPUtils.putData(Constants.SP_NIGHT_MODE, true);
         }
     }
 
@@ -387,7 +385,7 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
     }
 
     public void toSourceApkSettings(View view) {
-        AppUtils.toSelfSetting(this, apkSource);
+        GetAppInfoUtils.toSelfSetting(this, apkSource);
     }
 
     @Override

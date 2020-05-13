@@ -13,10 +13,12 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.tokyonth.installer.R;
-import com.tokyonth.installer.utils.BitmapUtils;
+import com.tokyonth.installer.utils.AssemblyUtils;
 
 @SuppressLint("Recycle")
 public class BurnRoundView extends View {
+
+    private static int DEFAULT_SIZE = 72;
 
     private int width, height;
     private int burnColor;
@@ -59,7 +61,7 @@ public class BurnRoundView extends View {
     }
 
     private void ConversionPic(int imageId, int color) {
-        burnSrc = BitmapUtils.getBitmapFromDrawable(context, imageId);
+        burnSrc = AssemblyUtils.getBitmapFromDrawable(context, imageId);
         overlayPaint.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
     }
 
@@ -89,7 +91,7 @@ public class BurnRoundView extends View {
         mPaint.setColor(burnColor);
         //width >> 1 与 height >> 1为圆心位置
         canvas.drawBitmap(burnSrc, (width >> 1) - (burnSrc.getWidth() >> 1), (height >> 1) - (burnSrc.getHeight() >> 1), overlayPaint);
-        canvas.drawCircle(width >> 1, height >> 1, (float) (getMeasuredWidth()/2.5),mPaint);
+        canvas.drawCircle(width >> 1, height >> 1, (float) (getMeasuredWidth() / 2.5), mPaint);
     }
 
     @Override
@@ -107,7 +109,7 @@ public class BurnRoundView extends View {
         if (specMode == MeasureSpec.EXACTLY) {
             result = specSize;
         } else {
-            result = 72;
+            result = DEFAULT_SIZE;
             if (specMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, specSize);
             }
@@ -122,7 +124,7 @@ public class BurnRoundView extends View {
         if (specMode == MeasureSpec.EXACTLY) {
             result = specSize;
         } else {
-            result = 72;
+            result = DEFAULT_SIZE;
             if (specMode == MeasureSpec.AT_MOST) {
                 result = Math.min(result, specSize);
             }

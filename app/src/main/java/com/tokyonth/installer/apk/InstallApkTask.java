@@ -4,7 +4,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 
-import com.tokyonth.installer.Contents;
+import com.tokyonth.installer.Constants;
 import com.tokyonth.installer.bean.ApkInfoBean;
 import com.tokyonth.installer.utils.ShellUtils;
 
@@ -25,9 +25,9 @@ public class InstallApkTask extends Thread {
         super.run();
         handler.post(() -> commanderCallback.onApkPreInstall(mApkInfo));
         if (Build.VERSION.SDK_INT >= 24) {
-            ShellUtils.execWithRoot(Contents.SE_LINUX_COMMAND);
+            ShellUtils.execWithRoot(Constants.SE_LINUX_COMMAND);
         }
-        final int retCode = ShellUtils.execWithRoot(Contents.INSTALL_COMMAND + "\"" + mApkInfo.getApkFile().getPath() + "\"" + "\n", new ShellUtils.Result() {
+        final int retCode = ShellUtils.execWithRoot(Constants.INSTALL_COMMAND + "\"" + mApkInfo.getApkFile().getPath() + "\"" + "\n", new ShellUtils.Result() {
             @Override
             public void onStdout(final String text) {
                 handler.post(() -> commanderCallback.onInstallLog(mApkInfo, text));

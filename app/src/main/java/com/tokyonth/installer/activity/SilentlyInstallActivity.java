@@ -6,7 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.tokyonth.installer.Contents;
+import com.tokyonth.installer.Constants;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.apk.APKCommander;
 import com.tokyonth.installer.base.BaseActivity;
@@ -53,7 +53,7 @@ public class SilentlyInstallActivity extends BaseActivity implements CommanderCa
     public void onApkInstalled(ApkInfoBean apkInfo, int resultCode) {
         if (resultCode == 0) {
             showToast(getString(R.string.apk_installed, apkInfo.getAppName()));
-            if (!apkInfo.isFakePath() && (boolean) SPUtils.getData(Contents.SP_AUTO_DEL, false)) {
+            if (!apkInfo.isFakePath() && (boolean) SPUtils.getData(Constants.SP_AUTO_DEL, false)) {
                 showToast(getString(R.string.apk_deleted, apkInfo.getApkFile().getName()));
             }
         } else {

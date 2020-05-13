@@ -4,7 +4,7 @@
     android:id="@+id/ll_common_toast"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/layout_toast_color_bg"
+    android:background="@drawable/ic_toast_bg_color"
     android:layout_gravity="center"
     android:orientation="horizontal" >
 

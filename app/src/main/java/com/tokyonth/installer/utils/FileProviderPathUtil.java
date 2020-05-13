@@ -13,8 +13,7 @@ import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
-import com.tokyonth.installer.Contents;
-import com.tokyonth.installer.apk.APKCommander;
+import com.tokyonth.installer.Constants;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,10 +31,9 @@ public class FileProviderPathUtil {
         String path = getFPUriToPath(context, uri);
         if (path == null) {
             return getFileFromContentUri(context, uri).getPath();
-        } if (Objects.equals(referrer, Contents.MT2_PKG_NAME)) {
-            return getPathFromInputStreamUri(context, uri, "fake.apk");
-        } if (path.contains(Contents.DATA_PATH_PREFIX)) {
-            return getPathFromInputStreamUri(context, uri, "fake.apk");
+        }
+        if (Objects.equals(referrer, Constants.MT2_PKG_NAME) || path.contains(Constants.DATA_PATH_PREFIX)) {
+            return getPathFromInputStreamUri(context, uri, "fakePath.apk");
         } else {
             return path;
         }
@@ -114,15 +112,11 @@ public class FileProviderPathUtil {
     private static String getPathFromInputStreamUri(Context context, Uri uri, String fileName) {
         InputStream inputStream = null;
         String filePath = null;
-
         if (uri.getAuthority() != null) {
-
-          //  APKCommander.mApkInfo.setFakePath(true);
             try {
                 inputStream = context.getContentResolver().openInputStream(uri);
                 File file = createTemporalFileFrom(context, inputStream, fileName);
                 filePath = file.getPath();
-
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

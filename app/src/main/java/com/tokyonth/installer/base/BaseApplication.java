@@ -6,7 +6,7 @@ import android.content.Context;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.tokyonth.installer.Contents;
+import com.tokyonth.installer.Constants;
 import com.tokyonth.installer.utils.SPUtils;
 
 public class BaseApplication extends Application {
@@ -18,9 +18,9 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
-        SPUtils.getInstance(this, Contents.SP_FILE_NAME);
+        SPUtils.getInstance(this, Constants.SP_FILE_NAME);
 
-        int NIGHT_MODE = (boolean) SPUtils.getData(Contents.SP_NIGHT_MODE, false) ?
+        int NIGHT_MODE = (boolean) SPUtils.getData(Constants.SP_NIGHT_MODE, false) ?
                 AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
         AppCompatDelegate.setDefaultNightMode(NIGHT_MODE);
     }

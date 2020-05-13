@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.tokyonth.installer.Contents;
+import com.tokyonth.installer.Constants;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.utils.SPUtils;
 import com.tokyonth.installer.utils.StatusBarColorUtils;
@@ -29,7 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        StatusBarColorUtils.setStatusBarDarkIcon(this, !(boolean) SPUtils.getData(Contents.SP_NIGHT_MODE, false));
+        StatusBarColorUtils.setStatusBarDarkIcon(this, !(boolean) SPUtils.getData(Constants.SP_NIGHT_MODE, false));
         if (setActivityView() != 0)
             setContentView(setActivityView());
         if (getIntent().getData() == null) {
