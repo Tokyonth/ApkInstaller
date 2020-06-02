@@ -79,7 +79,14 @@
     <string name="text_no_description">No corresponding description</string>
     <string name="text_uninstall">Uninstall</string>
     <string name="text_confirm_uninstall_app">Are you sure you want to uninstall %s?</string>
-    <string name="text_uninstall_complete">Uninstall complete!</string>
+    <string name="text_uninstall_complete">%s Uninstall complete!</string>
     <string name="text_uninstall_failure">Uninstall failed!</string>
     <string name="uninstall_dialog_disable">Freeze/Disable</string>
+    <string name="freeze_app_name">%s is Frozen</string>
+    <string name="freeze_failure">Frozen Failure!</string>
+    <string name="freeze_app_list">Freeze App List</string>
+    <string name="freeze_app_list_sub">List of software frozen by installer</string>
+    <string name="unfreeze_app">Unfreeze</string>
+    <string name="unfreeze_app_complete">Unfreeze Complete!</string>
+    <string name="unfreeze_app_failure">Unfreeze Failure!</string>
 </resources>

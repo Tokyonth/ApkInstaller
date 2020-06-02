@@ -45,8 +45,8 @@
     <string name="text_clean_cache">清理缓存</string>
     <string name="text_cache_size">缓存大小 : </string>
     <string name="clean_complete">清理完成</string>
-    <string name="install_vibrate">安装完成震动</string>
-    <string name="vibrate">震动</string>
+    <string name="install_vibrate">安装完成时震动</string>
+    <string name="vibrate">安装震动</string>
     <string name="dialog_text_title">提示</string>
     <string name="dialog_text_msg">内容</string>
     <string name="uninstall">卸载</string>
@@ -68,7 +68,7 @@
     <string name="dialog_no_longer_prompt">不再提示</string>
     <string name="text_apk_source">来源:%s</string>
     <string name="text_apk_source_more">点击查看详情</string>
-    <string name="text_apk_cache">APK安装包缓存大小:%s\n点击请理</string>
+    <string name="text_apk_cache">APK安装包缓存大小:%s\n点击清理</string>
     <string name="text_apk_cache_complete">清理完成!</string>
     <string name="text_cancel_installation">取消安装</string>
     <string name="text_follow_system">跟随系统</string>
@@ -80,7 +80,14 @@
     <string name="text_no_description">无对应描述</string>
     <string name="text_uninstall">卸载</string>
     <string name="text_confirm_uninstall_app">确定要卸载 %s 吗？</string>
-    <string name="text_uninstall_complete">卸载完成!</string>
+    <string name="text_uninstall_complete">%s 卸载完成!</string>
     <string name="text_uninstall_failure">卸载失败!</string>
     <string name="uninstall_dialog_disable">冻结/禁用</string>
+    <string name="freeze_app_name">%s 已冻结</string>
+    <string name="freeze_failure">冻结失败!</string>
+    <string name="freeze_app_list">冻结列表</string>
+    <string name="freeze_app_list_sub">由安装器冻结的软件列表</string>
+    <string name="unfreeze_app">解冻</string>
+    <string name="unfreeze_app_complete">解冻完成！</string>
+    <string name="unfreeze_app_failure">解冻失败！</string>
 </resources>
