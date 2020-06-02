@@ -27,7 +27,6 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup"
         tools:targetApi="q">
-
         <activity
             android:name=".activity.InstallerActivity"
             android:excludeFromRecents="true"
@@ -46,7 +45,6 @@
                 <data android:mimeType="application/vnd.android.package-archive" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.UninstallActivity"
             android:excludeFromRecents="true"
@@ -63,7 +61,6 @@
                 <data android:scheme="package" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.SilentlyInstallActivity"
             android:excludeFromRecents="true"
@@ -71,7 +68,9 @@
             android:label="@string/install_in_background"
             android:launchMode="singleTask"
             android:theme="@style/DialogTheme" />
-
+        <activity
+            android:name=".activity.FreezeActivity"
+            android:theme="@style/InstallAppTheme"/>
         <activity
             android:name=".activity.SettingsActivity"
             android:theme="@style/InstallAppTheme" />
@@ -85,7 +84,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-
     </application>
 
 </manifest>
