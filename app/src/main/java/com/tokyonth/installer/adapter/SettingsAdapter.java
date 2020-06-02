@@ -1,5 +1,7 @@
 package com.tokyonth.installer.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kyleduo.switchbutton.SwitchButton;
 import com.tokyonth.installer.Constants;
 import com.tokyonth.installer.R;
+import com.tokyonth.installer.activity.FreezeActivity;
 import com.tokyonth.installer.bean.SettingsBean;
 import com.tokyonth.installer.utils.SPUtils;
 import com.tokyonth.installer.widget.BurnRoundView;
@@ -21,8 +24,10 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private ArrayList<SettingsBean> list;
     private OnItemSwitchClick onItemSwitchClick;
+    private Context context;
 
-    public SettingsAdapter(ArrayList<SettingsBean> list) {
+    public SettingsAdapter(Context context, ArrayList<SettingsBean> list) {
+        this.context = context;
         this.list = list;
     }
 
@@ -59,6 +64,10 @@ public class SettingsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 case 2:
                     ((CommonViewHolder) holder).switchBtn.setChecked((boolean)SPUtils.getData(Constants.SP_VIBRATE, false));
                     break;
+            }
+            if (position == 3) {
+                ((CommonViewHolder) holder).switchBtn.setVisibility(View.GONE);
+                holder.itemView.setOnClickListener(v -> context.startActivity(new Intent(context, FreezeActivity.class)));
             }
         }
     }

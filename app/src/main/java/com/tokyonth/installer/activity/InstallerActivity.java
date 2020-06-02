@@ -53,11 +53,11 @@ import java.util.ArrayList;
 
 public class InstallerActivity extends BaseActivity implements CommanderCallback {
 
+    private SwitchButton sb_auto_del;
+    private RecyclerView perm_rv;
+    private RecyclerView act_rv;
     private CardView perm_view;
     private CardView act_card;
-    private RecyclerView act_rv;
-    private RecyclerView perm_rv;
-    private SwitchButton sb_auto_del;
 
     private ArrayList<PermFullBean> permFullBeanArrayList;
     private ArrayList<String> actStringArrayList;
@@ -70,22 +70,22 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
     private String apkFileName;
     private String apkSource;
 
-    private boolean showPerm = false;
-    private boolean showActivity = false;
     private boolean installComplete = false;
+    private boolean showActivity = false;
+    private boolean showPerm = false;
+
     private Uri uriData;
 
-
-    private BottomAppBar bottomAppBar;
+    private ExtendedFloatingActionButton fabInstall;
     private CircleImageView apkSourceIcon;
-    private TextView tvApkSource;
+    private BottomAppBar bottomAppBar;
     private TextView tvVersionTips;
-    private TextView tvAppName;
+    private TextView tvApkSource;
     private TextView tvAppVersion;
     private TextView tvInstallMsg;
-    private ExtendedFloatingActionButton fabInstall;
-    private TextView tvCancel;
+    private TextView tvAppName;
     private TextView tvSilently;
+    private TextView tvCancel;
 
     @Override
     public int setActivityView() {
@@ -114,6 +114,8 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
         fabInstall = findViewById(R.id.fab_install);
         tvCancel = findViewById(R.id.tv_cancel);
         tvSilently = findViewById(R.id.tv_silently);
+
+        bottomAppBar.setVisibility(View.INVISIBLE);
     }
 
     private void initData() {
@@ -129,6 +131,9 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
         perm_rv.setAdapter(permAdapter);
         act_rv.setAdapter(actAdapter);
         sb_auto_del.setOnCheckedChangeListener((buttonView, isChecked) -> SPUtils.putData(Constants.SP_AUTO_DEL, isChecked));
+
+        tvApkSource.setText(getString(R.string.text_apk_source, GetAppInfoUtils.getApplicationNameByPackageName(this, apkSource)));
+        apkSourceIcon.setImageDrawable(GetAppInfoUtils.getApplicationIconByPackageName(this, apkSource));
     }
 
     private void setViewStatus() {
@@ -144,10 +149,6 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
     private void initDetails(final ApkInfoBean apkInfo) {
         ImageView ivAppIcon = findViewById(R.id.iv_app_icon);
         ivAppIcon.setImageDrawable(apkInfo.getIcon());
-        bottomAppBar.setVisibility(View.VISIBLE);
-        tvApkSource.setText(getString(R.string.text_apk_source, GetAppInfoUtils.getApplicationNameByPackageName(this, apkSource)));
-        apkSourceIcon.setImageDrawable(GetAppInfoUtils.getApplicationIconByPackageName(this, apkSource));
-
         Bitmap bitmap = AssemblyUtils.DrawableToBitmap(apkInfo.getIcon());
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
             @Override
@@ -177,10 +178,11 @@ public class InstallerActivity extends BaseActivity implements CommanderCallback
             }
         });
 
-        apkFileName = apkInfo.getAppName();
-        apkFilePath = apkInfo.getApkFile().getPath();
+        bottomAppBar.setVisibility(View.VISIBLE);
         perm_view.setVisibility(View.VISIBLE);
         act_card.setVisibility(View.VISIBLE);
+        apkFileName = apkInfo.getAppName();
+        apkFilePath = apkInfo.getApkFile().getPath();
 
         tvAppName.setText(apkInfo.getAppName());
         tvAppVersion.setText(apkInfo.getVersion());

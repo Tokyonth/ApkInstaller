@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import com.tokyonth.installer.Constants;
 import com.tokyonth.installer.R;
 import com.tokyonth.installer.base.BaseActivity;
+import com.tokyonth.installer.database.SQLiteUtil;
 import com.tokyonth.installer.widget.CustomizeDialog;
 import com.tokyonth.installer.utils.ShellUtils;
 import com.tokyonth.installer.utils.GetAppInfoUtils;
@@ -33,13 +34,18 @@ public class UninstallActivity extends BaseActivity {
                     finish();
                 })
                 .setNeutralButton(getText(R.string.uninstall_dialog_disable), (dialog, which) -> {
-                    int result = ShellUtils.execWithRoot("pm disable " + pkgName);
-                    //String str = result == 0 ? getString(R.string.text_uninstall_complete) : getString(R.string.text_uninstall_failure);
-                    //showToast(str);
+                    int result = ShellUtils.execWithRoot(Constants.FREEZE_COMMAND + pkgName);
+                    String appName = GetAppInfoUtils.getApplicationNameByPackageName(this, pkgName);
+                    String str = result == 0 ? getString(R.string.freeze_app_name, appName) : getString(R.string.freeze_failure);
+                    if (result == 0) {
+                        SQLiteUtil.addData(this, pkgName);
+                    }
+                    showToast(str);
                     finish();
                 })
                 .setNegativeButton(R.string.dialog_btn_cancel, (dialog, which) -> finish())
-                .setCancelable(false).create().show();
+                .create().show();
+
     }
 
 }

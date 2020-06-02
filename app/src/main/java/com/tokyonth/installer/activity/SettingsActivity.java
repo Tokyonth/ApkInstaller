@@ -53,8 +53,11 @@ public class SettingsActivity extends AppCompatActivity {
         settingsBeanArrayList.add(new SettingsBean(getString(R.string.vibrate),
                 getString(R.string.install_vibrate),
                 R.drawable.ic_waves_24px, getResources().getColor(R.color.color2)));
+        settingsBeanArrayList.add(new SettingsBean(getString(R.string.freeze_app_list),
+                getString(R.string.freeze_app_list_sub),
+                R.drawable.ic_all_inbox_24px, getResources().getColor(R.color.color3)));
 
-        SettingsAdapter adapter = new SettingsAdapter(settingsBeanArrayList);
+        SettingsAdapter adapter = new SettingsAdapter(this, settingsBeanArrayList);
         RecyclerView rvSettings = findViewById(R.id.rv_settings_item);
         rvSettings.setLayoutManager(new LinearLayoutManager(this));
         rvSettings.setAdapter(adapter);

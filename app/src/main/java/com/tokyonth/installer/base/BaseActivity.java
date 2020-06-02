@@ -26,6 +26,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     private boolean isAuthorize = false;
     private static int REQUEST_CODE = 100;
 
+    public BaseActivity() {
+        super();
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

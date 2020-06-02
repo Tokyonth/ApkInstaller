@@ -73,7 +73,6 @@ public class GetAppInfoUtils {
         return null;
     }
 
-
     /**
      * [获取应用程序版本名称信息]
      * @param context 上下文
@@ -90,7 +89,6 @@ public class GetAppInfoUtils {
         return 0;
     }
 
-
     /**
      * [获取应用程序版本名称信息]
      * @param context 上下文
@@ -106,7 +104,6 @@ public class GetAppInfoUtils {
         }
         return null;
     }
-
 
     /**
      * 获取图标 bitmap
