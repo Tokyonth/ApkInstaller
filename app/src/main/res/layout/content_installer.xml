@@ -124,10 +124,10 @@
                 layout="@layout/layout_perm_info" />
 
             <include
-                layout="@layout/layout_act_info" />
+                layout="@layout/layout_activity_info" />
 
             <include
-                layout="@layout/layout_del_content" />
+                layout="@layout/layout_delete_content" />
 
         </LinearLayout>
 
