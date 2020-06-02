@@ -17,8 +17,10 @@ public class Constants {
     public static String SE_LINUX_COMMAND = "setenforce permissive";
     public static String INSTALL_COMMAND = "pm install -r --user 0 ";
     public static String UNINSTALL_COMMAND = "pm uninstall -k --user 0 ";
+    public static String FREEZE_COMMAND = "pm disable ";
+    public static String UNFREEZE_COMMAND = "pm enable ";
     public static String SP_NOT_TIP_VERSION = "not_show_version_tips";
-    public static String CACHE_APK_DIR = "/storage/emulated/0/Android/data/com.tokyonth.installer/cache/";
+    public static String CACHE_APK_DIR = "/storage/emulated/0/Android/data/" + PKG_NAME + "/cache/";
     public static String MT2_PKG_NAME = "bin.mt.plus";
 
 }
