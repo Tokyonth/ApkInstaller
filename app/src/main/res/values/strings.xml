@@ -89,4 +89,7 @@
     <string name="unfreeze_app">Unfreeze</string>
     <string name="unfreeze_app_complete">Unfreeze Complete!</string>
     <string name="unfreeze_app_failure">Unfreeze Failure!</string>
+    <string name="use_shizuku">Use Shizuku</string>
+    <string name="use_shizuku_sub">Install with Shizuku</string>
+    <string name="shizuku_permission_request">Please give Shizuku permission to this software</string>
 </resources>
