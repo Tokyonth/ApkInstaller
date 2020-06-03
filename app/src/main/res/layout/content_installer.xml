@@ -42,11 +42,11 @@
                 app:cardUseCompatPadding="true">
 
                 <LinearLayout
+                    android:id="@+id/ll_to_source"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:onClick="toSourceApkSettings"
                     android:orientation="horizontal"
                     tools:ignore="UnusedAttribute">
 
@@ -158,7 +158,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:onClick="silentlyButton"
                 android:text="@string/install_silently"
                 android:textColor="@color/colorText"
                 android:textStyle="bold" />
@@ -173,7 +172,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:onClick="cancelButton"
                 android:text="@string/text_cancel_installation"
                 android:textColor="@color/colorText"
                 android:textStyle="bold" />
@@ -186,7 +184,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:onClick="installFab"
         android:id="@+id/fab_install"
         android:text="@string/install"
         android:textColor="@android:color/white"

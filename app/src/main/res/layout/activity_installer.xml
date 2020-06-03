@@ -47,22 +47,22 @@
                     android:padding="12dp">
 
                     <ImageButton
+                        android:id="@+id/ib_night_mode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="?android:attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/title_night_mode"
-                        android:onClick="isNightMode"
                         android:padding="6dp"
                         android:src="@drawable/ic_opacity_24px"
                         android:tint="@android:color/white" />
 
                     <ImageButton
+                        android:id="@+id/ib_settings"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="?android:attr/selectableItemBackgroundBorderless"
                         android:backgroundTintMode="src_in"
                         android:contentDescription="@string/action_settings"
-                        android:onClick="settingsButton"
                         android:padding="6dp"
                         android:src="@drawable/ic_settings_24px"
                         android:tint="@android:color/white" />
