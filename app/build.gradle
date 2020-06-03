@@ -9,8 +9,8 @@ android {
         applicationId "com.tokyonth.installer"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 26
-        versionName "2.6"
+        versionCode 27
+        versionName "2.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -34,6 +34,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.kyleduo.switchbutton:library:2.0.0'
     implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'moe.shizuku.privilege:api:4.0.0'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test:runner:1.2.0'
