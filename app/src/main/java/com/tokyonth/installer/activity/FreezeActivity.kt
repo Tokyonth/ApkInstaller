@@ -3,6 +3,7 @@ package com.tokyonth.installer.activity
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -33,22 +34,22 @@ class FreezeActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
         adapter.setListener(listener = object : FreezeAdapter.OnItemClickListener {
             override fun onClick(position: Int, pkgName: String) {
-                val dialogView : View = View.inflate(this@FreezeActivity, R.layout.layout_freeze_dialog, null)
-                val customizeDialog : androidx.appcompat.app.AlertDialog = CustomizeDialog.getInstance(this@FreezeActivity)
+                val dialogView: View = View.inflate(this@FreezeActivity, R.layout.layout_freeze_dialog, null)
+                val customizeDialog: androidx.appcompat.app.AlertDialog = CustomizeDialog.getInstance(this@FreezeActivity)
                         .setView(dialogView)
                         .setNegativeButton(R.string.dialog_btn_cancel, null)
                         .create()
                 customizeDialog.show()
 
-                val tvUnfreeze : TextView = dialogView.findViewById(R.id.tv_unfreeze)
-                val tvUninstall : TextView = dialogView.findViewById(R.id.tv_uninstall)
+                val tvUnfreeze: TextView = dialogView.findViewById(R.id.tv_unfreeze)
+                val tvUninstall: TextView = dialogView.findViewById(R.id.tv_uninstall)
                 tvUnfreeze.setOnClickListener {
                     val result = ShellUtils.execWithRoot(Constants.UNFREEZE_COMMAND + pkgName)
                     val str: String
                     if (result == 0) {
                         SQLiteUtil.delData(this@FreezeActivity, pkgName)
                         str = getString(R.string.unfreeze_app_complete)
-                        listData!!.removeAt(position)
+                        listData.removeAt(position)
                     } else {
                         str = getString(R.string.unfreeze_app_failure)
                     }
@@ -63,7 +64,7 @@ class FreezeActivity : AppCompatActivity() {
                     if (result == 0) {
                         SQLiteUtil.delData(this@FreezeActivity, pkgName)
                         str = getString(R.string.text_uninstall_complete, appName)
-                        listData!!.removeAt(position)
+                        listData.removeAt(position)
                     } else {
                         str = getString(R.string.text_uninstall_failure)
                     }
@@ -74,6 +75,9 @@ class FreezeActivity : AppCompatActivity() {
             }
         })
 
+        if (adapter.itemCount != 0) {
+            findViewById<LinearLayout>(R.id.freeze_null_view).visibility = View.GONE
+        }
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         setTitle(R.string.uninstall_dialog_disable)
