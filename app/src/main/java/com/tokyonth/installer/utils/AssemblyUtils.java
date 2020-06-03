@@ -66,10 +66,10 @@ public class AssemblyUtils {
         Intent intent = new Intent();
         String act = null;
         String sysPkgName;
-        if ((boolean) SPUtils.getData(Constants.SP_USE_SYS_PKG, false)) {
-            sysPkgName = (String) SPUtils.getData(Constants.SYS_PKG_NAME, Constants.SYS_PKG_NAME);
+        if ((boolean) SPUtils.getData(Constants.INSTANCE.getSP_USE_SYS_PKG(), false)) {
+            sysPkgName = (String) SPUtils.getData(Constants.INSTANCE.getSYS_PKG_NAME(), Constants.INSTANCE.getSYS_PKG_NAME());
         } else {
-            sysPkgName = Constants.SYS_PKG_NAME;
+            sysPkgName = Constants.INSTANCE.getSYS_PKG_NAME();
         }
         try {
             PackageManager packageManager = context.getPackageManager();
@@ -81,10 +81,10 @@ public class AssemblyUtils {
         assert act != null;
         ComponentName cn = new ComponentName(sysPkgName, act);
         intent.setComponent(cn);
-        Uri apkUri = FileProvider.getUriForFile(context, Constants.PROVIDER_STR,
+        Uri apkUri = FileProvider.getUriForFile(context, Constants.INSTANCE.getPROVIDER_STR(),
                 new File(filePath));
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.setDataAndType(apkUri, Constants.URI_DATA_TYPE);
+        intent.setDataAndType(apkUri, Constants.INSTANCE.getURI_DATA_TYPE());
         context.startActivity(intent);
     }
 

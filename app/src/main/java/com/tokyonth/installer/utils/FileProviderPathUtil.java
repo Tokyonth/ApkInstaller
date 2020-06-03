@@ -32,7 +32,7 @@ public class FileProviderPathUtil {
         if (path == null) {
             return getFileFromContentUri(context, uri).getPath();
         }
-        if (Objects.equals(referrer, Constants.MT2_PKG_NAME) || path.contains(Constants.DATA_PATH_PREFIX)) {
+        if (Objects.equals(referrer, Constants.INSTANCE.getMT2_PKG_NAME()) || path.contains(Constants.INSTANCE.getDATA_PATH_PREFIX())) {
             return getPathFromInputStreamUri(context, uri, "fakePath.apk");
         } else {
             return path;
