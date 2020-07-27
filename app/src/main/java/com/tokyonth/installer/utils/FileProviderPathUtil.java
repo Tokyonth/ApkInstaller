@@ -27,52 +27,18 @@ import java.util.Objects;
 
 public class FileProviderPathUtil {
 
-    public static String getFilePath(Context context, Uri uri, String referrer) {
-        String path = getFPUriToPath(context, uri);
-        if (path == null) {
-            return getFileFromContentUri(context, uri).getPath();
+    public static File getFileFromUri(Context context, Uri uri) {
+        if (uri == null) {
+            return null;
         }
-        if (Objects.equals(referrer, Constants.INSTANCE.getMT2_PKG_NAME()) || path.contains(Constants.INSTANCE.getDATA_PATH_PREFIX())) {
-            return getPathFromInputStreamUri(context, uri, "fakePath.apk");
-        } else {
-            return path;
+        switch (uri.getScheme()) {
+            case "content":
+                return getFileFromContentUri(uri, context);
+            case "file":
+                return new File(uri.getPath());
+            default:
+                return null;
         }
-    }
-
-    private static String getFPUriToPath(Context context, Uri uri) {
-        List<PackageInfo> packs = context.getPackageManager().getInstalledPackages(PackageManager.GET_PROVIDERS);
-            for (PackageInfo pack : packs) {
-                ProviderInfo[] providers = pack.providers;
-                if (providers != null) {
-                    for (ProviderInfo provider : providers) {
-                        if (Objects.requireNonNull(uri.getAuthority()).equals(provider.authority)){
-                                Class<FileProvider> fileProviderClass = FileProvider.class;
-                                try {
-                                    Method getPathStrategy = fileProviderClass.getDeclaredMethod("getPathStrategy", Context.class , String.class);
-                                    getPathStrategy.setAccessible(true);
-                                    Object invoke = getPathStrategy.invoke(null, context, uri.getAuthority());
-                                    if (invoke != null) {
-                                        String PathStrategyStringClass = FileProvider.class.getName()+"$PathStrategy";
-                                        Class<?> PathStrategy = Class.forName(PathStrategyStringClass);
-                                        Method getFileForUri = PathStrategy.getDeclaredMethod("getFileForUri", Uri.class);
-                                        getFileForUri.setAccessible(true);
-                                        Object invoke1 = getFileForUri.invoke(invoke, uri);
-                                        if (invoke1 instanceof File) {
-                                            return ((File) invoke1).getAbsolutePath();
-                                        }
-                                    }
-                                } catch (NoSuchMethodException |
-                                        InvocationTargetException |
-                                        IllegalAccessException |
-                                        ClassNotFoundException e) {
-                                    e.printStackTrace();
-                                }
-                            break;
-                        }
-                    }
-                }
-            }
-        return null;
     }
 
     /**
@@ -82,12 +48,13 @@ public class FileProviderPathUtil {
      * @param context    Context
      * @return the file path as a string
      */
-    private static File getFileFromContentUri(Context context, Uri contentUri) {
+
+    private static File getFileFromContentUri(Uri contentUri, Context context) {
         if (contentUri == null) {
             return null;
         }
-        File file = null;
-        String filePath;
+        File file = new File("");
+        String filePath = null;
         String fileName;
         String[] filePathColumn = {MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
         ContentResolver contentResolver = context.getContentResolver();
@@ -95,27 +62,34 @@ public class FileProviderPathUtil {
                 null, null);
         if (cursor != null) {
             cursor.moveToFirst();
-            filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
+            try{
+                filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
+            } catch(Exception e){
+                e.printStackTrace();
+            }
             fileName = cursor.getString(cursor.getColumnIndex(filePathColumn[1]));
             cursor.close();
             if (!TextUtils.isEmpty(filePath)) {
                 file = new File(filePath);
             }
-            if (TextUtils.isEmpty(filePath)) {
+            if (!file.exists() || file.length() <= 0 || TextUtils.isEmpty(filePath)) {
                 filePath = getPathFromInputStreamUri(context, contentUri, fileName);
+            }
+            if (!TextUtils.isEmpty(filePath)) {
                 file = new File(filePath);
             }
         }
         return file;
     }
 
-    private static String getPathFromInputStreamUri(Context context, Uri uri, String fileName) {
+    public static String getPathFromInputStreamUri(Context context, Uri uri, String fileName) {
         InputStream inputStream = null;
         String filePath = null;
+
         if (uri.getAuthority() != null) {
             try {
                 inputStream = context.getContentResolver().openInputStream(uri);
-                File file = createTemporalFileFrom(context, inputStream, fileName);
+                File file = createTemporalFileFrom(inputStream, fileName);
                 filePath = file.getPath();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -129,32 +103,36 @@ public class FileProviderPathUtil {
                 }
             }
         }
+
         return filePath;
     }
 
-    private static File createTemporalFileFrom(Context context, InputStream inputStream, String fileName)
+    private static File createTemporalFileFrom(InputStream inputStream, String fileName)
             throws IOException {
         File targetFile = null;
+
         if (inputStream != null) {
             int read;
             byte[] buffer = new byte[8 * 1024];
-            targetFile = new File(context.getExternalCacheDir(), fileName);
+            //自己定义拷贝文件路径
+            targetFile = new File(Constants.INSTANCE.getCACHE_APK_DIR(), fileName);
             if (targetFile.exists()) {
-                if (!targetFile.delete()) {
-                    Log.e("FileProviderPathUtil", "failed to delete！");
-                }
+                targetFile.delete();
             }
             OutputStream outputStream = new FileOutputStream(targetFile);
+
             while ((read = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, read);
             }
             outputStream.flush();
+
             try {
                 outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
         return targetFile;
     }
 

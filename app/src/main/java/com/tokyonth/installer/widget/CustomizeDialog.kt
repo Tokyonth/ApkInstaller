@@ -7,7 +7,8 @@ import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.utils.SPUtils
 
-class CustomizeDialog private constructor(context: Context, overrideThemeResId: Int) : MaterialAlertDialogBuilder(context, overrideThemeResId) {
+class CustomizeDialog private constructor(context: Context, overrideThemeResId: Int) :
+        MaterialAlertDialogBuilder(context, overrideThemeResId) {
     companion object {
 
         fun getInstance(context: Context): CustomizeDialog {

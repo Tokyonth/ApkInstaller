@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:background="@color/colorBackGround"
     tools:context=".activity.InstallerActivity">
 
@@ -12,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
-        android:layout_marginTop="-4dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="4dp"
         app:cardBackgroundColor="@color/colorCard"
@@ -53,7 +53,7 @@
                         android:background="?android:attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/title_night_mode"
                         android:padding="6dp"
-                        android:src="@drawable/ic_opacity_24px"
+                        android:src="@drawable/ic_brightness_4_24px"
                         android:tint="@android:color/white" />
 
                     <ImageButton
@@ -75,35 +75,26 @@
                     android:gravity="center"
                     android:orientation="vertical">
 
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/tip_card"
+                    <TextView
+                        android:id="@+id/tv_version_tips"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:visibility="invisible"
-                        app:cardBackgroundColor="@color/colorCard"
-                        app:cardCornerRadius="32dp"
-                        app:cardElevation="0.5dp"
-                        app:cardPreventCornerOverlap="true"
-                        app:cardUseCompatPadding="true">
-
-                        <TextView
-                            android:id="@+id/tv_version_tips"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:paddingLeft="26dp"
-                            android:paddingTop="10dp"
-                            android:paddingRight="26dp"
-                            android:paddingBottom="10dp" />
-
-                    </com.google.android.material.card.MaterialCardView>
+                        android:background="@drawable/frame_reveal_weather_msg"
+                        android:gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:paddingLeft="26dp"
+                        android:paddingTop="10dp"
+                        android:paddingRight="26dp"
+                        android:paddingBottom="10dp" />
 
                     <ImageView
                         android:id="@+id/iv_app_icon"
                         android:layout_width="58dp"
                         android:layout_height="58dp"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="16dp"
                         android:scaleType="fitXY"
                         tools:ignore="ContentDescription" />
 

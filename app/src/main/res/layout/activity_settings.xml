@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/coordinator_layout"
     android:orientation="vertical"
+    android:fitsSystemWindows="true"
     android:background="@color/colorBackGround"
     tools:context=".activity.SettingsActivity">
 

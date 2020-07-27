@@ -5,7 +5,8 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 
-class SQLiteHelper(context: Context, name: String, factory: SQLiteDatabase.CursorFactory?, version: Int) : SQLiteOpenHelper(context, name, factory, version) {
+class SQLiteHelper(context: Context, name: String, factory: SQLiteDatabase.CursorFactory?, version: Int)
+    : SQLiteOpenHelper(context, name, factory, version) {
 
     @JvmOverloads
     constructor(context: Context, name: String, version: Int = Version) : this(context, name, null, version) {

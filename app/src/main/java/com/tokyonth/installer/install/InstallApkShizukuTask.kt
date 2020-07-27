@@ -11,23 +11,24 @@ import com.tokyonth.installer.Constants
 import com.tokyonth.installer.Constants.SHELL_SCRIPT_CACHE_FILE
 import com.tokyonth.installer.R
 import com.tokyonth.installer.bean.ApkInfoBean
+import com.tokyonth.installer.utils.PermissionHelper
 import com.tokyonth.installer.utils.ToastUtil
 import com.tokyonth.installer.utils.ToastUtil.showToast
 import moe.shizuku.api.ShizukuApiConstants
 import moe.shizuku.api.ShizukuService
 import java.io.File
 
-class ApkShizukuInstaller(private val activity: Activity,
-                          private val handler: Handler,
-                          private val commanderCallback: CommanderCallback,
-                          private val mApkInfo: ApkInfoBean) : Thread() {
+class InstallApkShizukuTask(private val activity: Activity,
+                            private val handler: Handler,
+                            private val commanderCallback: CommanderCallback,
+                            private val mApkInfo: ApkInfoBean) : Thread() {
 
     private var retCode : Int = -1
 
     override fun run() {
         super.run()
         handler.post { commanderCallback.onApkPreInstall(mApkInfo) }
-        if (requestPermission(activity)) {
+        if (PermissionHelper.requestPermissionByShizuku(activity)) {
             handler.post { commanderCallback.onInstallLog(mApkInfo, "Shizuku installation mode")}
             mApkInfo.apkFile?.let { rowInstall(it) }
         }
@@ -74,21 +75,6 @@ class ApkShizukuInstaller(private val activity: Activity,
                 Log.e("ApkShizukuInstaller", """Error: $errorString""".trimIndent())
             }
         }
-    }
-
-    private fun requestPermission(activity: Activity): Boolean {
-        var havePermission = false
-        val permission = ShizukuApiConstants.PERMISSION
-        if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-                showToast(activity, activity.getString(R.string.shizuku_permission_request), ToastUtil.DEFAULT_SITE)
-            }
-            ActivityCompat.requestPermissions(activity,
-                    arrayOf(permission),
-                    Constants.PERMISSION_REQUEST_CODE)
-        } else
-            havePermission = true
-        return havePermission
     }
 
     private fun initDir(dir_file: File) {

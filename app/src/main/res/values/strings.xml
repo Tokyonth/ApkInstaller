@@ -77,9 +77,10 @@
     <string name="text_settings_pkg">com.android.packageinstaller</string>
     <string name="text_i_know">I Know</string>
     <string name="text_no_description">No corresponding description</string>
-    <string name="text_uninstall">Uninstall</string>
+    <string name="text_uninstall">Uninstall - %s Mode</string>
+    <string name="text_uninstall_btn">Uninstall</string>
     <string name="text_confirm_uninstall_app">Are you sure you want to uninstall %s?</string>
-    <string name="text_uninstall_complete">%s Uninstall complete!</string>
+    <string name="text_uninstall_complete">Uninstall complete!</string>
     <string name="text_uninstall_failure">Uninstall failed!</string>
     <string name="uninstall_dialog_disable">Freeze/Disable</string>
     <string name="freeze_app_name">%s is Frozen</string>
@@ -89,7 +90,22 @@
     <string name="unfreeze_app">Unfreeze</string>
     <string name="unfreeze_app_complete">Unfreeze Complete!</string>
     <string name="unfreeze_app_failure">Unfreeze Failure!</string>
-    <string name="use_shizuku">Use Shizuku</string>
+    <string name="use_shizuku">Shizuku Mode</string>
     <string name="use_shizuku_sub">Install with Shizuku</string>
     <string name="shizuku_permission_request">Please give Shizuku permission to this software</string>
+    <string name="never_show">Never show</string>
+    <string name="follow_system_night_mode">Auto dark</string>
+    <string name="follow_system_night_mode_sub">Follow the system night mode</string>
+    <string name="icebox_mode">Icebox Mode</string>
+    <string name="icebox_mode_sub">Use refrigerator SDK to install</string>
+    <string name="install_mode">Installation mode</string>
+    <string name="install_mode_sub">Choose installation mode</string>
+    <string name="text_shell">Shell</string>
+    <string name="text_shizuku">Shizuku</string>
+    <string name="text_icebox">Icebox</string>
+    <array name="install_mode_arr">
+        <item>Shell</item>
+        <item>Shizuku</item>
+        <item>Icebox</item>
+    </array>
 </resources>

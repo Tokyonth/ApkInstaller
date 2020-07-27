@@ -42,20 +42,10 @@ public class ParsingContentUtil {
     private static String getPathFromIndex1PathSegment;
     private static String getLastPathSegment;
 
-    /**
-     * 反射获取准确的Intent Referrer
-     */
-    public static String reflectGetReferrer(Context context) {
-        try {
-            Class activityClass = Class.forName("android.app.Activity");
-            //noinspection JavaReflectionMemberAccess
-            Field refererField = activityClass.getDeclaredField("mReferrer");
-            refererField.setAccessible(true);
-            return (String) refererField.get(context);
-        } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
-            e.printStackTrace();
-            return null;
-        }
+    private String ApkSource;
+
+    public ParsingContentUtil(String ApkSource) {
+        this.ApkSource = ApkSource;
     }
 
     /**
@@ -194,9 +184,10 @@ public class ParsingContentUtil {
 
     //一些变量的初始化
     @SuppressLint("SdCardPath")
-    private static void initValue(Context context, Uri fromUri) {
+    private void initValue(Context context, Uri fromUri) {
         uri = fromUri;
-        String referrer = reflectGetReferrer(context);
+        //String referrer = reflectGetReferrer(context);
+        String referrer = ApkSource;
         shardUid = getSharedUserId(context, referrer);
         try {
             uriPath = uri.getPath();
@@ -249,6 +240,12 @@ public class ParsingContentUtil {
         ArrayList<String> pathList = new ArrayList<>();
 
         switch (authority) {
+            case "com.yingyonghui.market.provider":
+                String str1 = uriPath.substring(0, uriPath.indexOf("apk/"));
+                String str2 = uriPath.substring(str1.length() + 4);
+                path = getExternalStorageDirectory + getExternalFilesDir + "/app_download/" + str2;
+                pathList.add(path);
+                break;
             case "moe.shizuku.redirectstorage.ServerFileProvider":
                 if (uri.getPathSegments().size() > 2) {
                     String getIndex1PathSegment = uri.getPathSegments().get(1);
@@ -491,7 +488,7 @@ public class ParsingContentUtil {
     }
 
     //两种方法获取file
-    public static File getFile(Context context, Uri fromUri) {
+    public File getFile(Context context, Uri fromUri) {
         initValue(context, fromUri);
         File file = null;
         try {

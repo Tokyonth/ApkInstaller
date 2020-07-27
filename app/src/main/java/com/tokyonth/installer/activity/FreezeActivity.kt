@@ -6,27 +6,31 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.adapter.FreezeAdapter
+import com.tokyonth.installer.base.BaseActivity
 import com.tokyonth.installer.database.SQLiteUtil
 import com.tokyonth.installer.utils.GetAppInfoUtils
-import com.tokyonth.installer.utils.SPUtils
 import com.tokyonth.installer.utils.ShellUtils
-import com.tokyonth.installer.utils.StatusBarColorUtils
 import com.tokyonth.installer.widget.CustomizeDialog
 import java.util.ArrayList
 
-class FreezeActivity : AppCompatActivity() {
+class FreezeActivity : BaseActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        StatusBarColorUtils.setStatusBarDarkIcon(this, !(SPUtils.getData(Constants.SP_NIGHT_MODE, false) as Boolean))
-        setContentView(R.layout.activity_freeze)
+    override fun setActivityView(): Int {
+        return R.layout.activity_freeze
+    }
+
+    override fun initActivity(savedInstanceState: Bundle?) {
+        initData()
+    }
+
+    private fun initData() {
         val listData = SQLiteUtil.getAllData(this)
         val recyclerView = findViewById<RecyclerView>(R.id.rv_freeze_list)
         val adapter = FreezeAdapter(this, listData as ArrayList<String>?)
@@ -85,6 +89,10 @@ class FreezeActivity : AppCompatActivity() {
         if (actionBar != null) {
             actionBar.setHomeButtonEnabled(true)
             actionBar.setDisplayHomeAsUpEnabled(true)
+        }
+        toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.colorText))
+        toolbar.navigationIcon?.apply {
+            setTint(ContextCompat.getColor(this@FreezeActivity, R.color.colorText))
         }
     }
 

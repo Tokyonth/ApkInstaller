@@ -3,6 +3,7 @@ package com.tokyonth.installer.install
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.util.AndroidRuntimeException
 
@@ -18,7 +19,7 @@ import java.util.Collections
 
 abstract class ParseApkTask : Thread() {
 
-    private var uri: Uri? = null
+    var uri: Uri? = null
     private var handler: Handler? = null
     private var context: Context? = null
     private var referrer: String? = null
@@ -41,6 +42,7 @@ abstract class ParseApkTask : Thread() {
 
     protected abstract fun setPermInfo(permInfo: PermInfoBean)
 
+    @Suppress("DEPRECATION")
     override fun run() {
         super.run()
         try {
@@ -48,11 +50,14 @@ abstract class ParseApkTask : Thread() {
             mApkInfo = ApkInfoBean()
             permInfo = PermInfoBean()
 
-            val queryContent = ParsingContentUtil.getFile(context, uri)
-            val apkSourcePath = if (queryContent == null)
-                FileProviderPathUtil.getFilePath(context, uri, referrer)
-            else
+            var apkSourcePath = ""
+            val queryContent = ParsingContentUtil(referrer).getFile(context, uri)
+            apkSourcePath = if (queryContent == null) {
+                FileProviderPathUtil.getFileFromUri(context, uri).path
+            } else {
                 queryContent.path
+            }
+
             mApkInfo!!.apkFile = File(apkSourcePath)
 
             val pkgInfo = packageManager!!.getPackageArchiveInfo(mApkInfo!!.apkFile!!.path, PackageManager.GET_ACTIVITIES)
@@ -62,7 +67,11 @@ abstract class ParseApkTask : Thread() {
                 mApkInfo!!.appName = packageManager!!.getApplicationLabel(pkgInfo.applicationInfo).toString()
                 mApkInfo!!.packageName = pkgInfo.applicationInfo.packageName
                 mApkInfo!!.versionName = pkgInfo.versionName
-                mApkInfo!!.versionCode = pkgInfo.longVersionCode.toInt()
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                    mApkInfo!!.versionCode = pkgInfo.versionCode
+                } else {
+                    mApkInfo!!.versionCode = pkgInfo.longVersionCode.toInt()
+                }
                 mApkInfo!!.icon = pkgInfo.applicationInfo.loadIcon(packageManager)
 
                 val activityList = ArrayList<String>()
@@ -75,7 +84,11 @@ abstract class ParseApkTask : Thread() {
                 try {
                     val installedPkgInfo = packageManager!!.getPackageInfo(mApkInfo!!.packageName!!, PackageManager.GET_CONFIGURATIONS)
                     mApkInfo!!.installedVersionName = installedPkgInfo.versionName
-                    mApkInfo!!.installedVersionCode = installedPkgInfo.longVersionCode.toInt()
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                        mApkInfo!!.installedVersionCode = installedPkgInfo.versionCode
+                    } else {
+                        mApkInfo!!.installedVersionCode = installedPkgInfo.longVersionCode.toInt()
+                    }
                     mApkInfo!!.isHasInstalledApp = true
                 } catch (e: PackageManager.NameNotFoundException) {
                     e.printStackTrace()

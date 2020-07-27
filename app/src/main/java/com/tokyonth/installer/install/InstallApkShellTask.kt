@@ -8,9 +8,11 @@ import com.tokyonth.installer.Constants
 import com.tokyonth.installer.bean.ApkInfoBean
 import com.tokyonth.installer.utils.ShellUtils
 
-class InstallApkTask internal constructor(private val handler: Handler,
-                                          private val commanderCallback: CommanderCallback,
-                                          private val mApkInfo: ApkInfoBean) : Thread() {
+class InstallApkShellTask internal constructor(private val handler: Handler,
+                                               private val commanderCallback: CommanderCallback,
+                                               private val mApkInfo: ApkInfoBean) : Thread() {
+
+    private var retCode = -1
 
     override fun run() {
         super.run()
@@ -18,7 +20,7 @@ class InstallApkTask internal constructor(private val handler: Handler,
         if (Build.VERSION.SDK_INT >= 24) {
             ShellUtils.execWithRoot(Constants.SE_LINUX_COMMAND)
         }
-        val retCode = ShellUtils.execWithRoot(Constants.INSTALL_COMMAND + "\"" + mApkInfo.apkFile!!.path + "\"" + "\n", object : ShellUtils.Result {
+        retCode = ShellUtils.execWithRoot(Constants.INSTALL_COMMAND + "\"" + mApkInfo.apkFile!!.path + "\"" + "\n", object : ShellUtils.Result {
             override fun onStdout(text: String) {
                 handler.post { commanderCallback.onInstallLog(mApkInfo, text) }
             }
@@ -35,6 +37,7 @@ class InstallApkTask internal constructor(private val handler: Handler,
 
             }
         })
+
         if (retCode == 0 && mApkInfo.isFakePath) {
             if (!mApkInfo.apkFile!!.delete()) {
                 Log.e("InstallApkTask", "failed to delete！")

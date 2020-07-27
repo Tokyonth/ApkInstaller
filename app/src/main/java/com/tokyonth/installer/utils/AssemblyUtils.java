@@ -22,6 +22,7 @@ import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import com.tokyonth.installer.Constants;
 
 import java.io.File;
+import java.lang.reflect.Field;
 
 public class AssemblyUtils {
 
@@ -64,7 +65,7 @@ public class AssemblyUtils {
 
     public static void StartSystemPkgInstall(Context context, String filePath) {
         Intent intent = new Intent();
-        String act = null;
+        String activityName = null;
         String sysPkgName;
         if ((boolean) SPUtils.getData(Constants.INSTANCE.getSP_USE_SYS_PKG(), false)) {
             sysPkgName = (String) SPUtils.getData(Constants.INSTANCE.getSYS_PKG_NAME(), Constants.INSTANCE.getSYS_PKG_NAME());
@@ -74,19 +75,40 @@ public class AssemblyUtils {
         try {
             PackageManager packageManager = context.getPackageManager();
             PackageInfo packageInfo = packageManager.getPackageInfo(sysPkgName, PackageManager.GET_ACTIVITIES);
-            act = packageInfo.activities[0].name;
+            activityName = packageInfo.activities[0].name;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        assert act != null;
-        ComponentName cn = new ComponentName(sysPkgName, act);
-        intent.setComponent(cn);
-        Uri apkUri = FileProvider.getUriForFile(context, Constants.INSTANCE.getPROVIDER_STR(),
-                new File(filePath));
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.setDataAndType(apkUri, Constants.INSTANCE.getURI_DATA_TYPE());
-        context.startActivity(intent);
+        if (activityName != null) {
+            ComponentName componentName = new ComponentName(sysPkgName, activityName);
+            intent.setComponent(componentName);
+            Uri apkUri = FileProvider.getUriForFile(context, Constants.INSTANCE.getPROVIDER_STR(),
+                    new File(filePath));
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.setDataAndType(apkUri, Constants.INSTANCE.getURI_DATA_TYPE());
+            context.startActivity(intent);
+        } else {
+            ToastUtil.showToast(context, "打开失败!可尝试在设置中自定义包名", ToastUtil.DEFAULT_SITE);
+        }
+
     }
+
+    /**
+     * 反射获取准确的Intent Referrer
+     */
+    public static String reflectGetReferrer(Context context) {
+        try {
+            Class activityClass = Class.forName("android.app.Activity");
+            //noinspection JavaReflectionMemberAccess
+            Field refererField = activityClass.getDeclaredField("mReferrer");
+            refererField.setAccessible(true);
+            return (String) refererField.get(context);
+        } catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 }
 

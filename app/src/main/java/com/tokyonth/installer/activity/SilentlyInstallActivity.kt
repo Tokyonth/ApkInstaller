@@ -22,7 +22,7 @@ class SilentlyInstallActivity : BaseActivity(), CommanderCallback {
 
     override fun initActivity(savedInstanceState: Bundle?) {
         if (intent.data != null) {
-            val apkSource = intent.getStringExtra("apkSource")
+            val apkSource = intent.getStringExtra(Constants.APK_SOURCE)
             apkCommander = APKCommander(this, intent.data!!, this, apkSource as String)
         } else {
             showToast(getString(R.string.unable_to_install_apk))
@@ -45,7 +45,7 @@ class SilentlyInstallActivity : BaseActivity(), CommanderCallback {
     override fun onApkInstalled(apkInfo: ApkInfoBean, resultCode: Int) {
         if (resultCode == 0) {
             showToast(getString(R.string.apk_installed, apkInfo.appName))
-            if (!apkInfo.isFakePath && SPUtils.getData(Constants.SP_AUTO_DEL, false) as Boolean) {
+            if (!apkInfo.isFakePath && SPUtils.getData(Constants.SP_AUTO_DELETE, false) as Boolean) {
                 showToast(getString(R.string.apk_deleted, apkInfo.apkFile!!.name))
             }
         } else {

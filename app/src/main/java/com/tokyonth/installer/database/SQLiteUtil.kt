@@ -27,7 +27,8 @@ object SQLiteUtil {
         val list = ArrayList<String>()
         val dbHelper = SQLiteHelper(context, "freezeList", 1)
         val sqLiteDatabase = dbHelper.readableDatabase
-        val cursor = sqLiteDatabase.query("appList", arrayOf("_id", "pkg"), null, null, null, null, null)
+        val cursor = sqLiteDatabase.query("appList", arrayOf("_id", "pkg"),
+                null, null, null, null, null)
         while (cursor.moveToNext()) {
             list.add(cursor.getString(cursor.getColumnIndex("pkg")))
         }

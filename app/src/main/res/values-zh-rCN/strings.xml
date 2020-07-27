@@ -55,7 +55,7 @@
     <string name="text_low_ver">旧版本</string>
     <string name="text_new_ver">新版本</string>
     <string name="text_equal_ver">相同版本</string>
-    <string name="no_permissions">没有权限</string>
+    <string name="no_permissions">没有权限!</string>
     <string name="use_system_pkg">安装失败，是否使用系统打包安装程序进行安装？</string>
     <string name="app_act">活动组件 : (%s)</string>
     <string name="title_show_act">活动组件</string>
@@ -78,9 +78,10 @@
     <string name="text_settings_pkg">com.android.packageinstaller</string>
     <string name="text_i_know">我知道了</string>
     <string name="text_no_description">无对应描述</string>
-    <string name="text_uninstall">卸载</string>
+    <string name="text_uninstall">卸载 - %s 模式</string>
+    <string name="text_uninstall_btn">卸载</string>
     <string name="text_confirm_uninstall_app">确定要卸载 %s 吗？</string>
-    <string name="text_uninstall_complete">%s 卸载完成!</string>
+    <string name="text_uninstall_complete">卸载完成!</string>
     <string name="text_uninstall_failure">卸载失败!</string>
     <string name="uninstall_dialog_disable">冻结/禁用</string>
     <string name="freeze_app_name">%s 已冻结</string>
@@ -90,7 +91,22 @@
     <string name="unfreeze_app">解冻</string>
     <string name="unfreeze_app_complete">解冻完成！</string>
     <string name="unfreeze_app_failure">解冻失败！</string>
-    <string name="use_shizuku">使用Shizuku</string>
-    <string name="use_shizuku_sub">使用Shizuku进行APK安装</string>
+    <string name="use_shizuku">Shizuku模式</string>
+    <string name="use_shizuku_sub">利用Shizuku进行安装</string>
     <string name="shizuku_permission_request">请给予本软件 Shizuku 权限</string>
+    <string name="never_show">不再显示</string>
+    <string name="follow_system_night_mode">自动暗色</string>
+    <string name="follow_system_night_mode_sub">跟随系统夜间模式</string>
+    <string name="icebox_mode">冰箱模式</string>
+    <string name="icebox_mode_sub">利用冰箱SDK进行安装</string>
+    <string name="install_mode">安装模式</string>
+    <string name="install_mode_sub">选择安装模式</string>
+    <string name="text_shell">Shell</string>
+    <string name="text_shizuku">Shizuku</string>
+    <string name="text_icebox">冰箱</string>
+    <array name="install_mode_arr">
+        <item>Shell</item>
+        <item>Shizuku</item>
+        <item>冰箱</item>
+    </array>
 </resources>

@@ -3,12 +3,13 @@ package com.tokyonth.installer.activity
 import android.os.Bundle
 import android.text.Editable
 
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.GridLayoutManager
 
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -17,7 +18,7 @@ import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.adapter.SettingsAdapter
 import com.tokyonth.installer.adapter.SettingsAdapter.*
-import com.tokyonth.installer.utils.StatusBarColorUtils
+import com.tokyonth.installer.base.BaseActivity
 import com.tokyonth.installer.widget.CustomizeDialog
 import com.tokyonth.installer.bean.SettingsBean
 import com.tokyonth.installer.utils.GetAppInfoUtils
@@ -28,17 +29,17 @@ import java.io.File
 import java.util.ArrayList
 import java.util.Objects
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
 
     private var switchButtonUseSysPkg: SwitchButton? = null
     private var textViewSysPkgName: TextView? = null
     private var textViewApkCache: TextView? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        StatusBarColorUtils.setStatusBarDarkIcon(this,
-                !(SPUtils.getData(Constants.SP_NIGHT_MODE, false) as Boolean))
-        setContentView(R.layout.activity_settings)
+    override fun setActivityView(): Int {
+        return R.layout.activity_settings
+    }
+
+    override fun initActivity(savedInstanceState: Bundle?) {
         initViewData()
         initSettings()
     }
@@ -47,34 +48,47 @@ class SettingsActivity : AppCompatActivity() {
         val settingsBeanArrayList = ArrayList<SettingsBean>()
         settingsBeanArrayList.add(SettingsBean(getString(R.string.title_show_perm),
                 getString(R.string.summary_show_perm),
-                R.drawable.ic_verified_user_24px, resources.getColor(R.color.color0)))
+                R.drawable.ic_verified_user_24px, ContextCompat.getColor(this, R.color.color0),
+                SPUtils.getData(Constants.SP_SHOW_PERMISSION, true) as Boolean))
         settingsBeanArrayList.add(SettingsBean(getString(R.string.title_show_act),
                 getString(R.string.summary_show_act),
-                R.drawable.ic_widgets_24px, resources.getColor(R.color.color1)))
+                R.drawable.ic_widgets_24px, ContextCompat.getColor(this, R.color.color1),
+                SPUtils.getData(Constants.SP_SHOW_ACTIVITY, true) as Boolean))
         settingsBeanArrayList.add(SettingsBean(getString(R.string.vibrate),
                 getString(R.string.install_vibrate),
-                R.drawable.ic_waves_24px, resources.getColor(R.color.color2)))
-        settingsBeanArrayList.add(SettingsBean(getString(R.string.use_shizuku),
-                getString(R.string.use_shizuku_sub),
-                R.drawable.ic_extension_24px, resources.getColor(R.color.color4)))
-        settingsBeanArrayList.add(SettingsBean(getString(R.string.freeze_app_list),
-                getString(R.string.freeze_app_list_sub),
-                R.drawable.ic_all_inbox_24px, resources.getColor(R.color.color3)))
+                R.drawable.ic_waves_24px, ContextCompat.getColor(this, R.color.color2),
+                SPUtils.getData(Constants.SP_INSTALLED_VIBRATE, false) as Boolean))
+        settingsBeanArrayList.add(SettingsBean(getString(R.string.follow_system_night_mode),
+                getString(R.string.follow_system_night_mode_sub),
+                R.drawable.ic_brightness_6_24px, ContextCompat.getColor(this, R.color.color5),
+                SPUtils.getData(Constants.SP_NIGHT_FOLLOW_SYSTEM, false) as Boolean))
+        settingsBeanArrayList.add(SettingsBean(getString(R.string.install_mode),
+                getString(R.string.install_mode_sub),
+                R.drawable.ic_move_to_inbox_24px,
+                ContextCompat.getColor(this, R.color.color4), false))
+       // settingsBeanArrayList.add(SettingsBean(getString(R.string.freeze_app_list),
+        //        getString(R.string.freeze_app_list_sub),
+         //       R.drawable.ic_all_inbox_24px, ContextCompat.getColor(this, R.color.color3), false))
 
         val adapter = SettingsAdapter(this, settingsBeanArrayList)
         val rvSettings = findViewById<RecyclerView>(R.id.rv_settings_item)
-        rvSettings.layoutManager = LinearLayoutManager(this)
-        rvSettings.adapter = adapter
-        adapter.setOnItemClick(onItemSwitchClick = object : OnItemSwitchClick {
-            override fun onItemClick(view: View, pos: Int, bool: Boolean) {
-                when (pos) {
-                    0 -> SPUtils.putData(Constants.SP_SHOW_PERM, bool)
-                    1 -> SPUtils.putData(Constants.SP_SHOW_ACT, bool)
-                    2 -> SPUtils.putData(Constants.SP_VIBRATE, bool)
-                    3 -> SPUtils.putData(Constants.SP_IS_SHIZUKU_MODE, bool)
+        rvSettings.layoutManager = GridLayoutManager(this, 1)
+        rvSettings.adapter = adapter.apply {
+            setOnItemClick(onItemSwitchClick = object : OnItemSwitchClick {
+                override fun onItemClick(view: View, pos: Int, bool: Boolean) {
+                    when (pos) {
+                        0 -> SPUtils.putData(Constants.SP_SHOW_PERMISSION, bool)
+                        1 -> SPUtils.putData(Constants.SP_SHOW_ACTIVITY, bool)
+                        2 -> SPUtils.putData(Constants.SP_INSTALLED_VIBRATE, bool)
+                        3 -> {
+                            if (bool)
+                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                            SPUtils.putData(Constants.SP_NIGHT_FOLLOW_SYSTEM, bool)
+                        }
+                    }
                 }
-            }
-        })
+            })
+        }
 
         findViewById<TextView>(R.id.tv_version).append(GetAppInfoUtils.getVersionName(this))
 

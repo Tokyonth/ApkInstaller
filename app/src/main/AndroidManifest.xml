@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tokyonth.installer">
 
-    <uses-sdk tools:overrideLibrary="moe.shizuku.shared, moe.shizuku.api"/>
+    <uses-sdk tools:overrideLibrary="moe.shizuku.shared, moe.shizuku.api" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -18,6 +18,8 @@
     <uses-permission
         android:name="android.permission.DELETE_PACKAGES"
         tools:ignore="ProtectedPermissions" />
+
+    <uses-permission android:name="com.catchingnow.icebox.SDK" />
 
     <application
         android:name=".base.BaseApplication"
@@ -72,11 +74,10 @@
             android:theme="@style/AppTheme.NoDisplay" />
         <activity
             android:name=".activity.FreezeActivity"
-            android:theme="@style/InstallAppTheme"/>
+            android:theme="@style/InstallAppTheme" />
         <activity
             android:name=".activity.SettingsActivity"
             android:theme="@style/InstallAppTheme" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.FileProvider"
@@ -89,10 +90,9 @@
         <provider
             android:name="moe.shizuku.api.ShizukuProvider"
             android:authorities="${applicationId}.shizuku"
-            android:multiprocess="false"
             android:enabled="true"
             android:exported="true"
+            android:multiprocess="false"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
     </application>
-
 </manifest>
