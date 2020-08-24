@@ -62,9 +62,9 @@ public class FileProviderPathUtil {
                 null, null);
         if (cursor != null) {
             cursor.moveToFirst();
-            try{
+            try {
                 filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
-            } catch(Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             fileName = cursor.getString(cursor.getColumnIndex(filePathColumn[1]));
@@ -89,7 +89,7 @@ public class FileProviderPathUtil {
         if (uri.getAuthority() != null) {
             try {
                 inputStream = context.getContentResolver().openInputStream(uri);
-                File file = createTemporalFileFrom(inputStream, fileName);
+                File file = createTemporalFileFrom(context, inputStream, fileName);
                 filePath = file.getPath();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -107,15 +107,15 @@ public class FileProviderPathUtil {
         return filePath;
     }
 
-    private static File createTemporalFileFrom(InputStream inputStream, String fileName)
+    private static File createTemporalFileFrom(Context context, InputStream inputStream, String fileName)
             throws IOException {
         File targetFile = null;
 
         if (inputStream != null) {
             int read;
             byte[] buffer = new byte[8 * 1024];
-            //自己定义拷贝文件路径
-            targetFile = new File(Constants.INSTANCE.getCACHE_APK_DIR(), fileName);
+
+            targetFile = new File(context.getCacheDir(), fileName);
             if (targetFile.exists()) {
                 targetFile.delete();
             }
@@ -125,14 +125,12 @@ public class FileProviderPathUtil {
                 outputStream.write(buffer, 0, read);
             }
             outputStream.flush();
-
             try {
                 outputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
         return targetFile;
     }
 
