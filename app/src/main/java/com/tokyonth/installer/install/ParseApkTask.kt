@@ -50,14 +50,12 @@ abstract class ParseApkTask : Thread() {
             mApkInfo = ApkInfoBean()
             permInfo = PermInfoBean()
 
-            var apkSourcePath = ""
             val queryContent = ParsingContentUtil(referrer).getFile(context, uri)
-            apkSourcePath = if (queryContent == null) {
+            val apkSourcePath = if (queryContent == null) {
                 FileProviderPathUtil.getFileFromUri(context, uri).path
             } else {
                 queryContent.path
             }
-
             mApkInfo!!.apkFile = File(apkSourcePath)
 
             val pkgInfo = packageManager!!.getPackageArchiveInfo(mApkInfo!!.apkFile!!.path, PackageManager.GET_ACTIVITIES)
