@@ -20,7 +20,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="@drawable/ic_settings_bg"
+            android:background="@mipmap/ic_settings_bg"
             android:padding="16dp"
             android:orientation="vertical">
 

@@ -103,6 +103,7 @@
     <string name="text_shell">Shell</string>
     <string name="text_shizuku">Shizuku</string>
     <string name="text_icebox">Icebox</string>
+    <string name="text_freeze_null">No record</string>
     <array name="install_mode_arr">
         <item>Shell</item>
         <item>Shizuku</item>

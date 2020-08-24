@@ -29,11 +29,11 @@
             tools:ignore="ContentDescription" />
 
         <TextView
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/colorTextSub"
-            android:text="空 ..."/>
+            android:text="@string/text_freeze_null"/>
 
     </LinearLayout>
 
