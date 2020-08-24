@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.base.BaseActivity
@@ -36,7 +35,7 @@ class UninstallActivity : BaseActivity(), CommanderCallback {
             Objects.requireNonNull<String>(intent.dataString).replace("package:", "")
         }
 
-        val unMode = SPUtils.getData(Constants.SP_INSTALL_MODE_KEY, 0) as Int
+        val unMode = SPUtils.getData(Constants.SP_INSTALL_MODE, 0) as Int
         unInstallTask = UnInstallTask(unMode, pkgName, this, handler,this)
         var mode = ""
         when (unMode) {

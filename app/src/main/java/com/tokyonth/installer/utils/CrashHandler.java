@@ -32,27 +32,16 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     @SuppressLint("StaticFieldLeak")
     private static CrashHandler mInstance = new CrashHandler();
 
-    /**
-     * 单例模式，保证只有一个CrashHandler实例存在
-     *
-     * @return CrashHandler
-     */
     public static CrashHandler getInstance() {
         return mInstance;
     }
 
-    /**
-     * 异常发生时，系统回调的函数，我们在这里处理一些操作
-     */
     @Override
     public void uncaughtException(@NonNull Thread thread, @NonNull Throwable ex) {
         saveCrashReport2SD(mContext, ex);
         showCrashToast();
     }
 
-    /**
-     * 为我们的应用程序设置自定义Crash处理
-     */
     public void initCrashHandler(Context context) {
         mContext = context;
         Thread.setDefaultUncaughtExceptionHandler(this);
@@ -77,12 +66,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
-    /**
-     * 获取一些简单的信息,软件版本，手机版本，型号等信息存放在LinkedHashMap中
-     *
-     * @param context context
-     * @return hashMap
-     */
     private HashMap<String, String> obtainSimpleInfo(Context context) {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         PackageManager mPackageManager = context.getPackageManager();
@@ -104,12 +87,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         return map;
     }
 
-    /**
-     * 获取系统未捕捉的错误信息
-     *
-     * @param throwable throwable
-     * @return string
-     */
     private String obtainExceptionInfo(Throwable throwable) {
         StringWriter mStringWriter = new StringWriter();
         PrintWriter mPrintWriter = new PrintWriter(mStringWriter);
@@ -120,12 +97,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         return mStringWriter.toString();
     }
 
-    /**
-     * 保存获取的 软件信息，设备信息和出错信息保存在SDCard中
-     *
-     * @param context context
-     * @param ex ex
-     */
     private void saveCrashReport2SD(Context context, Throwable ex) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : obtainSimpleInfo(context).entrySet()) {
@@ -153,12 +124,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         }
     }
 
-    /**
-     * 将毫秒数转换成yyyy-MM-dd-HH-mm-ss的格式，并在后缀加入随机数
-     *
-     * @param milliseconds milliseconds
-     * @return string
-     */
     @SuppressLint("SimpleDateFormat")
     private String parserTime(long milliseconds) {
         System.setProperty("user.timezone", "Asia/Shanghai");

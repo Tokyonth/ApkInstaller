@@ -2,43 +2,34 @@ package com.tokyonth.installer.utils;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.core.content.FileProvider;
-
-import com.tokyonth.installer.Constants;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Objects;
 
 public class FileProviderPathUtil {
 
     public static File getFileFromUri(Context context, Uri uri) {
         if (uri == null) {
             return null;
+        } else if (uri.getScheme() != null && uri.getPath() != null) {
+            switch (uri.getScheme()) {
+                case "content":
+                    return getFileFromContentUri(uri, context);
+                case "file":
+                    return new File(uri.getPath());
+                default:
+                    return null;
+            }
         }
-        switch (uri.getScheme()) {
-            case "content":
-                return getFileFromContentUri(uri, context);
-            case "file":
-                return new File(uri.getPath());
-            default:
-                return null;
-        }
+        return null;
     }
 
     /**
@@ -85,7 +76,6 @@ public class FileProviderPathUtil {
     public static String getPathFromInputStreamUri(Context context, Uri uri, String fileName) {
         InputStream inputStream = null;
         String filePath = null;
-
         if (uri.getAuthority() != null) {
             try {
                 inputStream = context.getContentResolver().openInputStream(uri);
@@ -103,24 +93,22 @@ public class FileProviderPathUtil {
                 }
             }
         }
-
         return filePath;
     }
 
     private static File createTemporalFileFrom(Context context, InputStream inputStream, String fileName)
             throws IOException {
         File targetFile = null;
-
         if (inputStream != null) {
             int read;
             byte[] buffer = new byte[8 * 1024];
 
             targetFile = new File(context.getCacheDir(), fileName);
             if (targetFile.exists()) {
-                targetFile.delete();
+                boolean bool = targetFile.delete();
+                Log.e("Del", bool + "");
             }
             OutputStream outputStream = new FileOutputStream(targetFile);
-
             while ((read = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, read);
             }

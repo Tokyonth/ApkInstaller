@@ -1,28 +1,20 @@
 package com.tokyonth.installer.adapter
 
-import android.Manifest
 import android.app.Activity
-import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.catchingnow.icebox.sdk_client.IceBox
 
 import com.kyleduo.switchbutton.SwitchButton
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
-import com.tokyonth.installer.activity.FreezeActivity
-import com.tokyonth.installer.base.BaseApplication
 import com.tokyonth.installer.bean.SettingsBean
 import com.tokyonth.installer.utils.PermissionHelper
 import com.tokyonth.installer.utils.SPUtils
 import com.tokyonth.installer.widget.BurnRoundView
 import com.tokyonth.installer.widget.CustomizeDialog
-import moe.shizuku.api.ShizukuApiConstants
 
 import java.util.ArrayList
 
@@ -56,9 +48,9 @@ class SettingsAdapter(private val activity: Activity, private val list: ArrayLis
                 holder.itemView.setOnClickListener {
                     CustomizeDialog.getInstance(activity)
                             .setTitle(R.string.dialog_text_title)
-                            .setSingleChoiceItems(R.array.install_mode_arr, SPUtils.getData(Constants.SP_INSTALL_MODE_KEY, 0) as Int) {
+                            .setSingleChoiceItems(R.array.install_mode_arr, SPUtils.getData(Constants.SP_INSTALL_MODE, 0) as Int) {
                                 dialog, which ->
-                                SPUtils.putData(Constants.SP_INSTALL_MODE_KEY, which)
+                                SPUtils.putData(Constants.SP_INSTALL_MODE, which)
                                 if (which == 1) {
                                     PermissionHelper.requestPermissionByShizuku(activity)
                                 } else if (which == 2) {
@@ -76,7 +68,6 @@ class SettingsAdapter(private val activity: Activity, private val list: ArrayLis
                     activity.startActivity(Intent(BaseApplication.context, FreezeActivity::class.java))
                 }
             }
-
             */
             holder.switchBtn.setOnCheckedChangeListener { compoundButton, isChecked
                 -> onItemSwitchClick!!.onItemClick(compoundButton, position, isChecked)

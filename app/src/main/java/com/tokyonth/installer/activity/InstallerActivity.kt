@@ -146,9 +146,7 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
 
         rvPerm.addOnScrollListener(RvScrollListener(fabInstall))
         rvActivity.addOnScrollListener(RvScrollListener(fabInstall))
-
         sbAutoDel.setOnCheckedChangeListener { _, isChecked -> SPUtils.putData(Constants.SP_AUTO_DELETE, isChecked) }
-
         tvApkSource.text = getString(R.string.text_apk_source, GetAppInfoUtils.getApplicationNameByPackageName(this, apkSource))
         apkSourceIcon.setImageDrawable(GetAppInfoUtils.getApplicationIconByPackageName(this, apkSource))
     }
@@ -195,7 +193,6 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
         cardActivity.visibility = View.VISIBLE
         apkFileName = apkInfo.appName!!
         apkFilePath = apkInfo.apkFile!!.path
-
         tvAppName.text = apkInfo.appName
         tvAppVersion.text = apkInfo.version
 

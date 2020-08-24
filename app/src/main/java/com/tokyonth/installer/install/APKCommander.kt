@@ -4,7 +4,6 @@ import android.app.Activity
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import com.tokyonth.installer.Constants
 
 import com.tokyonth.installer.bean.ApkInfoBean
@@ -40,7 +39,7 @@ class APKCommander(private val activity: Activity, uri: Uri,
     }
 
     fun startInstall() {
-        when (SPUtils.getData(Constants.SP_INSTALL_MODE_KEY, 0) as Int) {
+        when (SPUtils.getData(Constants.SP_INSTALL_MODE, 0) as Int) {
             0 -> {
                 InstallApkShellTask(handler, callback, getApkInfo()).start()
             }

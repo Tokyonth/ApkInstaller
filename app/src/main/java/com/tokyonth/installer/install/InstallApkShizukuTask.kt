@@ -1,20 +1,11 @@
 package com.tokyonth.installer.install
 
 import android.app.Activity
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.tokyonth.installer.Constants
-import com.tokyonth.installer.Constants.SHELL_SCRIPT_CACHE_FILE
-import com.tokyonth.installer.R
 import com.tokyonth.installer.bean.ApkInfoBean
 import com.tokyonth.installer.utils.PermissionHelper
-import com.tokyonth.installer.utils.ToastUtil
-import com.tokyonth.installer.utils.ToastUtil.showToast
-import moe.shizuku.api.ShizukuApiConstants
 import moe.shizuku.api.ShizukuService
 import java.io.File
 
@@ -52,9 +43,10 @@ class InstallApkShizukuTask(private val activity: Activity,
     }
 
     private fun exec(command: String): Int? {
-        initDir(SHELL_SCRIPT_CACHE_FILE.parentFile!!)
-        SHELL_SCRIPT_CACHE_FILE.writeText(command)
-        return execInternal("sh", SHELL_SCRIPT_CACHE_FILE.path)
+        val file = activity.cacheDir
+        initDir(file.parentFile!!)
+        file.writeText(command)
+        return execInternal("sh", file.path + "run.sh")
     }
 
     private fun execInternal(vararg command: String): Int? {

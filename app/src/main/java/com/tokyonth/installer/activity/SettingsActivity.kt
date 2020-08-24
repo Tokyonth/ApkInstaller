@@ -25,7 +25,6 @@ import com.tokyonth.installer.utils.GetAppInfoUtils
 import com.tokyonth.installer.utils.FileUtils
 import com.tokyonth.installer.utils.SPUtils
 
-import java.io.File
 import java.util.ArrayList
 import java.util.Objects
 
@@ -66,9 +65,9 @@ class SettingsActivity : BaseActivity() {
                 getString(R.string.install_mode_sub),
                 R.drawable.ic_move_to_inbox_24px,
                 ContextCompat.getColor(this, R.color.color4), false))
-       // settingsBeanArrayList.add(SettingsBean(getString(R.string.freeze_app_list),
-        //        getString(R.string.freeze_app_list_sub),
-         //       R.drawable.ic_all_inbox_24px, ContextCompat.getColor(this, R.color.color3), false))
+        // settingsBeanArrayList.add(SettingsBean(getString(R.string.freeze_app_list),
+        //       getString(R.string.freeze_app_list_sub),
+        //       R.drawable.ic_all_inbox_24px, ContextCompat.getColor(this, R.color.color3), false))
 
         val adapter = SettingsAdapter(this, settingsBeanArrayList)
         val rvSettings = findViewById<RecyclerView>(R.id.rv_settings_item)
@@ -109,7 +108,6 @@ class SettingsActivity : BaseActivity() {
         findViewById<View>(R.id.card_pkg).setOnClickListener {
             val inView = View.inflate(this@SettingsActivity, R.layout.layout_input_pkg, null)
             val edit = inView.findViewById<TextInputEditText>(R.id.et_sys_pkg_name)
-
             CustomizeDialog.getInstance(this)
                     .setTitle(R.string.text_title_input)
                     .setView(inView)

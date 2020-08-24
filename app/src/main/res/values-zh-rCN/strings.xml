@@ -81,7 +81,7 @@
     <string name="text_uninstall">卸载 - %s 模式</string>
     <string name="text_uninstall_btn">卸载</string>
     <string name="text_confirm_uninstall_app">确定要卸载 %s 吗？</string>
-    <string name="text_uninstall_complete">卸载完成!</string>
+    <string name="text_uninstall_complete">%s 卸载完成!</string>
     <string name="text_uninstall_failure">卸载失败!</string>
     <string name="uninstall_dialog_disable">冻结/禁用</string>
     <string name="freeze_app_name">%s 已冻结</string>

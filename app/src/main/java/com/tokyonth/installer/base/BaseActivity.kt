@@ -56,7 +56,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun startRequestPermission() {
-        ActivityCompat.requestPermissions(this, permissions, Constants.PERMISSION_REQUEST_CODE)
+        ActivityCompat.requestPermissions(this, permissions, 100)
     }
 
     fun showToast(text: String) {
@@ -64,7 +64,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == Constants.PERMISSION_REQUEST_CODE) {
+        if (requestCode == 100) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 isAuthorize = grantResults[0] == PackageManager.PERMISSION_GRANTED
             }

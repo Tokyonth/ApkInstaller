@@ -80,7 +80,7 @@
     <string name="text_uninstall">Uninstall - %s Mode</string>
     <string name="text_uninstall_btn">Uninstall</string>
     <string name="text_confirm_uninstall_app">Are you sure you want to uninstall %s?</string>
-    <string name="text_uninstall_complete">Uninstall complete!</string>
+    <string name="text_uninstall_complete">%s Uninstall complete!</string>
     <string name="text_uninstall_failure">Uninstall failed!</string>
     <string name="uninstall_dialog_disable">Freeze/Disable</string>
     <string name="freeze_app_name">%s is Frozen</string>
