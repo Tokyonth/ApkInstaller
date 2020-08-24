@@ -47,6 +47,8 @@
                 <data android:scheme="file" />
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
+                <data android:mimeType="application/apk.1" />
+                <data android:mimeType="*/*" />
             </intent-filter>
         </activity>
         <activity
