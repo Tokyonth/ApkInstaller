@@ -21,8 +21,7 @@ class UnInstallTask(private val mode: Int, private val pkgName: String, private 
         super.run()
         when (mode) {
             1 -> {
-                val shell = ShizukuShell()
-                val result = shell.exec(Shell.Command("pm", "uninstall", pkgName))
+                val result = ShizukuShell().exec(Shell.Command("pm", "uninstall", pkgName))
                 handler.post { commanderCallback.onApkInstalled(apkInfoBean, result.exitCode) }
             }
             2 -> if (IceBox.uninstallPackage(context, pkgName)) {

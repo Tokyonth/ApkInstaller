@@ -19,7 +19,7 @@ import java.util.Collections
 
 abstract class ParseApkTask : Thread() {
 
-    var uri: Uri? = null
+    private var uri: Uri? = null
     private var handler: Handler? = null
     private var context: Context? = null
     private var referrer: String? = null
