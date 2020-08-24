@@ -97,11 +97,11 @@ class SettingsActivity : BaseActivity() {
         switchButtonUseSysPkg = findViewById(R.id.cb_use_sys_pkg)
         switchButtonUseSysPkg!!.setOnCheckedChangeListener { _, isChecked -> SPUtils.putData(Constants.SP_USE_SYS_PKG, isChecked) }
 
-        val cacheSize = FileUtils.byteToString(FileUtils.getFileOrFolderSize(File(Constants.CACHE_APK_DIR)))
+        val cacheSize = FileUtils.byteToString(FileUtils.getFileOrFolderSize(cacheDir))
         textViewApkCache!!.text = getString(R.string.text_apk_cache, cacheSize)
 
         findViewById<View>(R.id.card_apk_cache).setOnClickListener {
-            FileUtils.deleteFolderFile(Constants.CACHE_APK_DIR, true)
+            FileUtils.deleteFolderFile(cacheDir.path, true)
             Snackbar.make(findViewById(R.id.coordinator_layout), getString(R.string.text_apk_cache_complete), Snackbar.LENGTH_SHORT).show()
             textViewApkCache!!.text = getString(R.string.text_apk_cache, cacheSize)
         }
