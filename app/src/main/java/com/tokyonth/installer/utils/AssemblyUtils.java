@@ -20,6 +20,7 @@ import androidx.core.content.FileProvider;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.tokyonth.installer.Constants;
+import com.tokyonth.installer.R;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -88,17 +89,17 @@ public class AssemblyUtils {
             intent.setDataAndType(apkUri, Constants.INSTANCE.getURI_DATA_TYPE());
             context.startActivity(intent);
         } else {
-            ToastUtil.showToast(context, "打开失败!可尝试在设置中自定义包名", ToastUtil.DEFAULT_SITE);
+            ToastUtil.showToast(context, context.getString(R.string.open_sys_pkg_failure), ToastUtil.DEFAULT_SITE);
         }
 
     }
 
     /**
-     * 反射获取准确的Intent Referrer
+     * 获取准确的Intent Referrer
      */
     public static String reflectGetReferrer(Context context) {
         try {
-            Class activityClass = Class.forName("android.app.Activity");
+            Class<?> activityClass = Class.forName("android.app.Activity");
             //noinspection JavaReflectionMemberAccess
             Field refererField = activityClass.getDeclaredField("mReferrer");
             refererField.setAccessible(true);
@@ -109,6 +110,4 @@ public class AssemblyUtils {
         }
     }
 
-
 }
-

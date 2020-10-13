@@ -58,6 +58,7 @@ class SettingsAdapter(private val activity: Activity, private val list: ArrayLis
                                 }
                                 dialog.dismiss()
                             }
+                            .setNegativeButton(R.string.dialog_btn_cancel, null)
                             .setCancelable(false)
                             .create().show()
                 }

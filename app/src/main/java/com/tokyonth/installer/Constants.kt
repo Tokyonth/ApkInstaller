@@ -3,6 +3,7 @@ package com.tokyonth.installer
 object Constants {
 
     private var PKG_NAME = "com.tokyonth.installer"
+    const val SP_INSTALL_MODE = "install_mode"
     var SP_FILE_NAME = "config"
     var SYS_PKG_NAME = "com.android.packageinstaller"
     var SP_AUTO_DELETE = "auto_delete"
@@ -22,6 +23,5 @@ object Constants {
     var SP_NEVER_SHOW_USE_SYSTEM_PKG = "never_show_use_system_pkg"
     var SP_NIGHT_FOLLOW_SYSTEM = "night_follow_system"
     var APK_SOURCE = "apkSource"
-    const val SP_INSTALL_MODE = "install_mode"
 
 }

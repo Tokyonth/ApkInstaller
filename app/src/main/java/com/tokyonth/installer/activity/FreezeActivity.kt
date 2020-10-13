@@ -85,10 +85,9 @@ class FreezeActivity : BaseActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         setTitle(R.string.uninstall_dialog_disable)
-        val actionBar = supportActionBar
-        if (actionBar != null) {
-            actionBar.setHomeButtonEnabled(true)
-            actionBar.setDisplayHomeAsUpEnabled(true)
+        supportActionBar.apply {
+            actionBar?.setHomeButtonEnabled(true)
+            actionBar?.setDisplayHomeAsUpEnabled(true)
         }
         toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.colorText))
         toolbar.navigationIcon?.apply {

@@ -1,27 +1,28 @@
 package com.tokyonth.installer.install
 
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
+import android.provider.MediaStore
 import android.util.AndroidRuntimeException
-
+import android.util.Log
 import com.tokyonth.installer.bean.ApkInfoBean
 import com.tokyonth.installer.bean.permissions.PermInfoBean
+import com.tokyonth.installer.test.ProviderUtils
 import com.tokyonth.installer.utils.FileProviderPathUtil
 import com.tokyonth.installer.utils.ParsingContentUtil
-
 import java.io.File
-import java.util.ArrayList
-import java.util.Collections
-
+import java.util.*
 
 abstract class ParseApkTask : Thread() {
 
     var uri: Uri? = null
     private var handler: Handler? = null
-    private var context: Context? = null
+    private var activity: Activity? = null
     private var referrer: String? = null
     private var packageManager: PackageManager? = null
     private var commanderCallback: CommanderCallback? = null
@@ -29,13 +30,13 @@ abstract class ParseApkTask : Thread() {
     private var permInfo: PermInfoBean? = null
     private var mApkInfo: ApkInfoBean? = null
 
-    fun startParseApkTask(uri: Uri, context: Context, handler: Handler, commanderCallback: CommanderCallback, referrer: String) {
+    fun startParseApkTask(uri: Uri, activity: Activity, handler: Handler, commanderCallback: CommanderCallback, referrer: String) {
         this.uri = uri
         this.handler = handler
-        this.context = context
+        this.activity = activity
         this.referrer = referrer
         this.commanderCallback = commanderCallback
-        packageManager = context.packageManager
+        packageManager = activity.packageManager
     }
 
     protected abstract fun setApkInfo(mApkInfo: ApkInfoBean)
@@ -50,9 +51,9 @@ abstract class ParseApkTask : Thread() {
             mApkInfo = ApkInfoBean()
             permInfo = PermInfoBean()
 
-            val queryContent = ParsingContentUtil(referrer).getFile(context, uri)
+            val queryContent = ParsingContentUtil(referrer).getFile(activity, uri)
             val apkSourcePath = if (queryContent == null) {
-                FileProviderPathUtil.getFileFromUri(context, uri).path
+                FileProviderPathUtil.getFileFromUri(activity, uri).path
             } else {
                 queryContent.path
             }

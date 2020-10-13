@@ -144,19 +144,23 @@
         app:fabAlignmentMode="center"
         app:fabCradleMargin="6dp"
         app:fabCradleRoundedCornerRadius="6dp"
-        app:hideOnScroll="true">
+        app:hideOnScroll="true"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
+        app:titleMargin="0dp">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="24dp"
-            android:layout_marginRight="24dp"
+            android:layout_height="?attr/actionBarSize"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tv_silently"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="16dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:text="@string/install_silently"
                 android:textColor="@color/colorText"
@@ -164,13 +168,15 @@
 
             <View
                 android:layout_width="0dp"
-                android:layout_height="10dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/tv_cancel"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:padding="16dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:text="@string/text_cancel_installation"
                 android:textColor="@color/colorText"

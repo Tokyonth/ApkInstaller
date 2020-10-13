@@ -26,8 +26,7 @@ class BaseApplication : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             AppCompatDelegate.setDefaultNightMode(nightMode)
         }
-
-        CrashHandler.getInstance().initCrashHandler(this)
+        CrashHandler().initCrashHandler(this)
     }
 
     companion object {

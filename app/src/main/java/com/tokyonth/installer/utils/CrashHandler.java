@@ -29,12 +29,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String TAG = "CrashHandler";
     private Context mContext;
-    @SuppressLint("StaticFieldLeak")
-    private static CrashHandler mInstance = new CrashHandler();
-
-    public static CrashHandler getInstance() {
-        return mInstance;
-    }
 
     @Override
     public void uncaughtException(@NonNull Thread thread, @NonNull Throwable ex) {
@@ -57,7 +51,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             }
         }.start();
         try {
-            Thread.sleep(3000);
+            Thread.sleep(2000);
             killProcess(myPid());
             System.exit(0);
             System.gc();
@@ -83,7 +77,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         assert mPackageInfo != null;
         map.put("versionName", mPackageInfo.versionName);
         map.put("versionCode", "" + mPackageInfo.versionCode);
-        map.put("crash时间", parserTime(System.currentTimeMillis()));
+        map.put("crashTime", parserTime(System.currentTimeMillis()));
         return map;
     }
 
@@ -113,7 +107,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
                 Log.e(TAG, "Create dir" + isCreate);
             }
             try {
-                String fileName = dir.toString() + File.separator + "崩溃日志.log";
+                String fileName = dir.toString() + File.separator + "安装器崩溃日志.log";
                 FileOutputStream fos = new FileOutputStream(fileName);
                 fos.write(sb.toString().getBytes());
                 fos.flush();

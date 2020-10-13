@@ -73,8 +73,6 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
     private var showActivity = false
     private var showPerm = false
 
-    private lateinit var uriData: Uri
-
     private lateinit var fabInstall: ExtendedFloatingActionButton
     private lateinit var apkSourceIcon: CircleImageView
     private lateinit var bottomAppBar: BottomAppBar
@@ -132,9 +130,8 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
     }
 
     private fun initData() {
-        uriData = intent.data!!
         apkSource = AssemblyUtils.reflectGetReferrer(this)
-        apkCommander = APKCommander(this@InstallerActivity, uriData, this, apkSource)
+        apkCommander = APKCommander(this@InstallerActivity, intent.data!!, this, apkSource)
         permFullBeanArrayList = ArrayList()
         actStringArrayList = ArrayList()
         permAdapter = PermissionAdapter(permFullBeanArrayList, this)
@@ -350,7 +347,7 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
             }
             R.id.tv_silently -> {
                 val intent = Intent(this@InstallerActivity, SilentlyInstallActivity::class.java)
-                intent.data = uriData
+                intent.data = getIntent().data
                 intent.putExtra(Constants.APK_SOURCE, apkSource)
                 startActivity(intent)
                 finish()

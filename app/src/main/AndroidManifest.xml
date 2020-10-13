@@ -80,6 +80,7 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:theme="@style/InstallAppTheme" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.FileProvider"
