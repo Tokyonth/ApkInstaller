@@ -5,9 +5,9 @@ import android.os.Handler
 import com.catchingnow.icebox.sdk_client.IceBox
 import com.tokyonth.installer.Constants.UNFREEZE_COMMAND
 import com.tokyonth.installer.bean.ApkInfoBean
-import com.tokyonth.installer.utils.Shell
+import com.tokyonth.installer.utils.shizuku.Shell
 import com.tokyonth.installer.utils.ShellUtils
-import com.tokyonth.installer.utils.ShizukuShell
+import com.tokyonth.installer.utils.shizuku.ShizukuShell
 
 class UnInstallTask(private val mode: Int, private val pkgName: String, private val context: Context,
                     private val handler: Handler, private val commanderCallback: CommanderCallback) : Thread() {

@@ -6,7 +6,7 @@ import android.os.Handler
 import com.catchingnow.icebox.sdk_client.IceBox
 import com.tokyonth.installer.R
 import com.tokyonth.installer.bean.ApkInfoBean
-import com.tokyonth.installer.utils.PermissionHelper
+import com.tokyonth.installer.utils.HelperTools
 import com.tokyonth.installer.utils.ToastUtil
 
 class InstallApkIceBoxTask(private val uri: Uri, private val activity: Activity,
@@ -21,7 +21,7 @@ class InstallApkIceBoxTask(private val uri: Uri, private val activity: Activity,
         handler.post { commanderCallback.onApkPreInstall(mApkInfo) }
         val state = IceBox.querySupportSilentInstall(activity)
         handler.post { commanderCallback.onInstallLog(mApkInfo, state.toString() + "\n")}
-        if (PermissionHelper.requestPermissionByIcebox(activity)) {
+        if (HelperTools.requestPermissionByIcebox(activity)) {
             handler.post { commanderCallback.onInstallLog(mApkInfo, "IceBox installation mode")}
             retCode = if (IceBox.installPackage(activity, uri)) {
                 0

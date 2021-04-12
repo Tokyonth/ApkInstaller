@@ -11,7 +11,7 @@
     android:padding="10dp"
     android:focusable="true">
 
-    <com.tokyonth.installer.widget.BurnRoundView
+    <com.tokyonth.installer.view.BurnRoundView
         android:id="@+id/settings_item_icon"
         android:layout_width="48dp"
         android:layout_height="48dp"

@@ -1,4 +1,4 @@
-package com.tokyonth.installer.utils;
+package com.tokyonth.installer.utils.path;
 
 import android.content.ContentResolver;
 import android.content.Context;

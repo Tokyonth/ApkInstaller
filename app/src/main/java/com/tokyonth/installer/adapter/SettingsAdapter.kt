@@ -1,6 +1,7 @@
 package com.tokyonth.installer.adapter
 
 import android.app.Activity
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,15 +12,17 @@ import com.kyleduo.switchbutton.SwitchButton
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.bean.SettingsBean
-import com.tokyonth.installer.utils.PermissionHelper
-import com.tokyonth.installer.utils.SPUtils
-import com.tokyonth.installer.widget.BurnRoundView
-import com.tokyonth.installer.widget.CustomizeDialog
+import com.tokyonth.installer.utils.HelperTools
+import com.tokyonth.installer.utils.SPUtils.get
+import com.tokyonth.installer.utils.SPUtils.set
+import com.tokyonth.installer.view.BurnRoundView
+import com.tokyonth.installer.view.CustomizeDialog
 
 import java.util.ArrayList
 
 class SettingsAdapter(private val activity: Activity, private val list: ArrayList<SettingsBean>?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private lateinit var context: Context
     private var onItemSwitchClick: OnItemSwitchClick? = null
 
     fun setOnItemClick(onItemSwitchClick: OnItemSwitchClick) {
@@ -31,6 +34,7 @@ class SettingsAdapter(private val activity: Activity, private val list: ArrayLis
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        context = parent.context
         val view = LayoutInflater.from(parent.context).inflate(R.layout.rv_settings_item, parent, false)
         return CommonViewHolder(view)
     }
@@ -47,14 +51,12 @@ class SettingsAdapter(private val activity: Activity, private val list: ArrayLis
                 holder.switchBtn.visibility = View.GONE
                 holder.itemView.setOnClickListener {
                     CustomizeDialog.getInstance(activity)
-                            .setTitle(R.string.dialog_text_title)
-                            .setSingleChoiceItems(R.array.install_mode_arr, SPUtils.getData(Constants.SP_INSTALL_MODE, 0) as Int) {
-                                dialog, which ->
-                                SPUtils.putData(Constants.SP_INSTALL_MODE, which)
+                            .setSingleChoiceItems(R.array.install_mode_arr, context[Constants.SP_INSTALL_MODE, 0]) { dialog, which ->
+                                context[Constants.SP_INSTALL_MODE] = which
                                 if (which == 1) {
-                                    PermissionHelper.requestPermissionByShizuku(activity)
+                                    HelperTools.requestPermissionByShizuku(activity)
                                 } else if (which == 2) {
-                                    PermissionHelper.requestPermissionByIcebox(activity)
+                                    HelperTools.requestPermissionByIcebox(activity)
                                 }
                                 dialog.dismiss()
                             }
@@ -63,15 +65,16 @@ class SettingsAdapter(private val activity: Activity, private val list: ArrayLis
                             .create().show()
                 }
             }
-           /* if (position == 5) {
-                holder.switchBtn.visibility = View.GONE
-                holder.itemView.setOnClickListener {
-                    activity.startActivity(Intent(BaseApplication.context, FreezeActivity::class.java))
-                }
-            }
-            */
+            /* if (position == 5) {
+                 holder.switchBtn.visibility = View.GONE
+                 holder.itemView.setOnClickListener {
+                     activity.startActivity(Intent(BaseApplication.context, FreezeActivity::class.java))
+                 }
+             }
+             */
             holder.switchBtn.setOnCheckedChangeListener { compoundButton, isChecked
-                -> onItemSwitchClick!!.onItemClick(compoundButton, position, isChecked)
+                ->
+                onItemSwitchClick!!.onItemClick(compoundButton, position, isChecked)
             }
         }
     }

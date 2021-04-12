@@ -1,4 +1,4 @@
-package com.tokyonth.installer.widget
+package com.tokyonth.installer.view
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter

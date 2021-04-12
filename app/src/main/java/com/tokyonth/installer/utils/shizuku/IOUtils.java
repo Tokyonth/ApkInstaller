@@ -1,4 +1,4 @@
-package com.tokyonth.installer.utils;
+package com.tokyonth.installer.utils.shizuku;
 
 import android.util.Log;
 

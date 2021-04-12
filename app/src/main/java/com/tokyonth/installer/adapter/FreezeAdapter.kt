@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tokyonth.installer.R
-import com.tokyonth.installer.utils.GetAppInfoUtils
+import com.tokyonth.installer.utils.AppPackageUtils
 import java.util.ArrayList
 
 class FreezeAdapter(private val context: Context?, private val list: ArrayList<String>?) : RecyclerView.Adapter<FreezeAdapter.FreezeViewHolder>() {
@@ -25,8 +25,8 @@ class FreezeAdapter(private val context: Context?, private val list: ArrayList<S
     }
 
     override fun onBindViewHolder(holder: FreezeViewHolder, position: Int) {
-        val appName = GetAppInfoUtils.getApplicationNameByPackageName(context, list!![position])
-        val appIcon = GetAppInfoUtils.getApplicationIconByPackageName(context, list[position])
+        val appName = AppPackageUtils.getAppNameByPackageName(context, list!![position])
+        val appIcon = AppPackageUtils.getAppIconByPackageName(context, list[position])
         holder.tvFreezeAppName.text = appName
         holder.tvFreezeSub.text = list[position]
         holder.ivFreezeIcon.setImageDrawable(appIcon)

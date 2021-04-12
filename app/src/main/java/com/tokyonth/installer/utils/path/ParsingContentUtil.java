@@ -1,4 +1,4 @@
-package com.tokyonth.installer.utils;
+package com.tokyonth.installer.utils.path;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;

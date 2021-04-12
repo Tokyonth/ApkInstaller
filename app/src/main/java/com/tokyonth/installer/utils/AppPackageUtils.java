@@ -1,26 +1,16 @@
 package com.tokyonth.installer.utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 
-public class GetAppInfoUtils {
+public class AppPackageUtils {
 
-    public static void toSelfSetting(Context context, String str) {
-        Intent mIntent = new Intent();
-        mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
-        mIntent.setData(Uri.fromParts("package", str, null));
-        context.startActivity(mIntent);
-    }
-
-    public static String getApplicationNameByPackageName(Context context, String packageName) {
+    public static String getAppNameByPackageName(Context context, String packageName) {
         PackageManager packageManager = context.getPackageManager();
         String Name;
         try {
@@ -31,7 +21,7 @@ public class GetAppInfoUtils {
         return Name;
     }
 
-    public static Drawable getApplicationIconByPackageName(Context context, String packageName) {
+    public static Drawable getAppIconByPackageName(Context context, String packageName) {
         PackageManager packageManager = context.getPackageManager();
         Drawable icon = null;
         try {
@@ -125,4 +115,3 @@ public class GetAppInfoUtils {
     }
 
 }
-

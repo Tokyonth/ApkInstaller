@@ -5,7 +5,7 @@ import android.os.Build
 import android.os.Handler
 import android.util.Log
 import com.tokyonth.installer.bean.ApkInfoBean
-import com.tokyonth.installer.utils.PermissionHelper
+import com.tokyonth.installer.utils.HelperTools
 import moe.shizuku.api.ShizukuService
 import java.io.File
 
@@ -19,7 +19,7 @@ class InstallApkShizukuTask(private val activity: Activity,
     override fun run() {
         super.run()
         handler.post { commanderCallback.onApkPreInstall(mApkInfo) }
-        if (PermissionHelper.requestPermissionByShizuku(activity)) {
+        if (HelperTools.requestPermissionByShizuku(activity)) {
             handler.post { commanderCallback.onInstallLog(mApkInfo, "Shizuku installation mode")}
             mApkInfo.apkFile?.let { rowInstall(it) }
         }

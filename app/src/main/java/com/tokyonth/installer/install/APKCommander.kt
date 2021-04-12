@@ -8,16 +8,16 @@ import com.tokyonth.installer.Constants
 
 import com.tokyonth.installer.bean.ApkInfoBean
 import com.tokyonth.installer.bean.permissions.PermInfoBean
-import com.tokyonth.installer.utils.SPUtils
+import com.tokyonth.installer.utils.SPUtils.get
 
-class APKCommander(private val activity: Activity, uri: Uri,
-                   private val callback: CommanderCallback, referrer: String) : ParseApkTask() {
+class APKCommander(private val activity: Activity, private val callback: CommanderCallback,
+                   uri: Uri, referrer: String) : ParseApkTask() {
 
     private val handler: Handler = Handler(Looper.getMainLooper())
-    internal lateinit var apkInfo: ApkInfoBean
-    internal lateinit var permInfo: PermInfoBean
+    private lateinit var apkInfo: ApkInfoBean
+    private lateinit var permInfo: PermInfoBean
 
-    private fun getApkInfo(): ApkInfoBean {
+    fun getApkInfo(): ApkInfoBean {
         return apkInfo
     }
 
@@ -39,7 +39,7 @@ class APKCommander(private val activity: Activity, uri: Uri,
     }
 
     fun startInstall() {
-        when (SPUtils.getData(Constants.SP_INSTALL_MODE, 0) as Int) {
+        when (activity[Constants.SP_INSTALL_MODE, 0]) {
             0 -> {
                 InstallApkShellTask(handler, callback, getApkInfo()).start()
             }

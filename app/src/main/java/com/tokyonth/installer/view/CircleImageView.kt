@@ -1,4 +1,4 @@
-package com.tokyonth.installer.widget
+package com.tokyonth.installer.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,9 +15,9 @@ class CircleImageView : AppCompatImageView {
 
     private var mRadius = 0
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context?) : super(context!!)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context!!, attrs, defStyleAttr)
 
     private fun getIconBitmap(drawable: Drawable): Bitmap? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

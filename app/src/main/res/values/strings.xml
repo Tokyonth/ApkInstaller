@@ -104,6 +104,12 @@
     <string name="text_shizuku">Shizuku</string>
     <string name="text_icebox">Icebox</string>
     <string name="text_freeze_null">No record</string>
+    <string name="crash_file_name">InstallerCrashLog.txt</string>
+    <string name="exit_app">Exit</string>
+    <string name="authorization_app">OK</string>
+    <string name="app_get_perm_tips">The software needs to store read and write permissions, please grant permissions, \nand it is highly recommended that you uninstall or disable the system installer</string>
+    <string name="crash_tips">The program is abnormal, please check the crash log under SDCard!</string>
+    <string name="crash_feedback">Please send the log to the mailbox, or feedback in the private message of "CoolApk", personal email: Tokyonth@163.com</string>
     <string name="open_sys_pkg_failure">Open failed! Try to customize the package name in the settings</string>
     <array name="install_mode_arr">
         <item>Shell</item>

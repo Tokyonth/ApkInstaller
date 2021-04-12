@@ -1,6 +1,5 @@
 package com.tokyonth.installer.utils;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -11,16 +10,15 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.tokyonth.installer.R;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import static android.os.Process.killProcess;
 import static android.os.Process.myPid;
@@ -28,16 +26,16 @@ import static android.os.Process.myPid;
 public class CrashHandler implements Thread.UncaughtExceptionHandler {
 
     private static final String TAG = "CrashHandler";
-    private Context mContext;
+    private Context context;
 
     @Override
     public void uncaughtException(@NonNull Thread thread, @NonNull Throwable ex) {
-        saveCrashReport2SD(mContext, ex);
+        saveCrashReport2SD(context, ex);
         showCrashToast();
     }
 
     public void initCrashHandler(Context context) {
-        mContext = context;
+        this.context = context;
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
 
@@ -46,7 +44,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             @Override
             public void run() {
                 Looper.prepare();
-                ToastUtil.showToast(mContext, "程序出现异常,请查看SDCard下的崩溃日志!", ToastUtil.DEFAULT_SITE);
+                ToastUtil.showToast(context, context.getString(R.string.crash_tips), ToastUtil.DEFAULT_SITE);
                 Looper.loop();
             }
         }.start();
@@ -71,13 +69,13 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             e.printStackTrace();
         }
 
-        map.put("品牌", "" + Build.BRAND);
-        map.put("型号", "" + Build.MODEL);
-        map.put("SDK版本", "" + Build.VERSION.SDK_INT);
-        assert mPackageInfo != null;
-        map.put("versionName", mPackageInfo.versionName);
-        map.put("versionCode", "" + mPackageInfo.versionCode);
-        map.put("crashTime", parserTime(System.currentTimeMillis()));
+        map.put("phoneBrand", "" + Build.BRAND);
+        map.put("phoneModel", "" + Build.MODEL);
+        map.put("sdkVersion", "" + Build.VERSION.SDK_INT);
+        if (mPackageInfo != null) {
+            map.put("versionName", mPackageInfo.versionName);
+            map.put("versionCode", "" + mPackageInfo.versionCode);
+        }
         return map;
     }
 
@@ -98,8 +96,9 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             String value = entry.getValue();
             sb.append(key).append(" = ").append(value).append("\n");
         }
-        sb.append(obtainExceptionInfo(ex));
-        sb.append("\n请将日志发送到邮箱1948226838@qq.com 或者在 酷安 进行反馈");
+        sb.append("\n").append(context.getString(R.string.crash_feedback));
+        sb.append("\n").append("\n").append(obtainExceptionInfo(ex));
+
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File dir = new File(Environment.getExternalStorageDirectory().getPath());
             if (!dir.exists()) {
@@ -107,7 +106,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
                 Log.e(TAG, "Create dir" + isCreate);
             }
             try {
-                String fileName = dir.toString() + File.separator + "安装器崩溃日志.log";
+                String fileName = dir.toString() + File.separator + context.getString(R.string.crash_file_name);
                 FileOutputStream fos = new FileOutputStream(fileName);
                 fos.write(sb.toString().getBytes());
                 fos.flush();
@@ -116,15 +115,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
                 e.printStackTrace();
             }
         }
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private String parserTime(long milliseconds) {
-        System.setProperty("user.timezone", "Asia/Shanghai");
-        TimeZone tz = TimeZone.getTimeZone("Asia/Shanghai");
-        TimeZone.setDefault(tz);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
-        return format.format(new Date(milliseconds));
     }
 
 }

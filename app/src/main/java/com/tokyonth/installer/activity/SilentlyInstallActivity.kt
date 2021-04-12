@@ -1,8 +1,8 @@
 package com.tokyonth.installer.activity
 
 import android.net.Uri
-import android.os.Bundle
 import android.util.Log
+import androidx.viewbinding.ViewBinding
 
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
@@ -10,20 +10,24 @@ import com.tokyonth.installer.install.APKCommander
 import com.tokyonth.installer.base.BaseActivity
 import com.tokyonth.installer.bean.ApkInfoBean
 import com.tokyonth.installer.install.CommanderCallback
-import com.tokyonth.installer.utils.SPUtils
+import com.tokyonth.installer.utils.SPUtils.get
 
 class SilentlyInstallActivity : BaseActivity(), CommanderCallback {
 
     private var apkCommander: APKCommander? = null
 
-    override fun setActivityView(): Int {
-        return 0
+    override fun hasView(): Boolean {
+        return false
     }
 
-    override fun initActivity(savedInstanceState: Bundle?) {
+    override fun initView(): ViewBinding {
+        TODO("Not yet implemented")
+    }
+
+    override fun initData() {
         if (intent.data != null) {
             val apkSource = intent.getStringExtra(Constants.APK_SOURCE)
-            apkCommander = APKCommander(this, intent.data!!, this, apkSource as String)
+            apkCommander = APKCommander(this, this, intent.data!!, apkSource as String)
         } else {
             showToast(getString(R.string.unable_to_install_apk))
             finish()
@@ -45,7 +49,7 @@ class SilentlyInstallActivity : BaseActivity(), CommanderCallback {
     override fun onApkInstalled(apkInfo: ApkInfoBean, resultCode: Int) {
         if (resultCode == 0) {
             showToast(getString(R.string.apk_installed, apkInfo.appName))
-            if (!apkInfo.isFakePath && SPUtils.getData(Constants.SP_AUTO_DELETE, false) as Boolean) {
+            if (!apkInfo.isFakePath && get(Constants.SP_AUTO_DELETE, false)) {
                 showToast(getString(R.string.apk_deleted, apkInfo.apkFile!!.name))
             }
         } else {

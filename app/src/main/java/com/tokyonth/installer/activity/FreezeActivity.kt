@@ -1,42 +1,43 @@
 package com.tokyonth.installer.activity
 
-import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.adapter.FreezeAdapter
 import com.tokyonth.installer.base.BaseActivity
 import com.tokyonth.installer.database.SQLiteUtil
-import com.tokyonth.installer.utils.GetAppInfoUtils
+import com.tokyonth.installer.databinding.ActivityFreezeBinding
+import com.tokyonth.installer.utils.AppPackageUtils
+import com.tokyonth.installer.utils.CommonUtil.bind
 import com.tokyonth.installer.utils.ShellUtils
-import com.tokyonth.installer.widget.CustomizeDialog
+import com.tokyonth.installer.view.CustomizeDialog
 import java.util.ArrayList
 
 class FreezeActivity : BaseActivity() {
 
-    override fun setActivityView(): Int {
-        return R.layout.activity_freeze
+    override fun hasView(): Boolean {
+        return true
     }
 
-    override fun initActivity(savedInstanceState: Bundle?) {
-        initData()
+    override fun initView(): ViewBinding {
+        return bind<ActivityFreezeBinding>()
     }
 
-    private fun initData() {
+    override fun initData() {
         val listData = SQLiteUtil.getAllData(this)
         val recyclerView = findViewById<RecyclerView>(R.id.rv_freeze_list)
         val adapter = FreezeAdapter(this, listData as ArrayList<String>?)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
-        adapter.setListener(listener = object : FreezeAdapter.OnItemClickListener {
+        adapter.setListener(object : FreezeAdapter.OnItemClickListener {
             override fun onClick(position: Int, pkgName: String) {
                 val dialogView: View = View.inflate(this@FreezeActivity, R.layout.layout_freeze_dialog, null)
                 val customizeDialog: androidx.appcompat.app.AlertDialog = CustomizeDialog.getInstance(this@FreezeActivity)
@@ -59,11 +60,11 @@ class FreezeActivity : BaseActivity() {
                     }
                     adapter.notifyDataSetChanged()
                     customizeDialog.dismiss()
-                    Toast.makeText(this@FreezeActivity, str, Toast.LENGTH_SHORT).show()
+                    showToast(str)
                 }
                 tvUninstall.setOnClickListener {
                     val result = ShellUtils.execWithRoot(Constants.UNINSTALL_COMMAND + pkgName)
-                    val appName = GetAppInfoUtils.getApplicationNameByPackageName(this@FreezeActivity, pkgName)
+                    val appName = AppPackageUtils.getAppNameByPackageName(this@FreezeActivity, pkgName)
                     val str: String
                     if (result == 0) {
                         SQLiteUtil.delData(this@FreezeActivity, pkgName)
@@ -74,7 +75,7 @@ class FreezeActivity : BaseActivity() {
                     }
                     adapter.notifyDataSetChanged()
                     customizeDialog.dismiss()
-                    Toast.makeText(this@FreezeActivity, str, Toast.LENGTH_SHORT).show()
+                    showToast(str)
                 }
             }
         })

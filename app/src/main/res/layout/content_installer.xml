@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -43,9 +42,9 @@
 
                 <LinearLayout
                     android:id="@+id/ll_to_source"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:foreground="?android:attr/selectableItemBackground"
                     android:gravity="center"
                     android:orientation="horizontal"
                     tools:ignore="UnusedAttribute">
@@ -72,7 +71,7 @@
 
                     </LinearLayout>
 
-                    <com.tokyonth.installer.widget.CircleImageView
+                    <com.tokyonth.installer.view.CircleImageView
                         android:id="@+id/iv_apk_source"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
@@ -98,8 +97,8 @@
                     android:orientation="vertical">
 
                     <ProgressBar
-                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:id="@+id/progressBar"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="-6.8dp"
@@ -121,12 +120,15 @@
             </com.google.android.material.card.MaterialCardView>
 
             <include
+                android:id="@+id/include_perm"
                 layout="@layout/layout_perm_info" />
 
             <include
+                android:id="@+id/include_act"
                 layout="@layout/layout_activity_info" />
 
             <include
+                android:id="@+id/include_del"
                 layout="@layout/layout_delete_content" />
 
         </LinearLayout>
@@ -134,19 +136,19 @@
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.bottomappbar.BottomAppBar
-        style="@style/Widget.MaterialComponents.BottomAppBar"
         android:id="@+id/bottom_app_bar"
+        style="@style/Widget.MaterialComponents.BottomAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:backgroundTint="@color/colorCard"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="0dp"
         app:elevation="2dp"
         app:fabAlignmentMode="center"
         app:fabCradleMargin="6dp"
         app:fabCradleRoundedCornerRadius="6dp"
         app:hideOnScroll="true"
-        app:contentInsetLeft="0dp"
-        app:contentInsetStart="0dp"
         app:titleMargin="0dp">
 
         <LinearLayout
@@ -159,9 +161,9 @@
                 android:id="@+id/tv_silently"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:gravity="center"
                 android:padding="16dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:text="@string/install_silently"
                 android:textColor="@color/colorText"
                 android:textStyle="bold" />
@@ -175,9 +177,9 @@
                 android:id="@+id/tv_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:gravity="center"
                 android:padding="16dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:text="@string/text_cancel_installation"
                 android:textColor="@color/colorText"
                 android:textStyle="bold" />
@@ -187,10 +189,10 @@
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_install"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:id="@+id/fab_install"
         android:text="@string/install"
         android:textColor="@android:color/white"
         app:backgroundTint="@color/colorAccent"

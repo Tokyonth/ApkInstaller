@@ -1,20 +1,15 @@
 package com.tokyonth.installer.install
 
 import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
-import android.provider.MediaStore
 import android.util.AndroidRuntimeException
-import android.util.Log
 import com.tokyonth.installer.bean.ApkInfoBean
 import com.tokyonth.installer.bean.permissions.PermInfoBean
-import com.tokyonth.installer.test.ProviderUtils
-import com.tokyonth.installer.utils.FileProviderPathUtil
-import com.tokyonth.installer.utils.ParsingContentUtil
+import com.tokyonth.installer.utils.path.FileProviderPathUtil
+import com.tokyonth.installer.utils.path.ParsingContentUtil
 import java.io.File
 import java.util.*
 
@@ -120,6 +115,7 @@ abstract class ParseApkTask : Thread() {
             try {
                 val permissionInfo = packageManager!!.getPermissionInfo(str, 0)
                 group += permissionInfo.group
+                //permissionInfo.group?.let { group.add(it) }
 
                 val permissionLabel = permissionInfo.loadLabel(packageManager!!).toString()
                 label.add(permissionLabel)

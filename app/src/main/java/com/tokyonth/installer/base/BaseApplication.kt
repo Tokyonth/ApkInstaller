@@ -8,19 +8,18 @@ import androidx.appcompat.app.AppCompatDelegate
 
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.utils.CrashHandler
-import com.tokyonth.installer.utils.SPUtils
+import com.tokyonth.installer.utils.SPUtils.get
 
 class BaseApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
-        SPUtils.getInstance(this, Constants.SP_FILE_NAME)
 
-        if (SPUtils.getData(Constants.SP_NIGHT_FOLLOW_SYSTEM, false) as Boolean) {
+        if (get(Constants.SP_NIGHT_FOLLOW_SYSTEM, false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         } else {
-             val nightMode = if (SPUtils.getData(Constants.SP_NIGHT_MODE, false) as Boolean)
+             val nightMode = if (get(Constants.SP_NIGHT_MODE, false))
                 AppCompatDelegate.MODE_NIGHT_YES
              else
                 AppCompatDelegate.MODE_NIGHT_NO

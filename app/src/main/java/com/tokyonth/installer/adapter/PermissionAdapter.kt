@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 import com.tokyonth.installer.R
 import com.tokyonth.installer.bean.permissions.PermFullBean
-import com.tokyonth.installer.widget.CustomizeDialog
+import com.tokyonth.installer.view.CustomizeDialog
 
 import java.util.ArrayList
 

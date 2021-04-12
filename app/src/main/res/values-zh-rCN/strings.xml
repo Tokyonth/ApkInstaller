@@ -105,7 +105,13 @@
     <string name="text_shizuku">Shizuku</string>
     <string name="text_icebox">冰箱</string>
     <string name="text_freeze_null">空 …</string>
+    <string name="exit_app">退出</string>
+    <string name="authorization_app">授权</string>
+    <string name="app_get_perm_tips">软件运行需要储存读写权限,请赋予权限\n同时非常不建议你卸载或禁用系统安装器</string>
     <string name="open_sys_pkg_failure">打开失败!可尝试在设置中自定义包名</string>
+    <string name="crash_file_name">安装器崩溃日志.txt</string>
+    <string name="crash_tips">程序出现异常,请查看SDCard下的崩溃日志!</string>
+    <string name="crash_feedback">请将日志发送到邮箱\n或在"酷安"私信反馈\n个人邮箱:Tokyonth@163.com</string>
     <array name="install_mode_arr">
         <item>Shell</item>
         <item>Shizuku</item>

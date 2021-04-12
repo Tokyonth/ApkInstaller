@@ -1,12 +1,11 @@
-package com.tokyonth.installer.widget
+package com.tokyonth.installer.view
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import com.tokyonth.installer.R
-import com.tokyonth.installer.utils.AssemblyUtils
+import com.tokyonth.installer.utils.HelperTools
 import kotlin.math.min
 
 class BurnRoundView : View {
@@ -34,7 +33,6 @@ class BurnRoundView : View {
         initView(attrs)
     }
 
-    @SuppressLint("Recycle")
     private fun initView(attrs: AttributeSet?) {
         val array = context.obtainStyledAttributes(attrs, R.styleable.BurnRoundView)
         val imageId = array.getResourceId(R.styleable.BurnRoundView_burnSrc, 0)
@@ -48,10 +46,11 @@ class BurnRoundView : View {
         } else {
             color
         }
+        array.recycle()
     }
 
     private fun replaceImageColor(imageId: Int, color: Int) {
-        burnSrc = AssemblyUtils.getBitmapFromDrawable(context, imageId)
+        burnSrc = HelperTools.getBitmapFromDrawable(context, imageId)
         overlayPaint!!.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
     }
 

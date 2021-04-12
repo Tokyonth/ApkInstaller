@@ -25,6 +25,7 @@
         android:layout_height="wrap_content">
 
         <include
+            android:id="@+id/include_ct"
             layout="@layout/content_settings"/>
 
     </ScrollView>

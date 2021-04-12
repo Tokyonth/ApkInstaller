@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:background="@color/colorBackGround"
+    android:fitsSystemWindows="true"
     tools:context=".activity.InstallerActivity">
 
     <com.google.android.material.card.MaterialCardView
@@ -79,15 +79,15 @@
                         android:id="@+id/tv_version_tips"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:visibility="invisible"
-                        android:background="@drawable/ic_tips_background"
-                        android:gravity="center"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
+                        android:background="@drawable/ic_tips_background"
+                        android:gravity="center"
                         android:paddingLeft="26dp"
                         android:paddingTop="10dp"
                         android:paddingRight="26dp"
-                        android:paddingBottom="10dp" />
+                        android:paddingBottom="10dp"
+                        android:visibility="invisible" />
 
                     <ImageView
                         android:id="@+id/iv_app_icon"
@@ -121,6 +121,8 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <include layout="@layout/content_installer" />
+    <include
+        android:id="@+id/include_ct"
+        layout="@layout/content_installer" />
 
 </RelativeLayout>
