@@ -25,9 +25,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
     private val permissionsRequestCode = 100
 
-    abstract fun initView(): ViewBinding
-
-    abstract fun hasView(): Boolean
+    abstract fun initView(): ViewBinding?
 
     abstract fun initData()
 
@@ -35,8 +33,10 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
                 or WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
-        if (hasView()) {
-            setContentView(initView().root)
+        initView().let {
+            if (it != null) {
+                setContentView(it.root)
+            }
         }
         checkPermission()
     }
@@ -49,7 +49,8 @@ abstract class BaseActivity : AppCompatActivity() {
                         .setMessage(getString(R.string.app_get_perm_tips))
                         .setNegativeButton(getString(R.string.exit_app)) { _: DialogInterface?, _: Int -> finish() }
                         .setPositiveButton(getString(R.string.authorization_app)) { _: DialogInterface?, _: Int ->
-                            ActivityCompat.requestPermissions(this, permissions, permissionsRequestCode) }
+                            ActivityCompat.requestPermissions(this, permissions, permissionsRequestCode)
+                        }
                         .setCancelable(false)
                         .show()
             } else {

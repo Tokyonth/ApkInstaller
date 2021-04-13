@@ -19,11 +19,11 @@ class BaseApplication : Application() {
         if (get(Constants.SP_NIGHT_FOLLOW_SYSTEM, false)) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         } else {
-             val nightMode = if (get(Constants.SP_NIGHT_MODE, false))
-                AppCompatDelegate.MODE_NIGHT_YES
-             else
-                AppCompatDelegate.MODE_NIGHT_NO
-            AppCompatDelegate.setDefaultNightMode(nightMode)
+            AppCompatDelegate.setDefaultNightMode(
+                    if (get(Constants.SP_NIGHT_MODE, false))
+                        AppCompatDelegate.MODE_NIGHT_YES
+                    else
+                        AppCompatDelegate.MODE_NIGHT_NO)
         }
         CrashHandler().initCrashHandler(this)
     }
@@ -37,4 +37,3 @@ class BaseApplication : Application() {
     }
 
 }
-

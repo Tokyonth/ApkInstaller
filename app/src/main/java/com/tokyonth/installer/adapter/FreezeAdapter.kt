@@ -16,7 +16,7 @@ class FreezeAdapter(private val context: Context?, private val list: ArrayList<S
     private var listener: OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FreezeViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.rv_freeze_app_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rv_freeze_app, parent, false)
         return FreezeViewHolder(view)
     }
 
@@ -35,20 +35,22 @@ class FreezeAdapter(private val context: Context?, private val list: ArrayList<S
         }
     }
 
+    fun setItemListener(listener: OnItemClickListener) {
+        this.listener = listener
+    }
+
+    interface OnItemClickListener {
+
+        fun onClick(position: Int, pkgName: String)
+
+    }
+
     class FreezeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         var tvFreezeAppName: TextView = itemView.findViewById(R.id.tv_freeze_app_name)
         var tvFreezeSub: TextView = itemView.findViewById(R.id.tv_freeze_sub)
         var ivFreezeIcon: ImageView = itemView.findViewById(R.id.iv_freeze_icon)
 
-    }
-
-    fun setListener(listener: OnItemClickListener) {
-        this.listener = listener
-    }
-
-    interface OnItemClickListener {
-        fun onClick(position: Int, pkgName: String)
     }
 
 }

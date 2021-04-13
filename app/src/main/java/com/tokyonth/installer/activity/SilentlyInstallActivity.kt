@@ -16,21 +16,19 @@ class SilentlyInstallActivity : BaseActivity(), CommanderCallback {
 
     private var apkCommander: APKCommander? = null
 
-    override fun hasView(): Boolean {
-        return false
-    }
-
-    override fun initView(): ViewBinding {
-        TODO("Not yet implemented")
+    override fun initView(): ViewBinding? {
+        return null
     }
 
     override fun initData() {
-        if (intent.data != null) {
-            val apkSource = intent.getStringExtra(Constants.APK_SOURCE)
-            apkCommander = APKCommander(this, this, intent.data!!, apkSource as String)
-        } else {
-            showToast(getString(R.string.unable_to_install_apk))
-            finish()
+        intent.data.also {
+            if (it != null) {
+                val apkSource = intent.getStringExtra(Constants.APK_SOURCE)
+                apkCommander = APKCommander(this, this, it, apkSource as String)
+            } else {
+                showToast(getString(R.string.unable_to_install_apk))
+                finish()
+            }
         }
     }
 

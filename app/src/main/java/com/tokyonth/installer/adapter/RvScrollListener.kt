@@ -9,7 +9,7 @@ class RvScrollListener(private val view: ExtendedFloatingActionButton?) : Recycl
         super.onScrollStateChanged(recyclerView, newState)
         when (newState) {
             RecyclerView.SCROLL_STATE_IDLE -> view!!.alpha = 1f
-            RecyclerView.SCROLL_STATE_DRAGGING -> view!!.alpha = 0.16f
+            RecyclerView.SCROLL_STATE_DRAGGING -> view!!.alpha = 0.2f
         }
     }
 

@@ -4,10 +4,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
+import com.tokyonth.installer.Constants
 
 object SPUtils {
 
-    private const val USER = "ApkInstaller"
+    private const val USER = Constants.SP_FILE_NAME
 
     /**
      * 储存一个受SharedPreferences支持的数据到指定的Key中

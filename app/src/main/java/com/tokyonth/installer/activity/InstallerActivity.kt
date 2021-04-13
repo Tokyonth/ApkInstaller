@@ -66,11 +66,7 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
     private lateinit var vbActInclude: LayoutActivityInfoBinding
     private lateinit var vbPermInclude: LayoutPermInfoBinding
 
-    override fun hasView(): Boolean {
-        return true
-    }
-
-    override fun initView(): ViewBinding {
+    override fun initView(): ViewBinding? {
         vb = bind()
         vbInclude = vb.includeCt
         vbDelInclude = vbInclude.includeDel
@@ -173,7 +169,7 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
                 resources.getString(R.string.info_apk_path) + apkFilePath + "\n" +
                 resources.getString(R.string.text_size, FileIOUtils.byteToString(FileIOUtils.getFileSize(apkFilePath)))
         if (apkInfo.hasInstalledApp()) {
-            vbInclude.tvInstallMsg.append("\n" + resources.getString(R.string.info_installed_version) + apkInfo.installedVersion)
+            vbInclude.tvInstallMsg.append("\n${resources.getString(R.string.info_installed_version)} ${apkInfo.installedVersion}")
             vb.tvVersionTips.apply {
                 val translateAnimation = TranslateAnimation(0f, 0f, -200f, 0f)
                 translateAnimation.duration = 500

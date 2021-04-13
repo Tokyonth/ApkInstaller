@@ -23,7 +23,7 @@ object SQLiteUtil {
         sqLiteDatabase.close()
     }
 
-    fun getAllData(context: Context): List<String> {
+    fun getAllData(context: Context): ArrayList<String> {
         val list = ArrayList<String>()
         val dbHelper = SQLiteHelper(context, "freezeList", 1)
         val sqLiteDatabase = dbHelper.readableDatabase

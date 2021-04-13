@@ -21,12 +21,8 @@ class UninstallActivity : BaseActivity(), CommanderCallback {
     private lateinit var unInstallTask: UnInstallTask
     private val handler: Handler = Handler(Looper.getMainLooper())
 
-    override fun hasView(): Boolean {
-        return false
-    }
-
-    override fun initView(): ViewBinding {
-        TODO("Not yet implemented")
+    override fun initView(): ViewBinding? {
+        return null
     }
 
     override fun initData() {
@@ -39,41 +35,41 @@ class UninstallActivity : BaseActivity(), CommanderCallback {
             Objects.requireNonNull<String>(intent.dataString).replace("package:", "")
         }
 
-        val unMode = get(Constants.SP_INSTALL_MODE, 0)
-        unInstallTask = UnInstallTask(unMode, pkgName, this, handler, this)
-        var mode = ""
-        when (unMode) {
-            0 -> mode = getString(R.string.text_shell)
-            1 -> mode = getString(R.string.text_shizuku)
-            2 -> mode = getString(R.string.text_icebox)
-        }
+        get(Constants.SP_INSTALL_MODE, 0).also {
+            unInstallTask = UnInstallTask(it, pkgName, this, handler, this)
 
-        CustomizeDialog.getInstance(this)
-                .setTitle(getString(R.string.text_uninstall, mode))
-                .setMessage(getString(R.string.text_confirm_uninstall_app, AppPackageUtils.getAppNameByPackageName(this, pkgName)))
-                .setPositiveButton(R.string.text_uninstall_btn) { _, _ ->
-                    if (unMode == 0) {
-                        unInstallTask.shellMode()
-                    } else {
-                        unInstallTask.start()
+            CustomizeDialog.getInstance(this)
+                    .setTitle(getString(R.string.text_uninstall, {
+                        when (it) {
+                            0 -> getString(R.string.text_shell)
+                            1 -> getString(R.string.text_shizuku)
+                            2 -> getString(R.string.text_icebox)
+                            else -> ""
+                        }
+                    }))
+                    .setMessage(getString(R.string.text_confirm_uninstall_app, AppPackageUtils.getAppNameByPackageName(this, pkgName)))
+                    .setPositiveButton(R.string.text_uninstall_btn) { _, _ ->
+                        if (it == 0) {
+                            unInstallTask.shellMode()
+                        } else {
+                            unInstallTask.start()
+                        }
                     }
-                }
-                /*.setNeutralButton(getText(R.string.uninstall_dialog_disable)) { _: DialogInterface, _: Int ->
-                    val result = ShellUtils.execWithRoot(Constants.FREEZE_COMMAND + pkgName)
-                    val appName = GetAppInfoUtils.getApplicationNameByPackageName(this, pkgName)
-                    val str =
-                    if (result == 0) {
-                        SQLiteUtil.addData(this, pkgName)
+                    /*.setNeutralButton(getText(R.string.uninstall_dialog_disable)) { _: DialogInterface, _: Int ->
+                        val result = ShellUtils.execWithRoot(Constants.FREEZE_COMMAND + pkgName)
+                        val appName = GetAppInfoUtils.getApplicationNameByPackageName(this, pkgName)
+                        val str =
+                        if (result == 0) {
+                            SQLiteUtil.addData(this, pkgName)
+                        }
+                        showToast(str)
+                        finish()
                     }
-                    showToast(str)
-                    finish()
-                }
-                 */
-                .setNegativeButton(R.string.dialog_btn_cancel) { _: DialogInterface, _: Int ->
-                    finish()
-                }
-                .setCancelable(false)
-                .create().show()
+                     */
+                    .setNegativeButton(R.string.dialog_btn_cancel) { _: DialogInterface, _: Int -> finish() }
+                    .setCancelable(false)
+                    .create().show()
+        }
     }
 
     override fun onStartParseApk(uri: Uri) {
@@ -89,9 +85,12 @@ class UninstallActivity : BaseActivity(), CommanderCallback {
     }
 
     override fun onApkInstalled(apkInfo: ApkInfoBean, resultCode: Int) {
-        val str = if (resultCode == 0)
-            getString(R.string.text_uninstall_complete) else getString(R.string.text_uninstall_failure)
-        showToast(str)
+        showToast(
+                if (resultCode == 0)
+                    getString(R.string.text_uninstall_complete)
+                else
+                    getString(R.string.text_uninstall_failure)
+        )
         finish()
     }
 

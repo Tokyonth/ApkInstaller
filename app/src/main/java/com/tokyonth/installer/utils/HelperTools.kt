@@ -124,23 +124,23 @@ object HelperTools {
         val intent = Intent()
         var activityName: String? = null
         val sysPkgName: String = if (context[Constants.SP_USE_SYS_PKG, false]) {
-            context[Constants.SYS_PKG_NAME, Constants.SYS_PKG_NAME]
+            context[Constants.SYS_PKG_NAME_KEY, Constants.DEFAULT_SYS_PKG_NAME]
         } else {
-            Constants.SYS_PKG_NAME
+            Constants.DEFAULT_SYS_PKG_NAME
         }
         try {
-            val packageManager = context.packageManager
-            val packageInfo = packageManager.getPackageInfo(sysPkgName, PackageManager.GET_ACTIVITIES)
+            val packageInfo = context.packageManager.getPackageInfo(sysPkgName, PackageManager.GET_ACTIVITIES)
             activityName = packageInfo.activities[0].name
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
         if (activityName != null) {
-            val componentName = ComponentName(sysPkgName, activityName)
-            intent.component = componentName
-            val apkUri = FileProvider.getUriForFile(context, Constants.PROVIDER_STR, File(filePath!!))
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.setDataAndType(apkUri, Constants.URI_DATA_TYPE)
+            intent.apply {
+                val apkUri = FileProvider.getUriForFile(context, Constants.PROVIDER_STR, File(filePath!!))
+                component = ComponentName(sysPkgName, activityName)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                setDataAndType(apkUri, Constants.URI_DATA_TYPE)
+            }
             context.startActivity(intent)
         } else {
             showToast(context, context.getString(R.string.open_sys_pkg_failure), ToastUtil.DEFAULT_SITE)
