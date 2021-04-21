@@ -4,17 +4,17 @@
     android:id="@+id/ll_common_toast"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/ic_toast_bg_color"
     android:layout_gravity="center"
-    android:orientation="horizontal" >
+    android:background="@drawable/ic_toast_bg_color"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/tv_common_toast"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:textColor="@color/colorCard"
         android:padding="16dp"
-        tools:text="@string/app_name"/>
+        android:textColor="@color/colorCard"
+        tools:text="@string/app_name" />
 
 </LinearLayout>

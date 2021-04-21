@@ -97,7 +97,7 @@
                     android:orientation="vertical">
 
                     <ProgressBar
-                        android:id="@+id/progressBar"
+                        android:id="@+id/pb_installing"
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -196,7 +196,7 @@
         android:text="@string/install"
         android:textColor="@android:color/white"
         app:backgroundTint="@color/colorAccent"
-        app:elevation="6dp"
+        app:elevation="4dp"
         app:icon="@drawable/ic_get_app_24px"
         app:iconGravity="textStart"
         app:iconTint="@android:color/white"

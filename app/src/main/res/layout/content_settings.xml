@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackGround"
     android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
@@ -180,7 +179,7 @@
 
                 </LinearLayout>
 
-                <com.kyleduo.switchbutton.SwitchButton
+                <com.tokyonth.installer.view.SwitchButton
                     android:id="@+id/cb_use_sys_pkg"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />

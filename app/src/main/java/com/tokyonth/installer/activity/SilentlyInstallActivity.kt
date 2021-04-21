@@ -33,7 +33,7 @@ class SilentlyInstallActivity : BaseActivity(), CommanderCallback {
     }
 
     override fun onStartParseApk(uri: Uri) {
-        showToast(getString(R.string.parsing))
+        //showToast(getString(R.string.parsing))
     }
 
     override fun onApkParsed(apkInfo: ApkInfoBean) {

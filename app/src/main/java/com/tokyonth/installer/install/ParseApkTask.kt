@@ -15,15 +15,15 @@ import java.util.*
 
 abstract class ParseApkTask : Thread() {
 
-    var uri: Uri? = null
-    private var handler: Handler? = null
-    private var activity: Activity? = null
-    private var referrer: String? = null
-    private var packageManager: PackageManager? = null
-    private var commanderCallback: CommanderCallback? = null
+    lateinit var uri: Uri
+    private lateinit var handler: Handler
+    private lateinit var activity: Activity
+    private lateinit var referrer: String
+    private lateinit var packageManager: PackageManager
+    private lateinit var commanderCallback: CommanderCallback
 
-    private var permInfo: PermInfoBean? = null
-    private var mApkInfo: ApkInfoBean? = null
+    private lateinit var permInfo: PermInfoBean
+    private lateinit var mApkInfo: ApkInfoBean
 
     fun startParseApkTask(uri: Uri, activity: Activity, handler: Handler, commanderCallback: CommanderCallback, referrer: String) {
         this.uri = uri
@@ -42,7 +42,7 @@ abstract class ParseApkTask : Thread() {
     override fun run() {
         super.run()
         try {
-            handler!!.post { commanderCallback!!.onStartParseApk(uri!!) }
+            handler.post { commanderCallback.onStartParseApk(uri) }
             mApkInfo = ApkInfoBean()
             permInfo = PermInfoBean()
 
@@ -52,53 +52,53 @@ abstract class ParseApkTask : Thread() {
             } else {
                 queryContent.path
             }
-            mApkInfo!!.apkFile = File(apkSourcePath)
+            mApkInfo.apkFile = File(apkSourcePath)
 
-            val pkgInfo = packageManager!!.getPackageArchiveInfo(mApkInfo!!.apkFile!!.path, PackageManager.GET_ACTIVITIES)
+            val pkgInfo = packageManager.getPackageArchiveInfo(mApkInfo.apkFile!!.path, PackageManager.GET_ACTIVITIES)
             if (pkgInfo != null) {
-                pkgInfo.applicationInfo.sourceDir = mApkInfo!!.apkFile!!.path
-                pkgInfo.applicationInfo.publicSourceDir = mApkInfo!!.apkFile!!.path
-                mApkInfo!!.appName = packageManager!!.getApplicationLabel(pkgInfo.applicationInfo).toString()
-                mApkInfo!!.packageName = pkgInfo.applicationInfo.packageName
-                mApkInfo!!.versionName = pkgInfo.versionName
+                pkgInfo.applicationInfo.sourceDir = mApkInfo.apkFile!!.path
+                pkgInfo.applicationInfo.publicSourceDir = mApkInfo.apkFile!!.path
+                mApkInfo.appName = packageManager.getApplicationLabel(pkgInfo.applicationInfo).toString()
+                mApkInfo.packageName = pkgInfo.applicationInfo.packageName
+                mApkInfo.versionName = pkgInfo.versionName
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                    mApkInfo!!.versionCode = pkgInfo.versionCode
+                    mApkInfo.versionCode = pkgInfo.versionCode
                 } else {
-                    mApkInfo!!.versionCode = pkgInfo.longVersionCode.toInt()
+                    mApkInfo.versionCode = pkgInfo.longVersionCode.toInt()
                 }
-                mApkInfo!!.icon = pkgInfo.applicationInfo.loadIcon(packageManager)
+                mApkInfo.icon = pkgInfo.applicationInfo.loadIcon(packageManager)
 
                 val activityList = ArrayList<String>()
                 if (pkgInfo.activities != null) {
                     for (activity in pkgInfo.activities) {
                         activityList.add(activity.name)
                     }
-                    mApkInfo!!.activities = activityList
+                    mApkInfo.activities = activityList
                 }
                 try {
-                    val installedPkgInfo = packageManager!!.getPackageInfo(mApkInfo!!.packageName!!, PackageManager.GET_CONFIGURATIONS)
-                    mApkInfo!!.installedVersionName = installedPkgInfo.versionName
+                    val installedPkgInfo = packageManager.getPackageInfo(mApkInfo.packageName!!, PackageManager.GET_CONFIGURATIONS)
+                    mApkInfo.installedVersionName = installedPkgInfo.versionName
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                        mApkInfo!!.installedVersionCode = installedPkgInfo.versionCode
+                        mApkInfo.installedVersionCode = installedPkgInfo.versionCode
                     } else {
-                        mApkInfo!!.installedVersionCode = installedPkgInfo.longVersionCode.toInt()
+                        mApkInfo.installedVersionCode = installedPkgInfo.longVersionCode.toInt()
                     }
-                    mApkInfo!!.isHasInstalledApp = true
+                    mApkInfo.isHasInstalledApp = true
                 } catch (e: PackageManager.NameNotFoundException) {
                     e.printStackTrace()
-                    mApkInfo!!.isHasInstalledApp = false
+                    mApkInfo.isHasInstalledApp = false
                 }
 
-                val permPkgInfo = packageManager!!.getPackageArchiveInfo(mApkInfo!!.apkFile!!.path, PackageManager.GET_PERMISSIONS)!!
-                mApkInfo!!.permissions = permPkgInfo.requestedPermissions
+                val permPkgInfo = packageManager.getPackageArchiveInfo(mApkInfo.apkFile!!.path, PackageManager.GET_PERMISSIONS)!!
+                mApkInfo.permissions = permPkgInfo.requestedPermissions
                 val strList = ArrayList<String>()
                 if (permPkgInfo.requestedPermissions != null) {
                     Collections.addAll(strList, *permPkgInfo.requestedPermissions)
                     getPermissionInfo(strList)
                 }
             }
-            handler!!.post { commanderCallback!!.onApkParsed(mApkInfo!!) }
-            setApkInfo(mApkInfo!!)
+            handler.post { commanderCallback.onApkParsed(mApkInfo) }
+            setApkInfo(mApkInfo)
         } catch (e: Exception) {
             //handler!!.post { commanderCallback!!.onApkParsed(null!!) }
             e.printStackTrace()
@@ -113,14 +113,14 @@ abstract class ParseApkTask : Thread() {
         val description = ArrayList<String>()
         for (str in permission) {
             try {
-                val permissionInfo = packageManager!!.getPermissionInfo(str, 0)
+                val permissionInfo = packageManager.getPermissionInfo(str, 0)
                 group += permissionInfo.group
                 //permissionInfo.group?.let { group.add(it) }
 
-                val permissionLabel = permissionInfo.loadLabel(packageManager!!).toString()
+                val permissionLabel = permissionInfo.loadLabel(packageManager).toString()
                 label.add(permissionLabel)
 
-                val permissionDescription = permissionInfo.loadDescription(packageManager!!)
+                val permissionDescription = permissionInfo.loadDescription(packageManager)
                 if (permissionDescription == null) {
                     description.add("")
                 } else {
@@ -134,10 +134,10 @@ abstract class ParseApkTask : Thread() {
             }
 
         }
-        permInfo!!.permissionDescription = description
-        permInfo!!.permissionGroup = group
-        permInfo!!.permissionLabel = label
-        setPermInfo(permInfo!!)
+        permInfo.permissionDescription = description
+        permInfo.permissionGroup = group
+        permInfo.permissionLabel = label
+        setPermInfo(permInfo)
     }
 
 }

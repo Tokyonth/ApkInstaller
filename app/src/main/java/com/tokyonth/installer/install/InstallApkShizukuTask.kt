@@ -5,7 +5,7 @@ import android.os.Build
 import android.os.Handler
 import android.util.Log
 import com.tokyonth.installer.bean.ApkInfoBean
-import com.tokyonth.installer.utils.HelperTools
+import com.tokyonth.installer.utils.CommonUtils
 import moe.shizuku.api.ShizukuService
 import java.io.File
 
@@ -19,7 +19,7 @@ class InstallApkShizukuTask(private val activity: Activity,
     override fun run() {
         super.run()
         handler.post { commanderCallback.onApkPreInstall(mApkInfo) }
-        if (HelperTools.requestPermissionByShizuku(activity)) {
+        if (CommonUtils.requestPermissionByShizuku(activity)) {
             handler.post { commanderCallback.onInstallLog(mApkInfo, "Shizuku installation mode")}
             mApkInfo.apkFile?.let { rowInstall(it) }
         }
@@ -42,14 +42,14 @@ class InstallApkShizukuTask(private val activity: Activity,
         }
     }
 
-    private fun exec(command: String): Int? {
+    private fun exec(command: String): Int {
         val file = activity.cacheDir
         initDir(file.parentFile!!)
         file.writeText(command)
         return execInternal("sh", file.path + "run.sh")
     }
 
-    private fun execInternal(vararg command: String): Int? {
+    private fun execInternal(vararg command: String): Int {
         val process = ShizukuService.newProcess(command, null, null)
         process.waitFor()
         val errorString = process.errorStream.bufferedReader().use { it.readText() }

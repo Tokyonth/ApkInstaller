@@ -11,18 +11,22 @@ import com.tokyonth.installer.utils.shizuku.ShizukuShell
 
 class UnInstallTask(private val mode: Int, private val pkgName: String, private val context: Context,
                     private val handler: Handler, private val commanderCallback: CommanderCallback) : Thread() {
+
     private val apkInfoBean: ApkInfoBean = ApkInfoBean()
+
     fun shellMode() {
-        val resultCode = ShellUtils.execWithRoot(UNFREEZE_COMMAND + pkgName)
-        commanderCallback.onApkInstalled(apkInfoBean, resultCode)
+        ShellUtils.execWithRoot(UNFREEZE_COMMAND + pkgName).let {
+            commanderCallback.onApkInstalled(apkInfoBean, it)
+        }
     }
 
     override fun run() {
         super.run()
         when (mode) {
             1 -> {
-                val result = ShizukuShell().exec(Shell.Command("pm", "uninstall", pkgName))
-                handler.post { commanderCallback.onApkInstalled(apkInfoBean, result.exitCode) }
+                ShizukuShell().exec(Shell.Command("pm", "uninstall", pkgName)).let {
+                    handler.post { commanderCallback.onApkInstalled(apkInfoBean, it.exitCode) }
+                }
             }
             2 -> if (IceBox.uninstallPackage(context, pkgName)) {
                 handler.post { commanderCallback.onApkInstalled(apkInfoBean, 0) }

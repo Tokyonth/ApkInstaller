@@ -1,35 +1,32 @@
 package com.tokyonth.installer.adapter
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.tokyonth.installer.R
+import com.tokyonth.installer.databinding.ItemRvFreezeAppBinding
 import com.tokyonth.installer.utils.AppPackageUtils
 import java.util.ArrayList
 
-class FreezeAdapter(private val context: Context?, private val list: ArrayList<String>?) : RecyclerView.Adapter<FreezeAdapter.FreezeViewHolder>() {
+class FreezeAdapter(private val context: Context, private val list: ArrayList<String>) : RecyclerView.Adapter<FreezeAdapter.FreezeViewHolder>() {
 
     private var listener: OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FreezeViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rv_freeze_app, parent, false)
-        return FreezeViewHolder(view)
+        val vb = ItemRvFreezeAppBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return FreezeViewHolder(vb)
     }
 
     override fun getItemCount(): Int {
-        return list?.size ?: 0
+        return list.size
     }
 
     override fun onBindViewHolder(holder: FreezeViewHolder, position: Int) {
-        val appName = AppPackageUtils.getAppNameByPackageName(context, list!![position])
+        val appName = AppPackageUtils.getAppNameByPackageName(context, list[position])
         val appIcon = AppPackageUtils.getAppIconByPackageName(context, list[position])
-        holder.tvFreezeAppName.text = appName
-        holder.tvFreezeSub.text = list[position]
-        holder.ivFreezeIcon.setImageDrawable(appIcon)
+
+        holder.bind(appName, list[position], appIcon)
         holder.itemView.setOnClickListener {
             listener!!.onClick(position, list[position])
         }
@@ -39,17 +36,19 @@ class FreezeAdapter(private val context: Context?, private val list: ArrayList<S
         this.listener = listener
     }
 
-    interface OnItemClickListener {
+    fun interface OnItemClickListener {
 
         fun onClick(position: Int, pkgName: String)
 
     }
 
-    class FreezeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class FreezeViewHolder(private val vb: ItemRvFreezeAppBinding) : RecyclerView.ViewHolder(vb.root) {
 
-        var tvFreezeAppName: TextView = itemView.findViewById(R.id.tv_freeze_app_name)
-        var tvFreezeSub: TextView = itemView.findViewById(R.id.tv_freeze_sub)
-        var ivFreezeIcon: ImageView = itemView.findViewById(R.id.iv_freeze_icon)
+        fun bind(appName: String, appSub: String, appIcon: Drawable) {
+            vb.tvFreezeAppName.text = appName
+            vb.tvFreezeSub.text = appSub
+            vb.ivFreezeIcon.setImageDrawable(appIcon)
+        }
 
     }
 

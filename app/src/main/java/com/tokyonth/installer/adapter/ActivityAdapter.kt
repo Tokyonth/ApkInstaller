@@ -1,33 +1,33 @@
 package com.tokyonth.installer.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-import com.tokyonth.installer.R
+import com.tokyonth.installer.databinding.ItemRvActivityBinding
 
 import java.util.ArrayList
 
-class ActivityAdapter(private val list: ArrayList<String>?) : RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder>() {
+class ActivityAdapter(private val list: ArrayList<String>) : RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActivityViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rv_activity, parent, false)
-        return ActivityViewHolder(view)
+        val vb = ItemRvActivityBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ActivityViewHolder(vb)
     }
 
     override fun onBindViewHolder(holder: ActivityViewHolder, position: Int) {
-        holder.tvAct.text = list!![position]
+        holder.bind(list[position])
     }
 
     override fun getItemCount(): Int {
-        return list?.size ?: 0
+        return list.size
     }
 
-    class ActivityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ActivityViewHolder(private val vb: ItemRvActivityBinding) : RecyclerView.ViewHolder(vb.root) {
 
-        val tvAct: TextView = itemView.findViewById(R.id.tv_act)
+        fun bind(string: String) {
+            vb.tvAct.text = string
+        }
 
     }
 

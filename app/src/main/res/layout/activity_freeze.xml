@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackGround"
-    android:orientation="vertical"
+    android:background="@color/colorBackground"
     android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context=".activity.FreezeActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -16,11 +15,12 @@
 
     <LinearLayout
         android:id="@+id/freeze_null_view"
-        android:layout_marginBottom="?android:attr/actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="?android:attr/actionBarSize"
+        android:gravity="center"
         android:orientation="vertical"
-        android:gravity="center">
+        tools:ignore="UseCompoundDrawables">
 
         <ImageView
             android:layout_width="48dp"
@@ -29,17 +29,17 @@
             tools:ignore="ContentDescription" />
 
         <TextView
-            android:layout_marginTop="16dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorTextSub"
-            android:text="@string/text_freeze_null"/>
+            android:layout_marginTop="16dp"
+            android:text="@string/text_freeze_null"
+            android:textColor="@color/colorTextSub" />
 
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_freeze_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

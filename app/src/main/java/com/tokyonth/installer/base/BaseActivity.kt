@@ -1,7 +1,6 @@
 package com.tokyonth.installer.base
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
@@ -16,14 +15,14 @@ import androidx.core.content.ContextCompat
 import androidx.viewbinding.ViewBinding
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
+import com.tokyonth.installer.utils.CommonUtils
 import com.tokyonth.installer.utils.SPUtils.set
-import com.tokyonth.installer.utils.ToastUtil
 import com.tokyonth.installer.view.CustomizeDialog
 
 abstract class BaseActivity : AppCompatActivity() {
 
     private val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE)
-    private val permissionsRequestCode = 100
+    private val permissionsRequestCode = 955
 
     abstract fun initView(): ViewBinding?
 
@@ -47,8 +46,8 @@ abstract class BaseActivity : AppCompatActivity() {
                 CustomizeDialog.getInstance(this)
                         .setTitle(getString(R.string.dialog_title_tips))
                         .setMessage(getString(R.string.app_get_perm_tips))
-                        .setNegativeButton(getString(R.string.exit_app)) { _: DialogInterface?, _: Int -> finish() }
-                        .setPositiveButton(getString(R.string.authorization_app)) { _: DialogInterface?, _: Int ->
+                        .setNegativeButton(getString(R.string.exit_app)) { _, _ -> finish() }
+                        .setPositiveButton(getString(R.string.authorization_app)) { _, _ ->
                             ActivityCompat.requestPermissions(this, permissions, permissionsRequestCode)
                         }
                         .setCancelable(false)
@@ -90,7 +89,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     fun showToast(text: String) {
-        ToastUtil.showToast(this, text, ToastUtil.DEFAULT_SITE)
+        CommonUtils.showToast(this, text)
     }
 
 }

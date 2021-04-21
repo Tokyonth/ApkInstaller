@@ -13,7 +13,6 @@ import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import android.os.Vibrator
-import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.view.ViewAnimationUtils
@@ -34,8 +33,6 @@ import com.tokyonth.installer.install.CommanderCallback
 import com.tokyonth.installer.bean.permissions.PermFullBean
 import com.tokyonth.installer.databinding.*
 import com.tokyonth.installer.utils.*
-import com.tokyonth.installer.utils.CommonUtil.bind
-import com.tokyonth.installer.utils.CommonUtil.visibleOrGone
 import com.tokyonth.installer.utils.SPUtils.get
 import com.tokyonth.installer.utils.SPUtils.set
 import com.tokyonth.installer.view.ProgressDrawable
@@ -56,22 +53,25 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
     private lateinit var apkFileName: String
     private lateinit var apkSource: String
 
-    private var installComplete = false
-    private var showActivity = false
-    private var showPerm = false
-
     private lateinit var vb: ActivityInstallerBinding
     private lateinit var vbInclude: ContentInstallerBinding
     private lateinit var vbDelInclude: LayoutDeleteContentBinding
     private lateinit var vbActInclude: LayoutActivityInfoBinding
     private lateinit var vbPermInclude: LayoutPermInfoBinding
 
-    override fun initView(): ViewBinding? {
+    private val settingsRequestCode = 201
+
+    override fun initView(): ViewBinding {
         vb = bind()
         vbInclude = vb.includeCt
         vbDelInclude = vbInclude.includeDel
         vbActInclude = vbInclude.includeAct
         vbPermInclude = vbInclude.includePerm
+
+        vbInclude.fabInstall.tag = false
+        vbActInclude.actLl.tag = false
+        vbPermInclude.permLl.tag = false
+
         return vb
     }
 
@@ -99,7 +99,7 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
         permFullBeanArrayList = ArrayList()
         actStringArrayList = ArrayList()
 
-        apkSource = HelperTools.reflectGetReferrer(this).toString()
+        apkSource = CommonUtils.reflectGetReferrer(this).toString()
         apkCommander = APKCommander(this, this, intent.data!!, apkSource)
 
         permAdapter = PermissionAdapter(permFullBeanArrayList, this)
@@ -121,39 +121,38 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
         vbInclude.ivApkSource.setImageDrawable(AppPackageUtils.getAppIconByPackageName(this, apkSource))
     }
 
-    private fun setViewStatus() {
-        vb.includeCt.includePerm.cardPerm.visibleOrGone(get(Constants.SP_SHOW_PERMISSION, true))
-        vb.includeCt.includeAct.cardAct.visibleOrGone(get(Constants.SP_SHOW_ACTIVITY, true))
-        vb.includeCt.includeDel.sbAutoDel.isChecked = get(Constants.SP_AUTO_DELETE, false)
-    }
-
     @SuppressLint("SetTextI18n")
-    private fun initDetails(apkInfo: ApkInfoBean) {
-        vb.ivAppIcon.setImageDrawable(apkInfo.icon)
-        val bitmap = apkInfo.icon?.let { HelperTools.drawableToBitmap(it) }
-        if (bitmap != null) {
-            Palette.from(bitmap).generate { palette ->
-                val vibrantSwatch = palette!!.lightVibrantSwatch
-                val color: Int
-                color = if (vibrantSwatch != null) {
-                    HelperTools.colorBurn(vibrantSwatch.rgb)
-                } else {
-                    ContextCompat.getColor(this, R.color.colorAccent)
-                }
-                vb.tvVersionTips.setTextColor(color)
+    private fun initApkDetails(apkInfo: ApkInfoBean) {
+        apkInfo.icon.let {
+            vb.ivAppIcon.setImageDrawable(it)
+            CommonUtils.drawableToBitmap(it!!).let { it1 ->
+                {
+                    if (it1 != null) {
+                        Palette.from(it1).generate { palette ->
+                            val vibrantSwatch = palette!!.lightVibrantSwatch
+                            val color: Int = if (vibrantSwatch != null) {
+                                CommonUtils.colorBurn(vibrantSwatch.rgb)
+                            } else {
+                                ContextCompat.getColor(this, R.color.colorAccent)
+                            }
+                            vb.tvVersionTips.setTextColor(color)
 
-                val targetView = vb.appBarLayout
-                val width = targetView.measuredWidth
-                val height = targetView.measuredHeight
-                val animator = ViewAnimationUtils.createCircularReveal(targetView, width / 2, height / 2, 0f, height.toFloat())
-                animator.addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationStart(animation: Animator) {
-                        super.onAnimationStart(animation)
-                        targetView.setBackgroundColor(color)
+                            val targetView = vb.appBarLayout
+                            val width = targetView.measuredWidth
+                            val height = targetView.measuredHeight
+                            ViewAnimationUtils.createCircularReveal(targetView, width / 2, height / 2, 0f, height.toFloat()).apply {
+                                addListener(object : AnimatorListenerAdapter() {
+                                    override fun onAnimationStart(animation: Animator) {
+                                        super.onAnimationStart(animation)
+                                        targetView.setBackgroundColor(color)
+                                    }
+                                })
+                                duration = 500
+                                start()
+                            }
+                        }
                     }
-                })
-                animator.duration = 500
-                animator.start()
+                }
             }
         }
 
@@ -164,6 +163,7 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
         apkFilePath = apkInfo.apkFile!!.path
         vb.tvAppName.text = apkInfo.appName
         vb.tvAppVersion.text = apkInfo.version
+        vb.ivAppIcon.setImageDrawable(apkInfo.icon)
 
         vbInclude.tvInstallMsg.text = resources.getString(R.string.info_pkg_name) + apkInfo.packageName + "\n" +
                 resources.getString(R.string.info_apk_path) + apkFilePath + "\n" +
@@ -177,7 +177,7 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
                 animation = translateAnimation
                 startAnimation(translateAnimation)
                 visibility = View.VISIBLE
-                text = HelperTools.checkVersion(this@InstallerActivity, apkInfo.versionCode, apkInfo.installedVersionCode)
+                text = CommonUtils.checkVersion(this@InstallerActivity, apkInfo.versionCode, apkInfo.installedVersionCode)
             }
         }
 
@@ -218,27 +218,24 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
     }
 
     override fun onApkParsed(apkInfo: ApkInfoBean) {
-        if (!TextUtils.isEmpty(apkInfo.packageName)) {
-            initDetails(apkInfo)
+        if (apkInfo.packageName?.isNotEmpty()!!) {
+            initApkDetails(apkInfo)
             vbInclude.fabInstall.visibility = View.VISIBLE
             vbInclude.bottomAppBar.visibility = View.VISIBLE
         } else {
-            val uri = intent.data
-            var str: String? = null
-            if (uri != null) {
-                str = uri.toString()
+            intent.data.let {
+                vbInclude.tvInstallMsg.text = getString(R.string.parse_apk_failed, it.toString())
             }
-            vbInclude.tvInstallMsg.text = getString(R.string.parse_apk_failed, str)
         }
     }
 
     override fun onApkPreInstall(apkInfo: ApkInfoBean) {
-        vbInclude.progressBar.visibility = View.VISIBLE
+        vbInclude.pbInstalling.visibility = View.VISIBLE
         vbPermInclude.cardPerm.visibility = View.GONE
         vbActInclude.cardAct.visibility = View.GONE
-        vbInclude.fabInstall.isEnabled = false
         vbInclude.tvCancel.visibility = View.GONE
         vbInclude.tvSilently.visibility = View.GONE
+        vbInclude.fabInstall.isEnabled = false
 
         progressDrawable = ProgressDrawable()
         progressDrawable.putColor(Color.WHITE)
@@ -252,33 +249,35 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
     @Suppress("DEPRECATION")
     override fun onApkInstalled(apkInfo: ApkInfoBean, resultCode: Int) {
         if (resultCode == 0) {
-            vbDelInclude.cardDel.visibility = View.VISIBLE
             showToast(getString(R.string.apk_installed, apkInfo.appName))
+            vbDelInclude.cardDel.visibility = View.VISIBLE
             if (get(Constants.SP_INSTALLED_VIBRATE, false)) {
-                val vibrator = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-                vibrator.vibrate(800)
+                (getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).apply {
+                    vibrate(800)
+                }
             }
-            vb.tvAppName.text = getString(R.string.successful)
+
             vbInclude.fabInstall.apply {
                 icon = ContextCompat.getDrawable(this@InstallerActivity, R.drawable.ic_send_24px)
                 text = getString(R.string.open_app)
                 isEnabled = true
             }
+            vb.tvAppName.text = getString(R.string.successful)
             vbInclude.tvCancel.text = getString(R.string.back)
         } else {
             vbInclude.fabInstall.apply {
                 icon = ContextCompat.getDrawable(this@InstallerActivity, R.drawable.ic_clear_24px)
                 text = getString(R.string.failed)
-                isEnabled = true
+                isEnabled = false
             }
-            vbInclude.tvCancel.text = getString(R.string.failed)
+            vbInclude.tvCancel.text = getString(R.string.exit_app)
 
             if (get(Constants.SP_NEVER_SHOW_USE_SYSTEM_PKG, true)) {
                 CustomizeDialog.getInstance(this)
                         .setTitle(R.string.dialog_text_title)
                         .setMessage(R.string.use_system_pkg)
                         .setPositiveButton(R.string.dialog_ok) { _: DialogInterface?, _: Int ->
-                            HelperTools.startSystemPkgInstall(this, apkFilePath)
+                            CommonUtils.startSystemPkgInstall(this, apkFilePath)
                             finish()
                         }
                         .setNegativeButton(R.string.dialog_btn_cancel, null)
@@ -290,8 +289,8 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
 
         }
         vbInclude.tvCancel.visibility = View.VISIBLE
-        vb.includeCt.progressBar.visibility = View.GONE
-        installComplete = true
+        vbInclude.pbInstalling.visibility = View.GONE
+        vbInclude.fabInstall.tag = true
         progressDrawable.stop()
     }
 
@@ -303,6 +302,7 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
         if (get(Constants.SP_AUTO_DELETE, false) && vb.includeCt.tvCancel.text!! == getString(R.string.back)) {
             if (File(apkFilePath).delete()) {
                 showToast(getString(R.string.apk_deleted, apkFileName))
+                finish()
             }
         }
     }
@@ -310,49 +310,53 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
     override fun onClick(v: View?) {
         when (v!!.id) {
             R.id.fab_install -> {
-                if (installComplete) {
-                    startActivity(apkCommander.getApkInfo().packageName.let { it?.let { it1 -> packageManager.getLaunchIntentForPackage(it1) } })
-                    isAutoDel()
-                    finish()
-                } else {
-                    apkCommander.startInstall()
+                vbInclude.fabInstall.tag.let {
+                    if (it as Boolean) {
+                        apkCommander.getApkInfo().packageName.let { it1 ->
+                            {
+                                if (it1 != null) {
+                                    startActivity(packageManager.getLaunchIntentForPackage(it1))
+                                    isAutoDel()
+                                }
+                            }
+                        }
+                        finish()
+                    } else {
+                        apkCommander.startInstall()
+                    }
                 }
             }
-            R.id.tv_cancel -> {
-                isAutoDel()
-                finish()
-            }
+            R.id.tv_cancel -> isAutoDel()
             R.id.tv_silently -> {
-                val intent = Intent(this, SilentlyInstallActivity::class.java)
-                intent.data = getIntent().data
-                intent.putExtra(Constants.APK_SOURCE, apkSource)
+                val intent = Intent(this, SilentlyInstallActivity::class.java).apply {
+                    data = intent.data
+                    putExtra(Constants.APK_SOURCE, apkSource)
+                }
                 startActivity(intent)
                 finish()
             }
             R.id.perm_ll -> {
-                showPerm.also {
-                    if (showPerm) {
+                vbPermInclude.permLl.tag.let {
+                    if (it as Boolean) {
                         vbPermInclude.ivPermArrow.setImageResource(R.drawable.ic_chevron_right_24px)
                     } else {
                         vbPermInclude.ivPermArrow.setImageResource(R.drawable.ic_expand_more_24px)
                     }
-                    showPerm = !it
                     vbPermInclude.permRv.visibleOrGone(!it)
                 }
             }
             R.id.act_ll -> {
-                showActivity.also {
-                    if (showActivity) {
+                vbActInclude.actLl.tag.let {
+                    if (it as Boolean) {
                         vbActInclude.ivActArrow.setImageResource(R.drawable.ic_chevron_right_24px)
                     } else {
                         vbActInclude.ivActArrow.setImageResource(R.drawable.ic_expand_more_24px)
                     }
-                    showActivity = !it
                     vbActInclude.actRv.visibleOrGone(!it)
                 }
             }
             R.id.ib_night_mode -> {
-                get(Constants.SP_NIGHT_MODE, false).also {
+                get(Constants.SP_NIGHT_MODE, false).let {
                     if (it) {
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     } else {
@@ -361,15 +365,18 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
                     set(Constants.SP_NIGHT_MODE, !it)
                 }
             }
-            R.id.ib_settings -> startActivityForResult(Intent(this, SettingsActivity::class.java), 200)
-            R.id.ll_to_source -> HelperTools.toSelfSetting(this, apkSource)
+            R.id.ib_settings -> startActivityForResult(Intent(this, SettingsActivity::class.java), settingsRequestCode)
+            R.id.ll_to_source -> CommonUtils.toSelfSetting(this, apkSource)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (installComplete)
-            setViewStatus()
+        if (!(vbInclude.fabInstall.tag as Boolean) && requestCode == settingsRequestCode) {
+            vbPermInclude.cardPerm.visibleOrGone(get(Constants.SP_SHOW_PERMISSION, true))
+            vbActInclude.cardAct.visibleOrGone(get(Constants.SP_SHOW_ACTIVITY, true))
+        }
+        vbDelInclude.sbAutoDel.isChecked = get(Constants.SP_AUTO_DELETE, false)
     }
 
     override fun onDestroy() {

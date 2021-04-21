@@ -1,39 +1,37 @@
 package com.tokyonth.installer.adapter
 
 import android.app.Activity
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-import com.kyleduo.switchbutton.SwitchButton
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.bean.SettingsBean
-import com.tokyonth.installer.utils.HelperTools
+import com.tokyonth.installer.databinding.ItemRvSettingsBinding
+import com.tokyonth.installer.utils.CommonUtils
 import com.tokyonth.installer.utils.SPUtils.get
 import com.tokyonth.installer.utils.SPUtils.set
 import com.tokyonth.installer.view.BurnRoundView
 import com.tokyonth.installer.view.CustomizeDialog
+import com.tokyonth.installer.view.SwitchButton
 
 import java.util.ArrayList
 
-class SettingsAdapter(private val activity: Activity, private val list: ArrayList<SettingsBean>?) :
+class SettingsAdapter(private val activity: Activity, private val list: ArrayList<SettingsBean>) :
         RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>() {
 
-    private lateinit var context: Context
     private var onItemSwitchClick: OnItemSwitchClick? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingsViewHolder {
-        context = parent.context
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rv_settings, parent, false)
-        return SettingsViewHolder(view)
+        val vb = ItemRvSettingsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return SettingsViewHolder(vb)
     }
 
     override fun onBindViewHolder(holder: SettingsViewHolder, position: Int) {
-        val bean = list!![position]
+        val bean = list[position]
         holder.title.text = bean.title
         holder.sub.text = bean.sub
         holder.icon.setBurnSrc(bean.icon, bean.color, true)
@@ -43,12 +41,12 @@ class SettingsAdapter(private val activity: Activity, private val list: ArrayLis
             holder.switchBtn.visibility = View.GONE
             holder.itemView.setOnClickListener {
                 CustomizeDialog.getInstance(activity)
-                        .setSingleChoiceItems(R.array.install_mode_arr, context[Constants.SP_INSTALL_MODE, 0]) { dialog, which ->
-                            context[Constants.SP_INSTALL_MODE] = which
+                        .setSingleChoiceItems(R.array.install_mode_arr, activity[Constants.SP_INSTALL_MODE, 0]) { dialog, which ->
+                            activity[Constants.SP_INSTALL_MODE] = which
                             if (which == 1) {
-                                HelperTools.requestPermissionByShizuku(activity)
+                                CommonUtils.requestPermissionByShizuku(activity)
                             } else if (which == 2) {
-                                HelperTools.requestPermissionByIcebox(activity)
+                                CommonUtils.requestPermissionByIcebox(activity)
                             }
                             dialog.dismiss()
                         }
@@ -70,25 +68,25 @@ class SettingsAdapter(private val activity: Activity, private val list: ArrayLis
     }
 
     override fun getItemCount(): Int {
-        return list?.size ?: 0
+        return list.size
     }
 
     fun setOnItemClick(onItemSwitchClick: OnItemSwitchClick) {
         this.onItemSwitchClick = onItemSwitchClick
     }
 
-    interface OnItemSwitchClick {
+    fun interface OnItemSwitchClick {
 
         fun onItemClick(view: View, pos: Int, bool: Boolean)
 
     }
 
-    class SettingsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class SettingsViewHolder(vb: ItemRvSettingsBinding) : RecyclerView.ViewHolder(vb.root) {
 
-        val title: TextView = itemView.findViewById(R.id.settings_item_title)
-        val sub: TextView = itemView.findViewById(R.id.settings_item_sub)
-        val icon: BurnRoundView = itemView.findViewById(R.id.settings_item_icon)
-        val switchBtn: SwitchButton = itemView.findViewById(R.id.settings_item_switch)
+        val title: TextView = vb.settingsItemTitle
+        val sub: TextView = vb.settingsItemSub
+        val icon: BurnRoundView = vb.settingsItemIcon
+        val switchBtn: SwitchButton = vb.settingsItemSwitch
 
     }
 

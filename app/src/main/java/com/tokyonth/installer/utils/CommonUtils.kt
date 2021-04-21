@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -15,6 +14,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.VectorDrawable
 import android.net.Uri
+import android.view.View
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,14 +24,26 @@ import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import com.catchingnow.icebox.sdk_client.IceBox
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
+import com.tokyonth.installer.databinding.LayoutCommonToastBinding
 import com.tokyonth.installer.utils.SPUtils.get
-import com.tokyonth.installer.utils.ToastUtil.showToast
+import com.tokyonth.installer.utils.SPUtils.set
 import com.tokyonth.installer.view.CustomizeDialog
 import moe.shizuku.api.ShizukuApiConstants
 import java.io.File
 import kotlin.math.floor
 
-object HelperTools {
+object CommonUtils {
+
+    @JvmStatic
+    fun showToast(context: Context, msg: String) {
+        val vb = LayoutCommonToastBinding.bind(View.inflate(context, R.layout.layout_common_toast, null))
+        Toast(context).apply {
+            view = vb.root
+            vb.tvCommonToast.text = msg
+            duration = Toast.LENGTH_SHORT
+            show()
+        }
+    }
 
     fun checkVersion(context: Context, version: Int, installedVersion: Int): String {
         return when {
@@ -41,12 +54,18 @@ object HelperTools {
                 context.getString(R.string.text_new_ver)
             }
             else -> {
-                CustomizeDialog.getInstance(context)
-                        .setTitle(R.string.dialog_title_tips)
-                        .setMessage(R.string.low_ver_msg)
-                        .setPositiveButton(R.string.text_i_know) { _: DialogInterface?, _: Int -> context[Constants.SP_NEVER_TIP_VERSION, false] }
-                        .setNegativeButton(R.string.dialog_no_longer_prompt, null)
-                        .setCancelable(false).create().show()
+                context[Constants.SP_NEVER_TIP_VERSION, true].let {
+                    if (it) {
+                        CustomizeDialog.getInstance(context)
+                                .setTitle(R.string.dialog_title_tips)
+                                .setMessage(R.string.low_ver_msg)
+                                .setPositiveButton(R.string.text_i_know, null)
+                                .setNegativeButton(R.string.dialog_no_longer_prompt) { _, _ ->
+                                    context[Constants.SP_NEVER_TIP_VERSION] = false
+                                }
+                                .setCancelable(false).create().show()
+                    }
+                }
                 context.getString(R.string.text_low_ver)
             }
         }
@@ -67,7 +86,7 @@ object HelperTools {
         val permission = ShizukuApiConstants.PERMISSION
         if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-                showToast(activity, activity.getString(R.string.shizuku_permission_request), ToastUtil.DEFAULT_SITE)
+                showToast(activity, activity.getString(R.string.shizuku_permission_request))
             }
             ActivityCompat.requestPermissions(activity, arrayOf(permission), 100)
         } else {
@@ -77,11 +96,12 @@ object HelperTools {
     }
 
     fun toSelfSetting(context: Context, str: String?) {
-        val mIntent = Intent()
-        mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        mIntent.action = "android.settings.APPLICATION_DETAILS_SETTINGS"
-        mIntent.data = Uri.fromParts("package", str, null)
-        context.startActivity(mIntent)
+        val intent = Intent().apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            action = "android.settings.APPLICATION_DETAILS_SETTINGS"
+            data = Uri.fromParts("package", str, null)
+        }
+        context.startActivity(intent)
     }
 
     fun colorBurn(RGBValues: Int): Int {
@@ -94,6 +114,7 @@ object HelperTools {
         return Color.rgb(red, green, blue)
     }
 
+    @Suppress("DEPRECATION")
     fun drawableToBitmap(drawable: Drawable): Bitmap? {
         val w = drawable.intrinsicWidth
         val h = drawable.intrinsicHeight
@@ -143,7 +164,7 @@ object HelperTools {
             }
             context.startActivity(intent)
         } else {
-            showToast(context, context.getString(R.string.open_sys_pkg_failure), ToastUtil.DEFAULT_SITE)
+            showToast(context, context.getString(R.string.open_sys_pkg_failure))
         }
     }
 

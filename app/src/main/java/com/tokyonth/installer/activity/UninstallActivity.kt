@@ -14,29 +14,36 @@ import com.tokyonth.installer.install.UnInstallTask
 import com.tokyonth.installer.utils.AppPackageUtils
 import com.tokyonth.installer.utils.SPUtils.get
 import com.tokyonth.installer.view.CustomizeDialog
-import java.util.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 class UninstallActivity : BaseActivity(), CommanderCallback {
 
     private lateinit var unInstallTask: UnInstallTask
     private val handler: Handler = Handler(Looper.getMainLooper())
 
+    private var pkgName: String? = null
+
     override fun initView(): ViewBinding? {
         return null
     }
 
     override fun initData() {
-        val intentStr = intent.dataString
-        val strStartIndex: Int = intentStr!!.indexOf(":")
-        val strEndIndex: Int = intentStr.indexOf("#")
-        val pkgName = if (strEndIndex > 0 && strStartIndex > 0) {
-            intentStr.substring(intentStr.indexOf(":") + 1, intentStr.lastIndexOf("#"))
-        } else {
-            Objects.requireNonNull<String>(intent.dataString).replace("package:", "")
+        intent.dataString?.let {
+            val pattern: Pattern = Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]*)+([.][a-zA-Z_][a-zA-Z0-9_]*)+")
+            val matcher: Matcher = pattern.matcher(it)
+            while (matcher.find()) {
+                pkgName = matcher.group()
+            }
+            /*if (it.indexOf("#") > 0 && it.indexOf(":") > 0) {
+                it.substring(it.indexOf(":") + 1, it.lastIndexOf("#"))
+            } else {
+                it.replace("package:", "")
+            }*/
         }
 
         get(Constants.SP_INSTALL_MODE, 0).also {
-            unInstallTask = UnInstallTask(it, pkgName, this, handler, this)
+            unInstallTask = UnInstallTask(it, pkgName!!, this, handler, this)
 
             CustomizeDialog.getInstance(this)
                     .setTitle(getString(R.string.text_uninstall, {
@@ -64,8 +71,7 @@ class UninstallActivity : BaseActivity(), CommanderCallback {
                         }
                         showToast(str)
                         finish()
-                    }
-                     */
+                    }*/
                     .setNegativeButton(R.string.dialog_btn_cancel) { _: DialogInterface, _: Int -> finish() }
                     .setCancelable(false)
                     .create().show()

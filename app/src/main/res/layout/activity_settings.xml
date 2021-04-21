@@ -1,32 +1,32 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/coordinator_layout"
-    android:orientation="vertical"
+    android:background="@color/colorBackground"
     android:fitsSystemWindows="true"
-    android:background="@color/colorBackGround"
+    android:orientation="vertical"
     tools:context=".activity.SettingsActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"
         android:gravity="center"
         android:padding="16dp"
+        android:text="@string/action_settings"
         android:textColor="@color/colorText"
-        android:text="@string/action_settings"/>
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <ScrollView
-        android:fadingEdge="none"
-        android:overScrollMode="never"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:fadingEdge="none"
+        android:overScrollMode="never">
 
         <include
             android:id="@+id/include_ct"
-            layout="@layout/content_settings"/>
+            layout="@layout/content_settings" />
 
     </ScrollView>
 

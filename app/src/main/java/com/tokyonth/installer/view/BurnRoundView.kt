@@ -5,7 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import com.tokyonth.installer.R
-import com.tokyonth.installer.utils.HelperTools
+import com.tokyonth.installer.utils.CommonUtils
 import kotlin.math.min
 
 class BurnRoundView : View {
@@ -50,7 +50,7 @@ class BurnRoundView : View {
     }
 
     private fun replaceImageColor(imageId: Int, color: Int) {
-        burnSrc = HelperTools.getBitmapFromDrawable(context, imageId)
+        burnSrc = CommonUtils.getBitmapFromDrawable(context, imageId)
         overlayPaint!!.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
     }
 
@@ -86,27 +86,12 @@ class BurnRoundView : View {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec))
-        mWidth = measureWidth(widthMeasureSpec)
-        mHeight = measureHeight(heightMeasureSpec)
+        setMeasuredDimension(measureWidthAndHeight(widthMeasureSpec), measureWidthAndHeight(heightMeasureSpec))
+        mWidth = measureWidthAndHeight(widthMeasureSpec)
+        mHeight = measureWidthAndHeight(heightMeasureSpec)
     }
 
-    private fun measureWidth(measureSpec: Int): Int {
-        var result: Int
-        val specMode = MeasureSpec.getMode(measureSpec)
-        val specSize = MeasureSpec.getSize(measureSpec)
-        if (specMode == MeasureSpec.EXACTLY) {
-            result = specSize
-        } else {
-            result = DEFAULT_SIZE
-            if (specMode == MeasureSpec.AT_MOST) {
-                result = min(result, specSize)
-            }
-        }
-        return result
-    }
-
-    private fun measureHeight(measureSpec: Int): Int {
+    private fun measureWidthAndHeight(measureSpec: Int): Int {
         var result: Int
         val specMode = MeasureSpec.getMode(measureSpec)
         val specSize = MeasureSpec.getSize(measureSpec)

@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="?android:attr/selectableItemBackground"
     android:id="@+id/ll_perm"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_perm"
-        android:textColor="@color/colorTextSub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="12dp"
         android:layout_marginLeft="12dp"
-        tools:text="android.permission.WRITE_EXTERNAL_STORAGE"/>
+        android:layout_marginRight="12dp"
+        android:textColor="@color/colorText"
+        tools:text="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <TextView
         android:id="@+id/tv_des"
-        android:textColor="@color/colorTextSub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="12dp"
         android:layout_marginLeft="12dp"
-        tools:text="des"/>
+        android:layout_marginRight="12dp"
+        android:textColor="@color/colorTextSub"
+        tools:text="des" />
 
     <TextView
         android:id="@+id/tv_des_div"
-        android:textColor="@color/colorTextSub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="12dp"
         android:layout_marginLeft="12dp"
-        tools:text="des_div"/>
+        android:layout_marginRight="12dp"
+        android:textColor="@color/colorTextSub"
+        tools:text="des_div" />
 
 </LinearLayout>

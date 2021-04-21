@@ -2,7 +2,6 @@ package com.tokyonth.installer.activity
 
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,10 +12,11 @@ import com.tokyonth.installer.adapter.FreezeAdapter
 import com.tokyonth.installer.base.BaseActivity
 import com.tokyonth.installer.database.SQLiteUtil
 import com.tokyonth.installer.databinding.ActivityFreezeBinding
+import com.tokyonth.installer.databinding.LayoutFreezeDialogBinding
 import com.tokyonth.installer.utils.AppPackageUtils
-import com.tokyonth.installer.utils.CommonUtil.bind
-import com.tokyonth.installer.utils.CommonUtil.visibleOrGone
 import com.tokyonth.installer.utils.ShellUtils
+import com.tokyonth.installer.utils.bind
+import com.tokyonth.installer.utils.visibleOrGone
 import com.tokyonth.installer.view.CustomizeDialog
 import java.util.ArrayList
 
@@ -30,41 +30,35 @@ class FreezeActivity : BaseActivity() {
 
     private lateinit var vb: ActivityFreezeBinding
 
-    override fun initView(): ViewBinding? {
+    override fun initView(): ViewBinding {
         vb = bind()
         return vb
     }
 
     override fun initData() {
         listData = SQLiteUtil.getAllData(this)
-        freezeAdapter = FreezeAdapter(this, listData as ArrayList<String>?)
+        freezeAdapter = FreezeAdapter(this, listData)
 
         vb.rvFreezeList.apply {
             layoutManager = LinearLayoutManager(this@FreezeActivity)
             adapter = freezeAdapter
         }
 
-        freezeAdapter.setItemListener(object : FreezeAdapter.OnItemClickListener {
-            override fun onClick(position: Int, pkgName: String) {
-                val dialogView: View = View.inflate(this@FreezeActivity, R.layout.layout_freeze_dialog, null)
-                customizeDialog = CustomizeDialog.getInstance(this@FreezeActivity)
-                        .setView(dialogView)
-                        .setNegativeButton(R.string.dialog_btn_cancel, null)
-                        .create()
-                customizeDialog.show()
+        freezeAdapter.setItemListener { position, pkgName ->
+            val dialogViewVb = LayoutFreezeDialogBinding.bind(View.inflate(this@FreezeActivity, R.layout.layout_freeze_dialog, null))
+            customizeDialog = CustomizeDialog.getInstance(this@FreezeActivity)
+                    .setView(dialogViewVb.root)
+                    .setNegativeButton(R.string.dialog_btn_cancel, null)
+                    .create()
+            customizeDialog.show()
 
-                val tvUnfreeze: TextView = dialogView.findViewById(R.id.tv_unfreeze)
-                val tvUninstall: TextView = dialogView.findViewById(R.id.tv_uninstall)
-                tvUnfreeze.setOnClickListener {
-                    unfreezeApp(position, pkgName)
-                }
-                tvUninstall.setOnClickListener {
-                    uninstallApp(position, pkgName)
-                }
+            dialogViewVb.tvUnfreeze.setOnClickListener {
+                dialogAppAction(position, pkgName, false)
             }
-        })
-
-        vb.freezeNullView.visibleOrGone(freezeAdapter.itemCount == 0)
+            dialogViewVb.tvUninstall.setOnClickListener {
+                dialogAppAction(position, pkgName, true)
+            }
+        }
 
         setSupportActionBar(vb.toolbar)
         setTitle(R.string.uninstall_dialog_disable)
@@ -72,41 +66,40 @@ class FreezeActivity : BaseActivity() {
             actionBar?.setHomeButtonEnabled(true)
             actionBar?.setDisplayHomeAsUpEnabled(true)
         }
+        vb.freezeNullView.visibleOrGone(freezeAdapter.itemCount == 0)
         vb.toolbar.setTitleTextColor(ContextCompat.getColor(this, R.color.colorText))
-        vb.toolbar.navigationIcon?.apply {
-            setTint(ContextCompat.getColor(this@FreezeActivity, R.color.colorText))
-        }
+        vb.toolbar.navigationIcon?.setTint(ContextCompat.getColor(this@FreezeActivity, R.color.colorText))
     }
 
-    private fun uninstallApp(position: Int, pkgName: String) {
-        val result = ShellUtils.execWithRoot(Constants.UNINSTALL_COMMAND + pkgName)
+    private fun dialogAppAction(position: Int, pkgName: String, isUninstall: Boolean) {
         val appName = AppPackageUtils.getAppNameByPackageName(this@FreezeActivity, pkgName)
-        val str: String
-        if (result == 0) {
-            SQLiteUtil.delData(this@FreezeActivity, pkgName)
-            str = getString(R.string.text_uninstall_complete, appName)
-            listData.removeAt(position)
-        } else {
-            str = getString(R.string.text_uninstall_failure)
+        isUninstall.let {
+            val command = if (it) {
+                Constants.UNINSTALL_COMMAND + pkgName
+            } else {
+                Constants.UNFREEZE_COMMAND + pkgName
+            }
+            ShellUtils.execWithRoot(command).let { it1 ->
+                val str = if (it1 == 0) {
+                    SQLiteUtil.delData(this@FreezeActivity, pkgName)
+                    listData.removeAt(position)
+                    if (it) {
+                        getString(R.string.text_uninstall_complete, appName)
+                    } else {
+                        getString(R.string.unfreeze_app_complete)
+                    }
+                } else {
+                    if (it) {
+                        getString(R.string.text_uninstall_failure)
+                    } else {
+                        getString(R.string.unfreeze_app_failure)
+                    }
+                }
+                showToast(str)
+            }
         }
         freezeAdapter.notifyDataSetChanged()
         customizeDialog.dismiss()
-        showToast(str)
-    }
-
-    private fun unfreezeApp(position: Int, pkgName: String) {
-        val result = ShellUtils.execWithRoot(Constants.UNFREEZE_COMMAND + pkgName)
-        val str: String
-        if (result == 0) {
-            SQLiteUtil.delData(this@FreezeActivity, pkgName)
-            str = getString(R.string.unfreeze_app_complete)
-            listData.removeAt(position)
-        } else {
-            str = getString(R.string.unfreeze_app_failure)
-        }
-        freezeAdapter.notifyDataSetChanged()
-        customizeDialog.dismiss()
-        showToast(str)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
