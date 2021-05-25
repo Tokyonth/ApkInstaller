@@ -44,7 +44,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             @Override
             public void run() {
                 Looper.prepare();
-                ToastUtil.showToast(context, context.getString(R.string.crash_tips), ToastUtil.DEFAULT_SITE);
+                CommonUtils.showToast(context, context.getString(R.string.crash_tips));
                 Looper.loop();
             }
         }.start();
@@ -73,8 +73,13 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         map.put("phoneModel", "" + Build.MODEL);
         map.put("sdkVersion", "" + Build.VERSION.SDK_INT);
         if (mPackageInfo != null) {
-            map.put("versionName", mPackageInfo.versionName);
-            map.put("versionCode", "" + mPackageInfo.versionCode);
+            map.put("versionName", "" + mPackageInfo.versionName);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                map.put("versionCode", "" + mPackageInfo.versionCode);
+            } else {
+                map.put("versionCode", "" + mPackageInfo.getLongVersionCode());
+            }
+
         }
         return map;
     }

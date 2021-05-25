@@ -1,5 +1,6 @@
 package com.tokyonth.installer.activity
 
+import android.app.Activity
 import android.net.Uri
 import android.util.Log
 import androidx.viewbinding.ViewBinding
@@ -11,20 +12,24 @@ import com.tokyonth.installer.base.BaseActivity
 import com.tokyonth.installer.bean.ApkInfoBean
 import com.tokyonth.installer.install.CommanderCallback
 import com.tokyonth.installer.utils.SPUtils.get
+import java.lang.ref.WeakReference
 
 class SilentlyInstallActivity : BaseActivity(), CommanderCallback {
 
     private var apkCommander: APKCommander? = null
+
+    private lateinit var weakRefActivity: WeakReference<Activity>
 
     override fun initView(): ViewBinding? {
         return null
     }
 
     override fun initData() {
+        weakRefActivity = WeakReference<Activity>(this)
         intent.data.also {
             if (it != null) {
                 val apkSource = intent.getStringExtra(Constants.APK_SOURCE)
-                apkCommander = APKCommander(this, this, it, apkSource as String)
+                apkCommander = APKCommander(weakRefActivity, this, it, apkSource as String)
             } else {
                 showToast(getString(R.string.unable_to_install_apk))
                 finish()

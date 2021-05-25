@@ -177,13 +177,7 @@ object CommonUtils {
             val refererField = activityClass.getDeclaredField("mReferrer")
             refererField.isAccessible = true
             refererField[context] as String
-        } catch (e: ClassNotFoundException) {
-            e.printStackTrace()
-            null
-        } catch (e: IllegalAccessException) {
-            e.printStackTrace()
-            null
-        } catch (e: NoSuchFieldException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             null
         }

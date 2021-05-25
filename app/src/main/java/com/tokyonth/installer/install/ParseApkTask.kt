@@ -114,7 +114,15 @@ abstract class ParseApkTask : Thread() {
         for (str in permission) {
             try {
                 val permissionInfo = packageManager.getPermissionInfo(str, 0)
-                group += permissionInfo.group
+                permissionInfo.group.let {
+                    if (it != null) {
+                        group.add(it)
+                    } else {
+                        group.add("")
+                    }
+                }
+                //group.add(permissionInfo.group!!)
+                //group += permissionInfo.group
                 //permissionInfo.group?.let { group.add(it) }
 
                 val permissionLabel = permissionInfo.loadLabel(packageManager).toString()
@@ -126,7 +134,6 @@ abstract class ParseApkTask : Thread() {
                 } else {
                     description.add(permissionDescription as String)
                 }
-
             } catch (e: PackageManager.NameNotFoundException) {
                 description.add("")
                 label.add("")

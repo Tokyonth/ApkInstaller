@@ -8,16 +8,20 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import android.os.Vibrator
+import android.provider.DocumentsContract
 import android.util.Log
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.TranslateAnimation
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.viewbinding.ViewBinding
 
 import com.tokyonth.installer.base.BaseActivity
@@ -60,6 +64,7 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
     private lateinit var vbPermInclude: LayoutPermInfoBinding
 
     private val settingsRequestCode = 201
+    private val byAndroidRDataRequestCode = 11
 
     override fun initView(): ViewBinding {
         vb = bind()
@@ -76,12 +81,36 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
     }
 
     override fun initData() {
-        if (intent.data == null) {
-            finish()
-        } else {
-            initListener()
-            initViewDetail()
+        intent.data.let {
+            if (it == null) {
+                finish()
+            } else {
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
+                    getAndroidDataPermission(it)
+                } else {
+                    initApp()
+                }
+            }
         }
+    }
+
+    private fun initApp() {
+        initListener()
+        initViewDetail()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getAndroidDataPermission(uri: Uri) {
+        val doc = DocumentFile.fromTreeUri(this, uri)
+        val uriTree = doc?.uri
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+            flags = (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    or  Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                    or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, uriTree)
+        }
+        startActivityForResult(intent, byAndroidRDataRequestCode)
     }
 
     private fun initListener() {
@@ -372,6 +401,10 @@ class InstallerActivity : BaseActivity(), CommanderCallback, View.OnClickListene
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == byAndroidRDataRequestCode) {
+            initApp()
+        }
+
         if (!(vbInclude.fabInstall.tag as Boolean) && requestCode == settingsRequestCode) {
             vbPermInclude.cardPerm.visibleOrGone(get(Constants.SP_SHOW_PERMISSION, true))
             vbActInclude.cardAct.visibleOrGone(get(Constants.SP_SHOW_ACTIVITY, true))

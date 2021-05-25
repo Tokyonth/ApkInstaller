@@ -47,7 +47,7 @@ class APKCommander(private val activity: Activity, private val callback: Command
                 InstallApkShizukuTask(activity, handler, callback, getApkInfo()).start()
             }
             2 -> {
-                uri?.let { InstallApkIceBoxTask(it, activity, handler, callback, getApkInfo()).start() }
+                InstallApkIceBoxTask(uri, activity, handler, callback, getApkInfo()).start()
             }
         }
     }
