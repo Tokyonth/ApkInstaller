@@ -7,7 +7,7 @@
 - APK权限与Activity显示
 - 兼容Android10 Android11
 - 支持apks，xapk安装
-- 支持shizuku  icebox
+- 支持shizuku icebox
 - ...
 
 ## 截图
