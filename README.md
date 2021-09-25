@@ -3,11 +3,11 @@
 ### APK安装器
 
 - APK安装卸载
-- 路径显示
-- 源文件删除
-- 夜间模式
+- 路径显示 源文件删除 夜间模式
 - APK权限与Activity显示
-- 兼容AndroidQ设备
+- 兼容Android10 Android11
+- 支持apks，xapk安装
+- 支持shizuku  icebox
 - ...
 
 ## 截图

@@ -1,7 +1,5 @@
 package com.tokyonth.installer.utils
 
-import android.Manifest
-import android.app.Activity
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -14,85 +12,43 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.VectorDrawable
 import android.net.Uri
-import android.view.View
 import android.widget.Toast
 import androidx.annotation.DrawableRes
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
-import com.catchingnow.icebox.sdk_client.IceBox
+import com.tokyonth.installer.App
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
-import com.tokyonth.installer.databinding.LayoutCommonToastBinding
-import com.tokyonth.installer.utils.SPUtils.get
-import com.tokyonth.installer.utils.SPUtils.set
 import com.tokyonth.installer.view.CustomizeDialog
-import moe.shizuku.api.ShizukuApiConstants
 import java.io.File
 import kotlin.math.floor
 
 object CommonUtils {
 
-    @JvmStatic
-    fun showToast(context: Context, msg: String) {
-        val vb = LayoutCommonToastBinding.bind(View.inflate(context, R.layout.layout_common_toast, null))
-        Toast(context).apply {
-            view = vb.root
-            vb.tvCommonToast.text = msg
-            duration = Toast.LENGTH_SHORT
-            show()
-        }
-    }
-
     fun checkVersion(context: Context, version: Int, installedVersion: Int): String {
         return when {
             version == installedVersion -> {
-                context.getString(R.string.text_equal_ver)
+                context.getString(R.string.apk_equal_version)
             }
             version > installedVersion -> {
-                context.getString(R.string.text_new_ver)
+                context.getString(R.string.apk_new_version)
             }
             else -> {
-                context[Constants.SP_NEVER_TIP_VERSION, true].let {
-                    if (it) {
-                        CustomizeDialog.getInstance(context)
-                                .setTitle(R.string.dialog_title_tips)
-                                .setMessage(R.string.low_ver_msg)
-                                .setPositiveButton(R.string.text_i_know, null)
-                                .setNegativeButton(R.string.dialog_no_longer_prompt) { _, _ ->
-                                    context[Constants.SP_NEVER_TIP_VERSION] = false
-                                }
-                                .setCancelable(false).create().show()
-                    }
+                if (!App.localData.isNeverShowTip()) {
+                    CustomizeDialog.getInstance(context)
+                            .setTitle(R.string.dialog_title_tip)
+                            .setMessage(R.string.low_version_tip)
+                            .setPositiveButton(R.string.dialog_btn_ok, null)
+                            .setNegativeButton(R.string.dialog_no_longer_prompt) { _, _ ->
+                                App.localData.setNeverShowTip()
+                            }
+                            .setCancelable(false)
+                            .show()
                 }
-                context.getString(R.string.text_low_ver)
+                context.getString(R.string.apk_low_version)
             }
         }
-    }
-
-    fun requestPermissionByIcebox(activity: Activity): Boolean {
-        var havePermission = false
-        if (ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(IceBox.SDK_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE), 0x233)
-        } else {
-            havePermission = true
-        }
-        return havePermission
-    }
-
-    fun requestPermissionByShizuku(activity: Activity): Boolean {
-        var havePermission = false
-        val permission = ShizukuApiConstants.PERMISSION
-        if (ContextCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-                showToast(activity, activity.getString(R.string.shizuku_permission_request))
-            }
-            ActivityCompat.requestPermissions(activity, arrayOf(permission), 100)
-        } else {
-            havePermission = true
-        }
-        return havePermission
     }
 
     fun toSelfSetting(context: Context, str: String?) {
@@ -115,7 +71,7 @@ object CommonUtils {
     }
 
     @Suppress("DEPRECATION")
-    fun drawableToBitmap(drawable: Drawable): Bitmap? {
+    fun drawableToBitmap(drawable: Drawable): Bitmap {
         val w = drawable.intrinsicWidth
         val h = drawable.intrinsicHeight
         val config = if (drawable.opacity != PixelFormat.OPAQUE) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565
@@ -144,14 +100,15 @@ object CommonUtils {
     fun startSystemPkgInstall(context: Context, filePath: String?) {
         val intent = Intent()
         var activityName: String? = null
-        val sysPkgName: String = if (context[Constants.SP_USE_SYS_PKG, false]) {
-            context[Constants.SYS_PKG_NAME_KEY, Constants.DEFAULT_SYS_PKG_NAME]
+        val sysPkgName: String = if (App.localData.isUseSystemPkg()) {
+            App.localData.getSystemPkg()
         } else {
             Constants.DEFAULT_SYS_PKG_NAME
         }
         try {
-            val packageInfo = context.packageManager.getPackageInfo(sysPkgName, PackageManager.GET_ACTIVITIES)
-            activityName = packageInfo.activities[0].name
+            activityName = context.packageManager.getPackageInfo(sysPkgName, PackageManager.GET_ACTIVITIES).let {
+                it.activities[0].name
+            }
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }
@@ -164,7 +121,7 @@ object CommonUtils {
             }
             context.startActivity(intent)
         } else {
-            showToast(context, context.getString(R.string.open_sys_pkg_failure))
+            Toast.makeText(context, context.getString(R.string.open_sys_pkg_failure), Toast.LENGTH_SHORT).show()
         }
     }
 

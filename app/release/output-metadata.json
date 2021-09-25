@@ -1,19 +1,17 @@
 {
-  "version": 1,
+  "version": 2,
   "artifactType": {
     "type": "APK",
     "kind": "Directory"
   },
   "applicationId": "com.tokyonth.installer",
-  "variantName": "release",
+  "variantName": "processReleaseResources",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
-      "properties": [],
-      "versionCode": 30,
-      "versionName": "2.9-1",
-      "enabled": true,
+      "versionCode": 38,
+      "versionName": "3.4",
       "outputFile": "app-release.apk"
     }
   ]

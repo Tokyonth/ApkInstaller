@@ -1,73 +1,114 @@
 package com.tokyonth.installer.activity
 
-import android.app.Activity
-import android.net.Uri
-import android.util.Log
+import android.content.Intent
+import android.os.Bundle
+import android.view.Window
+import android.view.WindowManager
 import androidx.viewbinding.ViewBinding
+import com.tokyonth.installer.App
 
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.install.APKCommander
-import com.tokyonth.installer.base.BaseActivity
-import com.tokyonth.installer.bean.ApkInfoBean
-import com.tokyonth.installer.install.CommanderCallback
-import com.tokyonth.installer.utils.SPUtils.get
-import java.lang.ref.WeakReference
+import com.tokyonth.installer.data.ApkInfoEntity
+import com.tokyonth.installer.install.InstallCallback
+import com.tokyonth.installer.install.InstallStatus
+import com.tokyonth.installer.utils.CommonUtils
+import com.tokyonth.installer.utils.NotificationUtil
+import java.io.File
 
-class SilentlyInstallActivity : BaseActivity(), CommanderCallback {
+class SilentlyInstallActivity : BaseActivity(), InstallCallback {
 
-    private var apkCommander: APKCommander? = null
+    private lateinit var apkCommander: APKCommander
+    private lateinit var apkInfoEntity: ApkInfoEntity
 
-    private lateinit var weakRefActivity: WeakReference<Activity>
+    private var installLog = ""
 
     override fun initView(): ViewBinding? {
+        if (App.localData.isFirstBoot()) {
+            startActivity(Intent(this, SettingsActivity::class.java))
+            finish()
+        }
         return null
     }
 
     override fun initData() {
-        weakRefActivity = WeakReference<Activity>(this)
-        intent.data.also {
-            if (it != null) {
-                val apkSource = intent.getStringExtra(Constants.APK_SOURCE)
-                apkCommander = APKCommander(weakRefActivity, this, it, apkSource as String)
-            } else {
-                showToast(getString(R.string.unable_to_install_apk))
+        val apkSource = CommonUtils.reflectGetReferrer(this)!!
+        if (intent.getBooleanExtra(Constants.IS_FORM_INSTALL_ACT, false)) {
+            apkInfoEntity = intent.getParcelableExtra(Constants.APK_INFO)!!
+            apkCommander = APKCommander(apkInfoEntity, this)
+            apkCommander.start()
+            return
+        }
+        intent.data.let { uri ->
+            if (uri == null) {
+                showToast(getString(R.string.unable_install_apk))
                 finish()
+            } else {
+                if (App.localData.isDefaultSilent()) {
+                    apkCommander = APKCommander(uri, apkSource, this)
+                    apkCommander.start()
+                    return
+                }
+                Intent(this, InstallerActivity::class.java).let {
+                    it.data = uri
+                    it.putExtra(Constants.APK_SOURCE, apkSource)
+                    startActivity(it)
+                    finish()
+                }
             }
         }
     }
 
-    override fun onStartParseApk(uri: Uri) {
-        //showToast(getString(R.string.parsing))
-    }
-
-    override fun onApkParsed(apkInfo: ApkInfoBean) {
-        apkCommander!!.startInstall()
-    }
-
-    override fun onApkPreInstall(apkInfo: ApkInfoBean) {
-        showToast(getString(R.string.start_install, apkInfo.apkFile!!.path))
-    }
-
-    override fun onApkInstalled(apkInfo: ApkInfoBean, resultCode: Int) {
-        if (resultCode == 0) {
-            showToast(getString(R.string.apk_installed, apkInfo.appName))
-            if (!apkInfo.isFakePath && get(Constants.SP_AUTO_DELETE, false)) {
-                showToast(getString(R.string.apk_deleted, apkInfo.apkFile!!.name))
-            }
+    override fun onApkParsed(apkInfo: ApkInfoEntity) {
+        if (!apkInfo.packageName.isNullOrEmpty()) {
+            apkInfoEntity = apkInfo
+            apkCommander.startInstall()
         } else {
-            showToast(getString(R.string.install_failed, apkInfo.appName))
+            showToast(getString(R.string.unable_install_apk))
+            finish()
         }
+    }
+
+    override fun onApkPreInstall() {
+        showToast(getString(R.string.start_install, apkInfoEntity.appName))
+    }
+
+    override fun onApkInstalled(installStatus: InstallStatus) {
+        var notificationSub = apkInfoEntity.appName!!
+        val status = when (installStatus) {
+            InstallStatus.SUCCESS -> {
+                if (App.localData.isAutoDel()) {
+                    File(apkInfoEntity.filePath!!).delete()
+                    notificationSub = (getString(R.string.auto_del_notification, notificationSub))
+                }
+                getString(R.string.install_successful)
+            }
+            InstallStatus.FAILURE -> {
+                notificationSub += " ($installLog)"
+                getString(R.string.install_failed_msg)
+            }
+        }
+        NotificationUtil().sendNotification(this, status, notificationSub, apkInfoEntity.getIcon()!!)
         finish()
     }
 
-    override fun onInstallLog(apkInfo: ApkInfoBean, logText: String) {
-        Log.e("SilentlyInstall", logText)
+    override fun onInstallLog(installLog: String) {
+        this.installLog = installLog
     }
 
-    override fun onResume() {
-        super.onResume()
-        finish()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        val attr = window.attributes.apply {
+            height = 0
+            width = 0
+        }
+        window.apply {
+            attributes = attr
+            setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
+            setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+        }
     }
 
 }

@@ -69,4 +69,5 @@ class CircleImageView : AppCompatImageView {
             super.onDraw(canvas)
         }
     }
+
 }

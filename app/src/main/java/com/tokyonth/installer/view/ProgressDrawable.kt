@@ -5,7 +5,6 @@ import android.animation.ValueAnimator
 import android.graphics.*
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.animation.LinearInterpolator
 import kotlin.math.min
 
@@ -40,10 +39,6 @@ class ProgressDrawable: Drawable(), Animatable, ValueAnimator.AnimatorUpdateList
 
     private var lastStep = 0F
 
-    companion object {
-        private const val TAG = "ProgressDrawable"
-    }
-
     private val animator = ValueAnimator.ofFloat(0F, 2F).apply {
         addUpdateListener(this@ProgressDrawable)
         addListener(this@ProgressDrawable)
@@ -56,7 +51,6 @@ class ProgressDrawable: Drawable(), Animatable, ValueAnimator.AnimatorUpdateList
         if (colorList.isEmpty() || radius < 1) {
             return
         }
-        //logD("draw() -> startAngle: $startAngle, sweepAngle: $sweepAngle")
         canvas.drawArc(ovalBounds, startAngle, sweepAngle, false, paint)
     }
 
@@ -125,7 +119,6 @@ class ProgressDrawable: Drawable(), Animatable, ValueAnimator.AnimatorUpdateList
     override fun onAnimationUpdate(animation: ValueAnimator?) {
         if (animation == animator) {
             val value = animator.animatedValue as Float
-           // logD("onAnimationUpdate($value)")
             val isShrink = value > 1
             val sweepValue = if (value > 1) { 2 - value } else { value }
             val sweepLength = sweepStep * sweepValue
@@ -159,7 +152,6 @@ class ProgressDrawable: Drawable(), Animatable, ValueAnimator.AnimatorUpdateList
         colorIndex ++
         colorIndex %= colorList.size
         paint.color = colorList[colorIndex]
-        // logD("onAnimationRepeat($colorIndex)")
     }
 
     override fun onAnimationEnd(animation: Animator?) {}
@@ -170,12 +162,6 @@ class ProgressDrawable: Drawable(), Animatable, ValueAnimator.AnimatorUpdateList
         colorIndex ++
         colorIndex %= colorList.size
         paint.color = colorList[colorIndex]
-        logD("onAnimationStart($colorIndex)")
-    }
-
-    private fun logD(value: String) {
-        Log.d("Lollipop", "$TAG: $value")
     }
 
 }
-

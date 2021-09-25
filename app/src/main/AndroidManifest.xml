@@ -3,18 +3,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tokyonth.installer">
 
-    <uses-sdk tools:overrideLibrary="moe.shizuku.shared, moe.shizuku.api" />
+    <uses-sdk tools:overrideLibrary="rikka.shizuku.shared, rikka.shizuku.api, rikka.shizuku.aidl, rikka.shizuku.provider" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.ACCESS_ALL_DOWNLOADS" />
-    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+
     <uses-permission
         android:name="android.permission.INSTALL_PACKAGES"
         tools:ignore="ProtectedPermissions" />
+
     <uses-permission
         android:name="android.permission.DELETE_PACKAGES"
         tools:ignore="ProtectedPermissions" />
@@ -22,23 +30,22 @@
     <uses-permission android:name="com.catchingnow.icebox.SDK" />
 
     <application
-        android:name=".base.BaseApplication"
+        android:name=".App"
         android:icon="@mipmap/ic_app_icon"
         android:label="@string/app_name"
+        android:preserveLegacyExternalStorage="true"
         android:requestLegacyExternalStorage="true"
-        android:roundIcon="@mipmap/ic_app_icon_round"
+        android:roundIcon="@mipmap/ic_app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup"
-        tools:targetApi="q">
+        tools:targetApi="r">
 
         <activity
-            android:name=".activity.InstallerActivity"
+            android:name=".activity.SilentlyInstallActivity"
             android:excludeFromRecents="true"
-            android:icon="@mipmap/ic_app_icon"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:theme="@style/InstallAppTheme">
+            android:exported="true"
+            android:theme="@style/AppTheme.NoDisplay">
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -50,44 +57,50 @@
                 <data android:scheme="content" />
                 <data android:mimeType="application/vnd.android.package-archive" />
                 <data android:mimeType="application/apk.1" />
-                <data android:mimeType="*/*" />
             </intent-filter>
 
         </activity>
 
+        <!--        <activity
+                    android:name=".activity.UninstallActivity"
+                    android:excludeFromRecents="true"
+                    android:exported="true"
+                    android:launchMode="singleTask"
+                    android:theme="@style/Theme.ActivityDialogStyle">
+
+                    <intent-filter>
+                        <action android:name="android.intent.action.DELETE" />
+                        <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
+
+                        <category android:name="android.intent.category.DEFAULT" />
+
+                        <data android:scheme="package" />
+                    </intent-filter>
+
+                </activity>-->
+
         <activity
-            android:name=".activity.UninstallActivity"
+            android:name=".activity.InstallerActivity"
             android:excludeFromRecents="true"
-            android:icon="@mipmap/ic_app_icon"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.ActivityDialogStyle">
-
-            <intent-filter>
-                <action android:name="android.intent.action.DELETE" />
-                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="package" />
-            </intent-filter>
-
-        </activity>
-
-        <activity
-            android:name=".activity.SilentlyInstallActivity"
-            android:excludeFromRecents="true"
-            android:icon="@mipmap/ic_app_icon"
-            android:label="@string/install_in_background"
-            android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoDisplay" />
-
-        <activity
-            android:name=".activity.FreezeActivity"
+            android:exported="true"
             android:theme="@style/InstallAppTheme" />
 
         <activity
             android:name=".activity.SettingsActivity"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:theme="@style/InstallAppTheme">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activity.crash.ErrorActivity"
+            android:process=":appError"
             android:theme="@style/InstallAppTheme" />
 
         <provider
@@ -99,16 +112,21 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
-
         </provider>
 
         <provider
-            android:name="moe.shizuku.api.ShizukuProvider"
+            android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="${applicationId}.shizuku"
             android:enabled="true"
             android:exported="true"
             android:multiprocess="false"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
+        <provider
+            android:name=".activity.crash.InitProvider"
+            android:authorities="${applicationId}.activityCrashInitProvider"
+            android:exported="false"
+            android:initOrder="110" />
 
     </application>
 

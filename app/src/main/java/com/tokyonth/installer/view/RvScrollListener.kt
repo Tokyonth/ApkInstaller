@@ -1,9 +1,9 @@
-package com.tokyonth.installer.adapter
+package com.tokyonth.installer.view
 
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
-class RvScrollListener(private val view: ExtendedFloatingActionButton) : RecyclerView.OnScrollListener() {
+class RvScrollListener(private val view: View) : RecyclerView.OnScrollListener() {
 
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
         super.onScrollStateChanged(recyclerView, newState)

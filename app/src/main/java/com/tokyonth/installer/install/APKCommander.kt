@@ -1,54 +1,53 @@
 package com.tokyonth.installer.install
 
-import android.app.Activity
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
-import com.tokyonth.installer.Constants
 
-import com.tokyonth.installer.bean.ApkInfoBean
-import com.tokyonth.installer.bean.permissions.PermInfoBean
-import com.tokyonth.installer.utils.SPUtils.get
+import com.tokyonth.installer.App
+import com.tokyonth.installer.data.ApkInfoEntity
+import com.tokyonth.installer.utils.doAsync
+import com.tokyonth.installer.utils.onUI
 
-class APKCommander(private val activity: Activity, private val callback: CommanderCallback,
-                   uri: Uri, referrer: String) : ParseApkTask() {
+class APKCommander {
 
-    private val handler: Handler = Handler(Looper.getMainLooper())
-    private lateinit var apkInfo: ApkInfoBean
-    private lateinit var permInfo: PermInfoBean
+    private var installCallback: InstallCallback
+    private lateinit var apkInfoEntity: ApkInfoEntity
 
-    fun getApkInfo(): ApkInfoBean {
-        return apkInfo
+    private var uri: Uri? = null
+    private var referrer: String? = null
+
+    constructor(apkInfoEntity: ApkInfoEntity, installCallback: InstallCallback) {
+        this.apkInfoEntity = apkInfoEntity
+        this.installCallback = installCallback
     }
 
-    fun getPermInfo(): PermInfoBean {
-        return permInfo
+    constructor(uri: Uri, referrer: String, installCallback: InstallCallback) {
+        this.uri = uri
+        this.referrer = referrer
+        this.installCallback = installCallback
     }
 
-    override fun setApkInfo(mApkInfo: ApkInfoBean) {
-        this.apkInfo = mApkInfo
-    }
-
-    override fun setPermInfo(permInfo: PermInfoBean) {
-        this.permInfo = permInfo
-    }
-
-    init {
-        startParseApkTask(uri, activity, handler, callback, referrer)
-        start()
+    fun start() {
+        if (this::apkInfoEntity.isInitialized) {
+            installCallback.onApkParsed(apkInfoEntity)
+            return
+        }
+        ParseApkTask(uri!!, referrer!!).let {
+            doAsync {
+                apkInfoEntity = it.startParseApkTask()
+                onUI {
+                    installCallback.onApkParsed(apkInfoEntity)
+                }
+            }
+        }
     }
 
     fun startInstall() {
-        when (activity[Constants.SP_INSTALL_MODE, 0]) {
-            0 -> {
-                InstallApkShellTask(handler, callback, getApkInfo()).start()
-            }
-            1 -> {
-                InstallApkShizukuTask(activity, handler, callback, getApkInfo()).start()
-            }
-            2 -> {
-                InstallApkIceBoxTask(uri, activity, handler, callback, getApkInfo()).start()
-            }
+        when (App.localData.getInstallMode()) {
+            0 -> InstallApkShellTask(apkInfoEntity, installCallback).start()
+
+            1 -> InstallApkShizukuTask(apkInfoEntity, installCallback).start()
+
+            2 -> InstallApkIceBoxTask(apkInfoEntity, installCallback).start()
         }
     }
 

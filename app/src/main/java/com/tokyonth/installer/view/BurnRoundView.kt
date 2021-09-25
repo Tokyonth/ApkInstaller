@@ -42,7 +42,7 @@ class BurnRoundView : View {
         replaceImageColor(imageId, color)
         isBurn = array.getBoolean(R.styleable.BurnRoundView_isBurn, true)
         burnColor = if (isBurn) {
-            color and 0x60FFFFFF
+            color and 0x20FFFFFF
         } else {
             color
         }
@@ -57,7 +57,7 @@ class BurnRoundView : View {
     private fun setBurnColor(color: Int, isBurn: Boolean): Int {
         this.isBurn = isBurn
         burnColor = if (isBurn) {
-            color and 0x60FFFFFF
+            color and 0x20FFFFFF
         } else {
             color
         }

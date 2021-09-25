@@ -22,48 +22,43 @@ public class FileProviderPathUtil {
         } else if (uri.getScheme() != null && uri.getPath() != null) {
             switch (uri.getScheme()) {
                 case "content":
-                    return getFileFromContentUri(uri, context);
+                    return getFileFromContentUri(context, uri);
                 case "file":
                     return new File(uri.getPath());
-                default:
-                    return null;
             }
         }
         return null;
     }
 
-    /**
-     * Gets the corresponding path to a file from the given content:// URI
-     *
-     * @param contentUri The content:// URI to find the file path from
-     * @param context    Context
-     * @return the file path as a string
-     */
-
-    private static File getFileFromContentUri(Uri contentUri, Context context) {
+    private static File getFileFromContentUri(Context context, Uri contentUri) {
         if (contentUri == null) {
             return null;
         }
-        File file = new File("");
+        File file = null;
         String filePath = null;
-        String fileName;
+        String fileName = null;
         String[] filePathColumn = {MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
         ContentResolver contentResolver = context.getContentResolver();
-        Cursor cursor = contentResolver.query(contentUri, filePathColumn, null,
-                null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-            try {
-                filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
-            } catch (Exception e) {
-                e.printStackTrace();
+        try {
+            Cursor cursor = contentResolver.query(contentUri, filePathColumn, null,
+                    null, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                try {
+                    filePath = cursor.getString(cursor.getColumnIndex(filePathColumn[0]));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                fileName = cursor.getString(cursor.getColumnIndex(filePathColumn[1]));
+                cursor.close();
+
             }
-            fileName = cursor.getString(cursor.getColumnIndex(filePathColumn[1]));
-            cursor.close();
-            if (!TextUtils.isEmpty(filePath)) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (filePath != null && !TextUtils.isEmpty(filePath)) {
                 file = new File(filePath);
-            }
-            if (!file.exists() || file.length() <= 0 || TextUtils.isEmpty(filePath)) {
+            } else {
                 filePath = getPathFromInputStreamUri(context, contentUri, fileName);
             }
             if (!TextUtils.isEmpty(filePath)) {
@@ -123,4 +118,3 @@ public class FileProviderPathUtil {
     }
 
 }
-

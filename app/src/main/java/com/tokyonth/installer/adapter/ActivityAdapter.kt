@@ -1,18 +1,18 @@
 package com.tokyonth.installer.adapter
 
-import android.view.LayoutInflater
+import android.content.Context
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
-
-import com.tokyonth.installer.databinding.ItemRvActivityBinding
+import com.tokyonth.installer.R
 
 import java.util.ArrayList
 
 class ActivityAdapter(private val list: ArrayList<String>) : RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActivityViewHolder {
-        val vb = ItemRvActivityBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ActivityViewHolder(vb)
+        return ActivityViewHolder(activityText(parent.context))
     }
 
     override fun onBindViewHolder(holder: ActivityViewHolder, position: Int) {
@@ -23,10 +23,16 @@ class ActivityAdapter(private val list: ArrayList<String>) : RecyclerView.Adapte
         return list.size
     }
 
-    class ActivityViewHolder(private val vb: ItemRvActivityBinding) : RecyclerView.ViewHolder(vb.root) {
+    private fun activityText(context: Context): TextView {
+        return TextView(context).apply {
+            setTextColor(ResourcesCompat.getColor(context.resources, R.color.colorTextSub, null))
+        }
+    }
+
+    class ActivityViewHolder(private val textView: TextView) : RecyclerView.ViewHolder(textView) {
 
         fun bind(string: String) {
-            vb.tvAct.text = string
+            textView.text = string
         }
 
     }

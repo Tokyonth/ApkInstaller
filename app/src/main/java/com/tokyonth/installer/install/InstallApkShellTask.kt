@@ -1,49 +1,47 @@
 package com.tokyonth.installer.install
 
 import android.os.Build
-import android.os.Handler
-import android.util.Log
 
 import com.tokyonth.installer.Constants
-import com.tokyonth.installer.bean.ApkInfoBean
+import com.tokyonth.installer.data.ApkInfoEntity
 import com.tokyonth.installer.utils.ShellUtils
+import com.tokyonth.installer.utils.doAsync
+import com.tokyonth.installer.utils.onUI
 
-class InstallApkShellTask internal constructor(private val handler: Handler,
-                                               private val commanderCallback: CommanderCallback,
-                                               private val mApkInfo: ApkInfoBean) : Thread() {
+class InstallApkShellTask constructor(private val apkInfoEntity: ApkInfoEntity,
+                                      private val installCallback: InstallCallback) {
 
-    private var retCode = -1
-
-    override fun run() {
-        super.run()
-        handler.post { commanderCallback.onApkPreInstall(mApkInfo) }
+    fun start() {
+        installCallback.onApkPreInstall()
         if (Build.VERSION.SDK_INT >= 24) {
             ShellUtils.execWithRoot(Constants.SE_LINUX_COMMAND)
         }
-        retCode = ShellUtils.execWithRoot(Constants.INSTALL_COMMAND + "\"" + mApkInfo.apkFile!!.path + "\"" + "\n", object : ShellUtils.Result {
-            override fun onStdout(text: String) {
-                handler.post { commanderCallback.onInstallLog(mApkInfo, text) }
-            }
+        doAsync {
+            val retCode = ShellUtils.execWithRoot(Constants.INSTALL_COMMAND + "\"" + apkInfoEntity.filePath!! + "\"" + "\n", object : ShellUtils.Result {
+                override fun onStdout(text: String) {
+                    onUI {
+                        installCallback.onInstallLog(text)
+                    }
+                }
 
-            override fun onStderr(text: String) {
-                handler.post { commanderCallback.onInstallLog(mApkInfo, text) }
-            }
+                override fun onStderr(text: String) {
+                    onUI {
+                        installCallback.onInstallLog(text)
+                    }
+                }
 
-            override fun onCommand(command: String) {
+                override fun onCommand(command: String) {
 
-            }
+                }
 
-            override fun onFinish(resultCode: Int) {
+                override fun onFinish(resultCode: Int) {
 
-            }
-        })
-
-        if (retCode == 0 && mApkInfo.isFakePath) {
-            if (!mApkInfo.apkFile!!.delete()) {
-                Log.e("InstallApkTask", "failed to delete！")
+                }
+            })
+            onUI {
+                installCallback.onApkInstalled(InstallStatus(retCode))
             }
         }
-        handler.post { commanderCallback.onApkInstalled(mApkInfo, retCode) }
     }
 
 }

@@ -1,76 +1,123 @@
 package com.tokyonth.installer.install
 
-import android.app.Activity
-import android.os.Build
-import android.os.Handler
-import android.util.Log
-import com.tokyonth.installer.bean.ApkInfoBean
-import com.tokyonth.installer.utils.CommonUtils
-import moe.shizuku.api.ShizukuService
+import android.content.Context
+import android.content.Intent
+import android.content.IntentSender
+import android.content.pm.IPackageInstallerSession
+import android.content.pm.PackageInstaller
+import android.os.Process
+import com.tokyonth.installer.App
+import com.tokyonth.installer.data.ApkInfoEntity
+import com.tokyonth.installer.install.shizuku.IIntentSenderAdaptor
+import com.tokyonth.installer.install.shizuku.IntentSenderUtils
+import com.tokyonth.installer.install.shizuku.PackageInstallerUtils
+import com.tokyonth.installer.install.shizuku.ShizukuSystemServerApi
+import com.tokyonth.installer.utils.doAsync
+import com.tokyonth.installer.utils.onUI
+import rikka.shizuku.Shizuku
+import rikka.shizuku.ShizukuBinderWrapper
 import java.io.File
+import java.util.concurrent.CountDownLatch
 
-class InstallApkShizukuTask(private val activity: Activity,
-                            private val handler: Handler,
-                            private val commanderCallback: CommanderCallback,
-                            private val mApkInfo: ApkInfoBean) : Thread() {
+class InstallApkShizukuTask(private val apkInfoEntity: ApkInfoEntity,
+                            private val installCallback: InstallCallback) {
 
-    private var retCode : Int = -1
+    private val context: Context = App.context
 
-    override fun run() {
-        super.run()
-        handler.post { commanderCallback.onApkPreInstall(mApkInfo) }
-        if (CommonUtils.requestPermissionByShizuku(activity)) {
-            handler.post { commanderCallback.onInstallLog(mApkInfo, "Shizuku installation mode")}
-            mApkInfo.apkFile?.let { rowInstall(it) }
-        }
-        if (retCode == 0 && mApkInfo.isFakePath) {
-            if (!mApkInfo.apkFile!!.delete()) {
-                Log.e("InstallApkTask", "failed to delete！")
+    fun start() {
+        installCallback.onApkPreInstall()
+        val apkFile = File(apkInfoEntity.filePath!!)
+        doAsync {
+            var session: PackageInstaller.Session? = null
+            val res: StringBuilder = StringBuilder()
+
+            try {
+                session = getPackageInstallerSession()
+                res.append('\n').append("write: ")
+                doWriteSession(session, apkFile)
+
+                res.append('\n').append("commit: ")
+                val result = doCommitSession(session)
+                val status = result!!.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
+                val message = result.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
+                res.append('\n').append("status: ").append(status).append(" (").append(message).append(")")
+                onUI {
+                    installCallback.onApkInstalled(InstallStatus.invoke(status))
+                }
+            } catch (tr: Throwable) {
+                tr.printStackTrace()
+                res.append(tr)
+                onUI {
+                    installCallback.onApkInstalled(InstallStatus.invoke(-1))
+                }
+            } finally {
+                try {
+                    session?.close()
+                } catch (tr: Throwable) {
+                    res.append(tr)
+                }
             }
-        }
-        handler.post { commanderCallback.onApkInstalled(mApkInfo, retCode) }
-    }
-
-    private fun rowInstall(file: File) {
-        if (!ShizukuService.pingBinder()) {
-            return
-        } else try {
-            val command = "cat ${file.path} | pm install -S ${file.length()}"
-            exec(command)
-        } catch (e: Throwable) {
-            Log.e("ApkShizukuInstaller", e.toString())
-        }
-    }
-
-    private fun exec(command: String): Int {
-        val file = activity.cacheDir
-        initDir(file.parentFile!!)
-        file.writeText(command)
-        return execInternal("sh", file.path + "run.sh")
-    }
-
-    private fun execInternal(vararg command: String): Int {
-        val process = ShizukuService.newProcess(command, null, null)
-        process.waitFor()
-        val errorString = process.errorStream.bufferedReader().use { it.readText() }
-        val exitValue = process.exitValue()
-        handler.post { commanderCallback.onInstallLog(mApkInfo, errorString)}
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            process.destroyForcibly()
-        } else {
-            process.destroy()
-        }
-        return exitValue.also {
-            if(exitValue == 0) {
-                retCode = 0
-            } else {
-                Log.e("ApkShizukuInstaller", """Error: $errorString""".trimIndent())
+            onUI {
+                installCallback.onInstallLog(res.toString().trim())
             }
         }
     }
 
-    private fun initDir(dir_file: File) {
-        if (!dir_file.exists()) dir_file.mkdirs()
+    private fun getPackageInstaller(): PackageInstaller {
+        val isRoot = Shizuku.getUid() == 0
+        // the reason for use "com.android.shell" as installer package under adb is that getMySessions will check installer package's owner
+        val installerPackageName = if (isRoot) context.packageName else "com.android.shell"
+        val userId = if (isRoot) Process.myUserHandle().hashCode() else 0
+        return PackageInstallerUtils.createPackageInstaller(ShizukuSystemServerApi.PackageManager_getPackageInstaller(), installerPackageName, userId)
+    }
+
+    private fun getPackageInstallerSession(totalSize: Long? = null): PackageInstaller.Session {
+        val res: StringBuilder = StringBuilder()
+        res.append("createSession: ")
+
+        val params: PackageInstaller.SessionParams = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+        totalSize?.let {
+            params.setSize(totalSize)
+        }
+        var installFlags = PackageInstallerUtils.getInstallFlags(params)
+        installFlags = installFlags or (0x00000004 /*PackageManager.INSTALL_ALLOW_TEST*/ or 0x00000002) /*PackageManager.INSTALL_REPLACE_EXISTING*/
+        PackageInstallerUtils.setInstallFlags(params, installFlags)
+
+        val packageInstaller = getPackageInstaller()
+        val sessionId = packageInstaller.createSession(params)
+        res.append(sessionId)
+        @Suppress("LocalVariableName")
+        val _session = IPackageInstallerSession.Stub.asInterface(ShizukuBinderWrapper(ShizukuSystemServerApi.PackageManager_getPackageInstaller().openSession(sessionId).asBinder()))
+        return PackageInstallerUtils.createSession(_session)
+    }
+
+    private fun doWriteSession(session: PackageInstaller.Session, apkFile: File) {
+        val inputStream = apkFile.inputStream()
+        val outputStream = session.openWrite(apkFile.name, 0, -1)
+        val buf = ByteArray(8192)
+        var len: Int
+
+        while (inputStream.read(buf).also { len = it } > 0) {
+            outputStream.write(buf, 0, len)
+            outputStream.flush()
+            session.fsync(outputStream)
+        }
+        inputStream.close()
+        outputStream.close()
+    }
+
+    private fun doCommitSession(session: PackageInstaller.Session): Intent? {
+        val results = arrayOf<Intent?>(null)
+        val countDownLatch = CountDownLatch(1)
+        val intentSender: IntentSender = IntentSenderUtils.newInstance(object : IIntentSenderAdaptor() {
+            override fun send(intent: Intent?) {
+                results[0] = intent
+                countDownLatch.countDown()
+            }
+        })
+        session.commit(intentSender)
+        countDownLatch.await()
+        return results[0]
     }
 
 }

@@ -17,14 +17,17 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.documentfile.provider.DocumentFile;
+
+import com.tokyonth.installer.App;
+import com.tokyonth.installer.Constants;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 /**
  * @author mihotel 2020.03.04
- *
+ * Fix Tokyonth
  */
 public class ParsingContentUtil {
 
@@ -32,20 +35,18 @@ public class ParsingContentUtil {
     private static String shardUid;
     private static String uriPath;
     private static String authority;
-    private static String SDCARD;
+    private static String sdCard;
     private static String getExternalStorageDirectory;
     private static String getExternalRootDir;
     private static String getExternalFilesDir;
-    private static String getExternalCacheDir;
     private static String getStorageIsolationDir;
     private static String getFirstPathSegment;
     private static String getPathFromIndex1PathSegment;
-    private static String getLastPathSegment;
 
-    private String ApkSource;
+    private final String apkSource;
 
-    public ParsingContentUtil(String ApkSource) {
-        this.ApkSource = ApkSource;
+    public ParsingContentUtil(String apkSource) {
+        this.apkSource = apkSource;
     }
 
     /**
@@ -57,7 +58,8 @@ public class ParsingContentUtil {
         String sharedUserId = null;
         try {
             applicationInfo = pm.getApplicationInfo(pkgName, 0);
-        } catch (Exception ignore) { }
+        } catch (Exception ignore) {
+        }
         if (applicationInfo != null) {
             PackageInfo pkgInfo = pm.getPackageArchiveInfo(applicationInfo.sourceDir, PackageManager.GET_ACTIVITIES);
             if (pkgInfo != null) {
@@ -76,17 +78,13 @@ public class ParsingContentUtil {
 
         // DocumentProvider
         if (DocumentsContract.isDocumentUri(context, uri)) {
-
             String docId = DocumentsContract.getDocumentId(uri);
             final String[] split = docId.split(":");
             final String type = split[0];
-
             Log.e("docId", docId);
-
             switch (getAuthority) {
                 // DownloadsProvider
                 case "com.android.providers.downloads.documents":
-
                     if (split.length > 1) {
                         if ("raw".equalsIgnoreCase(type)) {
                             path = split[1];
@@ -161,9 +159,7 @@ public class ParsingContentUtil {
      * @return The value of the _data column, which is typically a file path.
      * @author paulburke
      */
-    private static String getDataColumn(Context context, Uri uri, String selection,
-                                        String[] selectionArgs) {
-
+    private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Log.e("query_uri", uri + "");
         final String column = MediaStore.MediaColumns.DATA;
         final String[] projection = {
@@ -186,24 +182,22 @@ public class ParsingContentUtil {
     @SuppressLint("SdCardPath")
     private void initValue(Context context, Uri fromUri) {
         uri = fromUri;
-        //String referrer = reflectGetReferrer(context);
-        String referrer = ApkSource;
-        shardUid = getSharedUserId(context, referrer);
+        shardUid = getSharedUserId(context, apkSource);
         try {
             uriPath = uri.getPath();
             authority = uri.getAuthority();
             //"/storage/emulated/0"
             getExternalStorageDirectory = Environment.getExternalStorageDirectory().getPath();
-            SDCARD = "/sdcard";
-            getExternalRootDir = "/Android/data/" + referrer;
-            getExternalFilesDir = "/Android/data/" + referrer + "/files";
-            getExternalCacheDir = "/Android/data/" + referrer + "/cache";
-            getStorageIsolationDir = "/Android/data/" + referrer + "/sdcard";
+            sdCard = "/sdcard";
+            getExternalRootDir = "/Android/data/" + apkSource;
+            getExternalFilesDir = "/Android/data/" + apkSource + "/files";
+            String getExternalCacheDir = "/Android/data/" + apkSource + "/cache";
+            getStorageIsolationDir = "/Android/data/" + apkSource + "/sdcard";
 
             //获取索引0路径段
             getFirstPathSegment = uri.getPathSegments().get(0);
             //最后一个路径段
-            getLastPathSegment = uri.getLastPathSegment();
+            String getLastPathSegment = uri.getLastPathSegment();
 
             //删索引0路径段和其前面的"/"
             getPathFromIndex1PathSegment = uriPath.substring(getFirstPathSegment.length() + 1);
@@ -238,7 +232,6 @@ public class ParsingContentUtil {
         String path = "";
         String path0;
         ArrayList<String> pathList = new ArrayList<>();
-
         switch (authority) {
             case "com.yingyonghui.market.provider":
                 String str1 = uriPath.substring(0, uriPath.indexOf("apk/"));
@@ -250,7 +243,7 @@ public class ParsingContentUtil {
                 if (uri.getPathSegments().size() > 2) {
                     String getIndex1PathSegment = uri.getPathSegments().get(1);
                     String getPathfromIndex2PathSegment = uriPath.substring(getFirstPathSegment.length() + 1 + getIndex1PathSegment.length() + 1);
-                    if (SDCARD.equalsIgnoreCase("/" + getIndex1PathSegment)) {
+                    if (sdCard.equalsIgnoreCase("/" + getIndex1PathSegment)) {
                         path = getPathFromIndex1PathSegment;
                         pathList.add(path);
                     }
@@ -263,7 +256,6 @@ public class ParsingContentUtil {
                     path = getExternalStorageDirectory + getExternalFilesDir + "/Download" + getPathFromIndex1PathSegment;
                 }
             case "com.coolapk.market.fileprovider":
-
                 switch (getFirstPathSegment) {
                     case "files_root":
                         //content://com.coolapk.market.fileprovider/files_root/file.apk
@@ -330,34 +322,6 @@ public class ParsingContentUtil {
                 pathList.add(path);
                 pathList.add(path0);
                 break;
-//                //content://com.tencent.mobileqq.fileprovider/external_files/storage/emulated/0/Tencent/QQfile_recv/file.apk
-//                //content://com.tencent.mobileqq.fileprovider/external_files/storage/emulated/0/Android/data/com.tencent.mobileqq/Tencent/QQfile_recv/file.apk
-//
-//                //删索引0路径段和其前面的"/"
-//                path = getPathExcludeFirstPathSegment;
-//                pathList.add(path);
-//
-//                //删索引0路径段和前面的"/"，在索引4路径段前的"/"前面插入"/Android/data/com.referrer/sdcard"
-//                if (uri.getPathSegments().size() > 3) {
-//                    int indexTencent = path.indexOf(uri.getPathSegments().get(4)) - 1;
-//                    StringBuilder stringBuilder = new StringBuilder(path)
-//                            .insert(indexTencent, getStorageIsolationDir);
-//                    path = stringBuilder.toString();
-//                    pathList.add(path);
-//                }
-//
-//                //content://com.tencent.mm.external.fileprovider/external/tencent/MicroMsg/Download/file.apk
-//
-//                //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"
-//                path = getExternalStorageDirectory + getPathExcludeFirstPathSegment;
-//                pathList.add(path);
-//
-//                //删索引0路径段和其前面的"/",前面加"/storage/emulated/0"+"/Android/data/com.referrer/sdcard"
-//                path = getExternalStorageDirectory + getStorageIsolationDir + getPathExcludeFirstPathSegment;
-//                pathList.add(path);
-
-//                pathList = getPathListAboutExternalStoragePublicDirectory();
-
             case "com.tencent.mm.external.fileprovider":
             case "com.tencent.mobileqq.fileprovider":
             case "com.mi.android.globalFileexplorer.myprovider":
@@ -384,9 +348,7 @@ public class ParsingContentUtil {
 
     //在pathList挑选有效的file
     private static File pickValidFileFromPathList(ArrayList<String> pathList) {
-        if (pathList == null) {
-            return null;
-        } else {
+        if (pathList != null) {
             for (String getPath : pathList) {
                 if (checkFileOrPath(getPath)) {
                     return new File(getPath);
@@ -394,8 +356,8 @@ public class ParsingContentUtil {
                     Log.e("fakePath", getPath + "");
                 }
             }
-            return null;
         }
+        return null;
     }
 
     //方法 1.2 的一个具体操作获取PathList
@@ -416,15 +378,15 @@ public class ParsingContentUtil {
                     //content://com.tencent.mobileqq.fileprovider/external_files/storage/emulated/0/Tencent/QQfile_recv/file.apk
                     pathList = getPathListStartWith(getExternalStorageDirectory, getPathFromIndex1PathSegment);
                 }
-            } else if (SDCARD.equalsIgnoreCase("/" + getFirstPathSegment)) {
+            } else if (sdCard.equalsIgnoreCase("/" + getFirstPathSegment)) {
                 if (size > 1) {
                     //content://in.mfile.files/storage/emulated/0/file.apk
-                    pathList = getPathListStartWith(SDCARD, uriPath);
+                    pathList = getPathListStartWith(sdCard, uriPath);
                 }
-            } else if (getPathFromIndex1PathSegment.startsWith(SDCARD)) {
+            } else if (getPathFromIndex1PathSegment.startsWith(sdCard)) {
                 if (size > 2) {
                     //content://in.mfile.files/storage/emulated/0/file.apk
-                    pathList = getPathListStartWith(SDCARD, getPathFromIndex1PathSegment);
+                    pathList = getPathListStartWith(sdCard, getPathFromIndex1PathSegment);
                 }
             } else {
                 String path0 = getExternalStorageDirectory + uriPath;
@@ -456,10 +418,8 @@ public class ParsingContentUtil {
             }
             pathList.add(getPathWithIsolation(startWith, getExternalFilesDir, path));
             pathList.add(path0);
-            return pathList;
-        } else {
-            return pathList;
         }
+        return pathList;
     }
 
     //兼容"存储空间隔离"
@@ -476,6 +436,10 @@ public class ParsingContentUtil {
     }
 
     private static boolean checkFileOrPath(File file) {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R && file.getPath().contains(Constants.ANDROID_DATA_STR)) {
+            DocumentFile documentFile = DocumentFileUriUtils.getDocumentFile(App.Companion.getContext(), file.getPath());
+            return documentFile.exists();
+        }
         return file != null && file.exists() && !file.isDirectory();
     }
 

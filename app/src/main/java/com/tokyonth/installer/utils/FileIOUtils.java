@@ -12,7 +12,7 @@ public class FileIOUtils {
         if (!TextUtils.isEmpty(filePath)) {
             try {
                 File file = new File(filePath);
-                if (file.isDirectory()) {// 处理目录
+                if (file.isDirectory()) {
                     File[] files = file.listFiles();
                     assert files != null;
                     for (File value : files) {
@@ -20,7 +20,7 @@ public class FileIOUtils {
                     }
                 }
                 if (deleteThisPath) {
-                    if (!file.isDirectory()) {// 如果是文件，删除
+                    if (!file.isDirectory()) {
                         boolean bool = file.delete();
                         if (!bool)
                             Log.e("FileUtils", "failed to delete");
@@ -29,24 +29,20 @@ public class FileIOUtils {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
 
     public static String byteToString(long size) {
-        long GB = 1024 * 1024 * 1024;//定义GB的计算常量
-        long MB = 1024 * 1024;//定义MB的计算常量
-        long KB = 1024;//定义KB的计算常量
-        DecimalFormat decimalFormat = new DecimalFormat("0.00");//格式化小数
+        long GB = 1024 * 1024 * 1024;
+        long MB = 1024 * 1024;
+        long KB = 1024;
+        DecimalFormat decimalFormat = new DecimalFormat("0.00");
         String resultSize;
         if (size / GB >= 1) {
-            //如果当前Byte的值大于等于1GB
             resultSize = decimalFormat.format(size / (float) GB) + "GB";
         } else if (size / MB >= 1) {
-            //如果当前Byte的值大于等于1MB
             resultSize = decimalFormat.format(size / (float) MB) + "MB";
         } else if (size / KB >= 1) {
-            //如果当前Byte的值大于等于1KB
             resultSize = decimalFormat.format(size / (float) KB) + "KB";
         } else {
             resultSize = size + "B";

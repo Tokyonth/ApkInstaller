@@ -7,7 +7,7 @@
     tools:context=".activity.UninstallActivity">
 
     <TextView
-        android:id="@+id/name"
+        android:id="@+id/app_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

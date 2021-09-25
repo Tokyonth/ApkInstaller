@@ -1,36 +1,68 @@
 package com.tokyonth.installer.install
 
-import android.app.Activity
-import android.net.Uri
-import android.os.Handler
 import com.catchingnow.icebox.sdk_client.IceBox
+import com.tokyonth.installer.App
+import com.tokyonth.installer.data.ApkInfoEntity
+import com.tokyonth.installer.utils.doAsync
+import com.tokyonth.installer.utils.onUI
+import android.net.Uri
+import androidx.annotation.StringRes
+
+import androidx.core.content.FileProvider
+import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
-import com.tokyonth.installer.bean.ApkInfoBean
-import com.tokyonth.installer.utils.CommonUtils
+import java.io.File
 
-class InstallApkIceBoxTask(private val uri: Uri, private val activity: Activity,
-                           private val handler: Handler,
-                           private val commanderCallback: CommanderCallback,
-                           private val mApkInfo: ApkInfoBean) : Thread() {
+class InstallApkIceBoxTask(private val apkInfoEntity: ApkInfoEntity,
+                           private val installCallback: InstallCallback) {
 
-    private var retCode: Int = -1
+    private val context = App.context
 
-    override fun run() {
-        super.run()
-        handler.post { commanderCallback.onApkPreInstall(mApkInfo) }
-        val state = IceBox.querySupportSilentInstall(activity)
-        handler.post { commanderCallback.onInstallLog(mApkInfo, state.toString() + "\n") }
-        if (CommonUtils.requestPermissionByIcebox(activity)) {
-            handler.post { commanderCallback.onInstallLog(mApkInfo, "IceBox installation mode") }
-            retCode = if (IceBox.installPackage(activity, uri)) {
-                0
-            } else {
-                1
+    fun start() {
+        installCallback.onApkPreInstall()
+        val iceboxState = when (IceBox.querySupportSilentInstall(context)) {
+            IceBox.SilentInstallSupport.NOT_DEVICE_OWNER -> {
+                getString(R.string.not_icebox_owner)
             }
-        } else {
-            CommonUtils.showToast(activity, activity.getString(R.string.no_permissions))
+            IceBox.SilentInstallSupport.PERMISSION_REQUIRED -> {
+                getString(R.string.not_icebox_perm)
+            }
+            IceBox.SilentInstallSupport.SYSTEM_NOT_SUPPORTED -> {
+                getString(R.string.not_support_icebox_system)
+            }
+            IceBox.SilentInstallSupport.UPDATE_REQUIRED -> {
+                getString(R.string.not_support_icebox_version)
+            }
+            IceBox.SilentInstallSupport.NOT_INSTALLED -> {
+                //PackageUtils.getVersionNameByPackageName(context, Constants.ICEBOX_PKG_NAME)
+                getString(R.string.not_install_icebox)
+            }
+            IceBox.SilentInstallSupport.NOT_RUNNING -> {
+                getString(R.string.icebox_not_running)
+            }
+            else -> ""
         }
-        handler.post { commanderCallback.onApkInstalled(mApkInfo, retCode) }
+        installCallback.onInstallLog(iceboxState)
+        if (iceboxState.isNotEmpty()) {
+            installCallback.onApkInstalled(InstallStatus.FAILURE)
+            return
+        }
+        doAsync {
+            val authority: String = Constants.PROVIDER_STR
+            val uri: Uri = FileProvider.getUriForFile(context, authority, File(apkInfoEntity.filePath!!))
+            val status = IceBox.installPackage(context, uri)
+            onUI {
+                if (status) {
+                    installCallback.onApkInstalled(InstallStatus.SUCCESS)
+                } else {
+                    installCallback.onApkInstalled(InstallStatus.FAILURE)
+                }
+            }
+        }
+    }
+
+    private fun getString(@StringRes id: Int): String {
+        return context.getString(id)
     }
 
 }

@@ -1,113 +1,82 @@
 package com.tokyonth.installer.install
 
-import android.app.Activity
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.os.Handler
-import android.util.AndroidRuntimeException
-import com.tokyonth.installer.bean.ApkInfoBean
-import com.tokyonth.installer.bean.permissions.PermInfoBean
+import com.tokyonth.installer.App
+import com.tokyonth.installer.Constants
+import com.tokyonth.installer.data.ApkInfoEntity
+import com.tokyonth.installer.utils.CommonUtils
+import com.tokyonth.installer.utils.path.DocumentFileUriUtils
 import com.tokyonth.installer.utils.path.FileProviderPathUtil
 import com.tokyonth.installer.utils.path.ParsingContentUtil
-import java.io.File
 import java.util.*
 
-abstract class ParseApkTask : Thread() {
+class ParseApkTask(private var uri: Uri, private var referrer: String) {
 
-    lateinit var uri: Uri
-    private lateinit var handler: Handler
-    private lateinit var activity: Activity
-    private lateinit var referrer: String
-    private lateinit var packageManager: PackageManager
-    private lateinit var commanderCallback: CommanderCallback
+    private val context = App.context
+    private val packageManager = context.packageManager
 
-    private lateinit var permInfo: PermInfoBean
-    private lateinit var mApkInfo: ApkInfoBean
-
-    fun startParseApkTask(uri: Uri, activity: Activity, handler: Handler, commanderCallback: CommanderCallback, referrer: String) {
-        this.uri = uri
-        this.handler = handler
-        this.activity = activity
-        this.referrer = referrer
-        this.commanderCallback = commanderCallback
-        packageManager = activity.packageManager
-    }
-
-    protected abstract fun setApkInfo(mApkInfo: ApkInfoBean)
-
-    protected abstract fun setPermInfo(permInfo: PermInfoBean)
-
-    @Suppress("DEPRECATION")
-    override fun run() {
-        super.run()
+    fun startParseApkTask(): ApkInfoEntity {
+        val apkInfo = ApkInfoEntity()
         try {
-            handler.post { commanderCallback.onStartParseApk(uri) }
-            mApkInfo = ApkInfoBean()
-            permInfo = PermInfoBean()
-
-            val queryContent = ParsingContentUtil(referrer).getFile(activity, uri)
-            val apkSourcePath = if (queryContent == null) {
-                FileProviderPathUtil.getFileFromUri(activity, uri).path
-            } else {
-                queryContent.path
-            }
-            mApkInfo.apkFile = File(apkSourcePath)
-
-            val pkgInfo = packageManager.getPackageArchiveInfo(mApkInfo.apkFile!!.path, PackageManager.GET_ACTIVITIES)
-            if (pkgInfo != null) {
-                pkgInfo.applicationInfo.sourceDir = mApkInfo.apkFile!!.path
-                pkgInfo.applicationInfo.publicSourceDir = mApkInfo.apkFile!!.path
-                mApkInfo.appName = packageManager.getApplicationLabel(pkgInfo.applicationInfo).toString()
-                mApkInfo.packageName = pkgInfo.applicationInfo.packageName
-                mApkInfo.versionName = pkgInfo.versionName
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                    mApkInfo.versionCode = pkgInfo.versionCode
+            var apkSourcePath = ParsingContentUtil(referrer).getFile(context, uri).let {
+                if (it == null) {
+                    FileProviderPathUtil.getFileFromUri(context, uri).path
                 } else {
-                    mApkInfo.versionCode = pkgInfo.longVersionCode.toInt()
-                }
-                mApkInfo.icon = pkgInfo.applicationInfo.loadIcon(packageManager)
-
-                val activityList = ArrayList<String>()
-                if (pkgInfo.activities != null) {
-                    for (activity in pkgInfo.activities) {
-                        activityList.add(activity.name)
-                    }
-                    mApkInfo.activities = activityList
-                }
-                try {
-                    val installedPkgInfo = packageManager.getPackageInfo(mApkInfo.packageName!!, PackageManager.GET_CONFIGURATIONS)
-                    mApkInfo.installedVersionName = installedPkgInfo.versionName
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                        mApkInfo.installedVersionCode = installedPkgInfo.versionCode
-                    } else {
-                        mApkInfo.installedVersionCode = installedPkgInfo.longVersionCode.toInt()
-                    }
-                    mApkInfo.isHasInstalledApp = true
-                } catch (e: PackageManager.NameNotFoundException) {
-                    e.printStackTrace()
-                    mApkInfo.isHasInstalledApp = false
-                }
-
-                val permPkgInfo = packageManager.getPackageArchiveInfo(mApkInfo.apkFile!!.path, PackageManager.GET_PERMISSIONS)!!
-                mApkInfo.permissions = permPkgInfo.requestedPermissions
-                val strList = ArrayList<String>()
-                if (permPkgInfo.requestedPermissions != null) {
-                    Collections.addAll(strList, *permPkgInfo.requestedPermissions)
-                    getPermissionInfo(strList)
+                    it.path
                 }
             }
-            handler.post { commanderCallback.onApkParsed(mApkInfo) }
-            setApkInfo(mApkInfo)
-        } catch (e: Exception) {
-            //handler!!.post { commanderCallback!!.onApkParsed(null!!) }
-            e.printStackTrace()
-            throw AndroidRuntimeException(e)
-        }
 
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R && apkSourcePath.contains(Constants.ANDROID_DATA_STR)) {
+                DocumentFileUriUtils.getDocumentFile(context, apkSourcePath).run {
+                    apkSourcePath = FileProviderPathUtil.getPathFromInputStreamUri(context, uri, name)
+                }
+            }
+            apkInfo.filePath = apkSourcePath
+
+            packageManager.getPackageArchiveInfo(apkInfo.filePath!!, PackageManager.GET_ACTIVITIES)?.let {
+                it.applicationInfo.sourceDir = apkInfo.filePath!!
+                it.applicationInfo.publicSourceDir = apkInfo.filePath!!
+                apkInfo.appName = packageManager.getApplicationLabel(it.applicationInfo).toString()
+                apkInfo.packageName = it.applicationInfo.packageName
+                apkInfo.versionName = it.versionName
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                    apkInfo.versionCode = it.versionCode
+                } else {
+                    apkInfo.versionCode = it.longVersionCode.toInt()
+                }
+                apkInfo.activities = it.activities.asList()
+                apkInfo.setIcon(CommonUtils.drawableToBitmap(it.applicationInfo.loadIcon(packageManager)))
+            }
+
+            apkInfo.isHasInstalledApp = try {
+                packageManager.getPackageInfo(apkInfo.packageName!!, PackageManager.GET_CONFIGURATIONS).let {
+                    apkInfo.installedVersionName = it.versionName
+                    apkInfo.installedVersionCode = if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                        it.versionCode
+                    } else {
+                        it.longVersionCode.toInt()
+                    }
+                }
+                true
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
+                false
+            }
+
+            packageManager.getPackageArchiveInfo(apkInfo.filePath!!, PackageManager.GET_PERMISSIONS)?.let {
+                apkInfo.permissions = it.requestedPermissions
+                apkInfo.permissionsDescribe = getPermissionInfo(it.requestedPermissions.asList())
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            //throw AndroidRuntimeException(e)
+        }
+        return apkInfo
     }
 
-    private fun getPermissionInfo(permission: List<String>) {
+    private fun getPermissionInfo(permission: List<String>): Triple<ArrayList<String>, ArrayList<String>, ArrayList<String>> {
         val group = ArrayList<String>()
         val label = ArrayList<String>()
         val description = ArrayList<String>()
@@ -121,9 +90,6 @@ abstract class ParseApkTask : Thread() {
                         group.add("")
                     }
                 }
-                //group.add(permissionInfo.group!!)
-                //group += permissionInfo.group
-                //permissionInfo.group?.let { group.add(it) }
 
                 val permissionLabel = permissionInfo.loadLabel(packageManager).toString()
                 label.add(permissionLabel)
@@ -139,12 +105,8 @@ abstract class ParseApkTask : Thread() {
                 label.add("")
                 group.add("")
             }
-
         }
-        permInfo.permissionDescription = description
-        permInfo.permissionGroup = group
-        permInfo.permissionLabel = label
-        setPermInfo(permInfo)
+        return Triple(group, label, description)
     }
 
 }

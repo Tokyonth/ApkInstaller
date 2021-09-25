@@ -5,18 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
     android:gravity="center|start"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:padding="12dp">
 
     <com.tokyonth.installer.view.BurnRoundView
         android:id="@+id/settings_item_icon"
         android:layout_width="48dp"
         android:layout_height="48dp"
         app:burnColor="@color/colorAccent"
-        app:burnSrc="@drawable/ic_settings_24px"
+        app:burnSrc="@drawable/ic_settings"
         tools:ignore="PrivateResource" />
 
     <LinearLayout
