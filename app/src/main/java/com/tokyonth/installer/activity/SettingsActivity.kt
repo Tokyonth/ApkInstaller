@@ -71,13 +71,13 @@ class SettingsActivity : BaseActivity() {
             adapter = settingsAdapter
         }
 
-        val cacheSize = FileIOUtils.byteToString(FileIOUtils.getFileOrFolderSize(cacheDir))
+        val cacheSize = FileIOUtils.byteToString(FileIOUtils.getFileOrFolderSize(externalCacheDir))
         viewBind.tvApkCache.text = getString(R.string.text_apk_cache, cacheSize)
         viewBind.tvVersion.text = getString(R.string.text_settings_version, BuildConfig.VERSION_NAME)
         viewBind.cbUseSysPkg.setOnCheckedChangeListener { _, isChecked -> localDataRepo.setUseSystemPkg(isChecked) }
         viewBind.cardPkg.setOnClickListener { systemPkgNameDialog() }
         viewBind.cardApkCache.setOnClickListener {
-            FileIOUtils.deleteFolderFile(cacheDir.path, true)
+            FileIOUtils.deleteFolderFile(externalCacheDir?.path, true)
             Snackbar.make(viewBind.rootLayout, getString(R.string.clean_complete), Snackbar.LENGTH_SHORT).show()
             viewBind.tvApkCache.text = getString(R.string.text_apk_cache, "0B")
         }

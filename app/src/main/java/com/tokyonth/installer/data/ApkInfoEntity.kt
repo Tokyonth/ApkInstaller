@@ -21,14 +21,18 @@ class ApkInfoEntity() : Parcelable {
     var installedVersionCode: Int = 0
 
     var permissions: Array<String>? = null
-    var activities: List<ActivityInfo>? = null
-    var permissionsDescribe: Triple<ArrayList<String>, ArrayList<String>, ArrayList<String>>? = null
+    var activities: Array<ActivityInfo>? = null
+    var permissionsDesc: Triple<ArrayList<String>, ArrayList<String>, ArrayList<String>>? = null
 
     val version: String
         get() = "$versionName($versionCode)"
 
     val installedVersion: String
         get() = if (isHasInstalledApp) "$installedVersionName($installedVersionCode)" else " -- "
+
+    fun hasInstalledApp(): Boolean {
+        return isHasInstalledApp
+    }
 
     fun getIcon(): Bitmap? {
         return Constants.APP_ICON_BITMAP
@@ -50,10 +54,6 @@ class ApkInfoEntity() : Parcelable {
         installedVersionCode = parcel.readInt()
         //permissions = parcel.createStringArray()
         //activities = parcel.createTypedArrayList(ActivityInfo.CREATOR)
-    }
-
-    fun hasInstalledApp(): Boolean {
-        return isHasInstalledApp
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

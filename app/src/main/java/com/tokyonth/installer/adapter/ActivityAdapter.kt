@@ -6,7 +6,6 @@ import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tokyonth.installer.R
-
 import java.util.ArrayList
 
 class ActivityAdapter(private val list: ArrayList<String>) : RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder>() {

@@ -66,6 +66,7 @@ class ContractListView : FrameLayout {
     }
 
     private fun permInfoDialog(entity: PermFullEntity) {
+        //val group = if (entity.des.isEmpty()) resources.getString(R.string.text_no_description) else entity.group
         val lab = if (entity.lab.isEmpty()) resources.getString(R.string.text_no_description) else entity.lab
         val des = if (entity.des.isEmpty()) resources.getString(R.string.text_no_description) else entity.des
 

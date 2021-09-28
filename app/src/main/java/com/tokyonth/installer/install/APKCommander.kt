@@ -1,6 +1,7 @@
 package com.tokyonth.installer.install
 
 import android.net.Uri
+import android.util.Log
 
 import com.tokyonth.installer.App
 import com.tokyonth.installer.data.ApkInfoEntity
@@ -32,12 +33,14 @@ class APKCommander {
             return
         }
         ParseApkTask(uri!!, referrer!!).let {
-            doAsync {
+            doAsync({
+                Log.e("ParseApkError->", it.message!!)
+            }, {
                 apkInfoEntity = it.startParseApkTask()
                 onUI {
                     installCallback.onApkParsed(apkInfoEntity)
                 }
-            }
+            })
         }
     }
 

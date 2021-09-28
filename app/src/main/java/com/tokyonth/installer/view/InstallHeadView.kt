@@ -20,7 +20,7 @@ import com.tokyonth.installer.databinding.LayoutInstallTopBinding
 import com.tokyonth.installer.utils.CommonUtils
 import com.tokyonth.installer.utils.lazyBind
 
-class InstallTopView : FrameLayout {
+class InstallHeadView : FrameLayout {
 
     constructor(context: Context) : super(context) {
         initView()
@@ -70,6 +70,12 @@ class InstallTopView : FrameLayout {
             visibility = View.VISIBLE
             text = CommonUtils.checkVersion(context, versionCode, installedVersionCode)
         }
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        //super.setEnabled(enabled)
+        rootView.ibNightMode.isEnabled = enabled
+        rootView.ibSettings.isEnabled = enabled
     }
 
     private fun nightModeStatus() {

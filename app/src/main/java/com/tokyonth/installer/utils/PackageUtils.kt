@@ -1,7 +1,6 @@
 package com.tokyonth.installer.utils
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -18,7 +17,7 @@ object PackageUtils {
         return isAppClientAvailable(context, Constants.ICEBOX_PKG_NAME)
     }
 
-    private fun isAppClientAvailable(context: Context, pkgName: String): Boolean {
+    fun isAppClientAvailable(context: Context, pkgName: String): Boolean {
         context.packageManager.let {
             for (name in it.getInstalledPackages(0)) {
                 if (name.packageName == pkgName) {
@@ -31,13 +30,13 @@ object PackageUtils {
 
     fun getAppNameByPackageName(context: Context, packageName: String?): String {
         return context.packageManager.let {
-            it.getApplicationLabel(it.getApplicationInfo(packageName!!, PackageManager.GET_META_DATA)).toString()
+            it.getApplicationLabel(it.getApplicationInfo(packageName!!, 0)).toString()
         }
     }
 
     fun getAppIconByPackageName(context: Context, packageName: String?): Drawable {
         return context.packageManager.let {
-            it.getApplicationIcon(it.getApplicationInfo(packageName!!, PackageManager.GET_META_DATA))
+            it.getApplicationIcon(it.getApplicationInfo(packageName!!, 0))
         }
     }
 

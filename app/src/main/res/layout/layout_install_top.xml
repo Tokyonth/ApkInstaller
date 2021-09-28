@@ -26,8 +26,7 @@
         android:padding="6dp"
         android:src="@drawable/ic_dark"
         app:layout_constraintEnd_toStartOf="@id/ib_settings"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@android:color/white" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/ib_settings"
@@ -36,13 +35,11 @@
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
         android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:backgroundTintMode="src_in"
-        android:contentDescription="@string/settings"
+        android:contentDescription="@null"
         android:padding="6dp"
         android:src="@drawable/ic_settings"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@android:color/white" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_version_tips"

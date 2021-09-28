@@ -48,6 +48,8 @@ class InstallerActivity : BaseActivity(), InstallCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             apkInfoEntity = savedInstanceState.getParcelable(Constants.APK_INFO)!!
+        } else {
+            setViewStatus(false)
         }
         super.onCreate(savedInstanceState)
     }
@@ -95,6 +97,7 @@ class InstallerActivity : BaseActivity(), InstallCallback {
     override fun onApkParsed(apkInfo: ApkInfoEntity) {
         if (!apkInfo.packageName.isNullOrEmpty()) {
             apkInfoEntity = apkInfo
+            setViewStatus(true)
             initApkDetails()
         } else {
             CustomizeDialog.getInstance(this)
@@ -108,12 +111,7 @@ class InstallerActivity : BaseActivity(), InstallCallback {
     }
 
     override fun onApkPreInstall() {
-        viewBind.clAct.visibility = View.GONE
-        viewBind.clPerm.visibility = View.GONE
-        viewBind.tvCancel.visibility = View.GONE
-        viewBind.tvSilently.visibility = View.GONE
-        viewBind.fabInstall.isEnabled = false
-
+        setViewStatus(false)
         progressDrawable = ProgressDrawable().apply {
             putColor(Color.WHITE)
             animatorDuration(1500)
@@ -122,7 +120,7 @@ class InstallerActivity : BaseActivity(), InstallCallback {
 
         viewBind.fabInstall.icon = progressDrawable
         viewBind.tvInstallMsg.text = ""
-        viewBind.installTopView.setAppName(getString(R.string.installing))
+        viewBind.installHeadView.setAppName(getString(R.string.installing))
     }
 
     override fun onApkInstalled(installStatus: InstallStatus) {
@@ -132,6 +130,7 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         }
         viewBind.tvCancel.visibility = View.VISIBLE
         viewBind.llDel.visibility = View.VISIBLE
+        viewBind.installHeadView.isEnabled = true
         progressDrawable.stop()
         installSuccess = true
 
@@ -143,9 +142,9 @@ class InstallerActivity : BaseActivity(), InstallCallback {
 
     @SuppressLint("SetTextI18n")
     private fun initApkDetails() {
-        viewBind.installTopView.setAppIcon(apkInfoEntity.getIcon()!!)
-        viewBind.installTopView.setAppName(apkInfoEntity.appName!!)
-        viewBind.installTopView.setAppVersion(apkInfoEntity.version)
+        viewBind.installHeadView.setAppIcon(apkInfoEntity.getIcon()!!)
+        viewBind.installHeadView.setAppName(apkInfoEntity.appName!!)
+        viewBind.installHeadView.setAppVersion(apkInfoEntity.version)
 
         viewBind.sbAutoDel.setOnCheckedChangeListener { _, isChecked -> localDataRepo.setAutoDel(isChecked) }
         viewBind.tvApkSource.text = getString(R.string.text_apk_source, PackageUtils.getAppNameByPackageName(this, apkSource))
@@ -158,32 +157,44 @@ class InstallerActivity : BaseActivity(), InstallCallback {
                         resources.getString(R.string.text_apk_file_size, apkSize)
         if (apkInfoEntity.hasInstalledApp()) {
             viewBind.tvInstallMsg.append("\n${resources.getString(R.string.info_installed_version)} ${apkInfoEntity.installedVersion}")
-            viewBind.installTopView.showVersionTip(apkInfoEntity.versionCode, apkInfoEntity.installedVersionCode)
+            viewBind.installHeadView.showVersionTip(apkInfoEntity.versionCode, apkInfoEntity.installedVersionCode)
         }
         loadingPermActInfo()
     }
 
-    private fun loadingPermActInfo() {
-        val permFullBeanArrayList = ArrayList<PermFullEntity>()
-        val (group, lab, des) = apkInfoEntity.permissionsDescribe!!
-        if (!apkInfoEntity.permissions.isNullOrEmpty()) {
-            for (i in apkInfoEntity.permissions!!.indices) {
-                permFullBeanArrayList.add(PermFullEntity(apkInfoEntity.permissions!![i], group[i], des[i], lab[i]))
-            }
-        }
-        viewBind.clPerm.setScrollView(viewBind.fabInstall)
-        viewBind.clPerm.setListData(permFullBeanArrayList)
-        viewBind.clPerm.setTitle(getString(R.string.app_permissions, permFullBeanArrayList.size.toString()))
+    private fun setViewStatus(isEnable: Boolean) {
+        viewBind.clAct.visibleOrGone(isEnable)
+        viewBind.clPerm.visibleOrGone(isEnable)
+        viewBind.tvCancel.visibleOrGone(isEnable)
+        viewBind.tvSilently.visibleOrGone(isEnable)
 
-        val actStringArrayList = ArrayList<String>()
-        if (!apkInfoEntity.activities.isNullOrEmpty()) {
-            for (actInfo in apkInfoEntity.activities!!) {
-                actStringArrayList.add(actInfo.name)
+        viewBind.fabInstall.isEnabled = isEnable
+        viewBind.rlToSource.isEnabled = isEnable
+        viewBind.installHeadView.isEnabled = isEnable
+    }
+
+    private fun loadingPermActInfo() {
+        viewBind.clPerm.setTitle(getString(R.string.app_permissions, "0"))
+        apkInfoEntity.permissions?.let {
+            val permList = ArrayList<PermFullEntity>()
+            val (group, lab, des) = apkInfoEntity.permissionsDesc!!
+            for (index in it.indices) {
+                permList.add(PermFullEntity(it[index], group[index], des[index], lab[index]))
             }
+            viewBind.clPerm.setScrollView(viewBind.fabInstall)
+            viewBind.clPerm.setListData(permList)
+            viewBind.clPerm.setTitle(getString(R.string.app_permissions, it.size.toString()))
         }
-        viewBind.clAct.setScrollView(viewBind.fabInstall)
-        viewBind.clAct.setListData(actStringArrayList)
-        viewBind.clAct.setTitle(getString(R.string.apk_activity, actStringArrayList.size.toString()))
+        viewBind.clAct.setTitle(getString(R.string.apk_activity, "0"))
+        apkInfoEntity.activities?.let {
+            val actList = ArrayList<String>()
+            for (act in it) {
+                actList.add(act.name)
+            }
+            viewBind.clAct.setScrollView(viewBind.fabInstall)
+            viewBind.clAct.setListData(actList)
+            viewBind.clAct.setTitle(getString(R.string.apk_activity, it.size.toString()))
+        }
     }
 
     private fun installSuccess() {
@@ -198,7 +209,7 @@ class InstallerActivity : BaseActivity(), InstallCallback {
                 backgroundTintList = ColorStateList.valueOf(ResourcesCompat.getColor(resources, R.color.color8, null))
             }
         }
-        viewBind.installTopView.setAppName(getString(R.string.install_successful))
+        viewBind.installHeadView.setAppName(getString(R.string.install_successful))
         viewBind.tvCancel.text = getString(R.string.back_track)
     }
 
@@ -209,7 +220,7 @@ class InstallerActivity : BaseActivity(), InstallCallback {
             text = getString(R.string.install_failed_msg)
             isEnabled = false
         }
-        viewBind.installTopView.setAppName(getString(R.string.install_failed_msg))
+        viewBind.installHeadView.setAppName(getString(R.string.install_failed_msg))
         viewBind.tvCancel.text = getString(R.string.exit_app)
 
         if (!localDataRepo.isNeverShowUsePkg()) {

@@ -8,8 +8,8 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
-    <com.tokyonth.installer.view.InstallTopView
-        android:id="@+id/install_top_view"
+    <com.tokyonth.installer.view.InstallHeadView
+        android:id="@+id/install_head_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp" />

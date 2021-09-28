@@ -98,7 +98,7 @@ public class FileProviderPathUtil {
             int read;
             byte[] buffer = new byte[8 * 1024];
 
-            targetFile = new File(context.getCacheDir(), fileName);
+            targetFile = new File(context.getExternalCacheDir(), fileName);
             if (targetFile.exists()) {
                 boolean bool = targetFile.delete();
                 Log.e("Del", bool + "");

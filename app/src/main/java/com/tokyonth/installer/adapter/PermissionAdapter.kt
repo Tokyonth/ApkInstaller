@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.RecyclerView
 
 import com.tokyonth.installer.data.PermFullEntity
 import com.tokyonth.installer.view.item.PermissionItemView
-
 import java.util.ArrayList
 
 class PermissionAdapter(private val list: ArrayList<PermFullEntity>) : RecyclerView.Adapter<PermissionAdapter.PermissionViewHolder>() {
