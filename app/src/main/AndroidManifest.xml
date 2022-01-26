@@ -39,12 +39,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        tools:ignore="LockedOrientationActivity"
         tools:targetApi="r">
 
         <activity
             android:name=".activity.SilentlyInstallActivity"
             android:excludeFromRecents="true"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoDisplay">
 
             <intent-filter>
@@ -66,6 +68,7 @@
             android:excludeFromRecents="true"
             android:exported="true"
             android:launchMode="singleTask"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.ActivityDialogStyle">
 
             <intent-filter>
@@ -83,12 +86,14 @@
             android:name=".activity.InstallerActivity"
             android:excludeFromRecents="true"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/InstallAppTheme" />
 
         <activity
             android:name=".activity.SettingsActivity"
             android:exported="true"
             android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:theme="@style/InstallAppTheme">
 
             <intent-filter>
@@ -101,6 +106,7 @@
         <activity
             android:name=".activity.crash.ErrorActivity"
             android:process=":appError"
+            android:screenOrientation="portrait"
             android:theme="@style/InstallAppTheme" />
 
         <provider
