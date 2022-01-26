@@ -436,7 +436,7 @@ public class ParsingContentUtil {
     }
 
     private static boolean checkFileOrPath(File file) {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R && file.getPath().contains(Constants.ANDROID_DATA_STR)) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && file.getPath().contains(Constants.ANDROID_DATA_STR)) {
             DocumentFile documentFile = DocumentFileUriUtils.getDocumentFile(App.Companion.getContext(), file.getPath());
             return documentFile.exists();
         }
