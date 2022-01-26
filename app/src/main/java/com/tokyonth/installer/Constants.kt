@@ -11,6 +11,7 @@ object Constants {
     const val IS_FORM_INSTALL_ACT = "isFormInstallAct"
     const val URI_DATA_TYPE = "application/vnd.android.package-archive"
     const val DEFAULT_SYS_PKG_NAME = "com.android.packageinstaller"
+    const val MIUI_SYS_PKG_NAME = "com.miui.packageinstaller"
     const val PROVIDER_STR = "$PKG_NAME.FileProvider"
     const val SE_LINUX_COMMAND = "setenforce permissive"
     const val INSTALL_COMMAND = "pm install -r -d --user 0 -i $PKG_NAME "

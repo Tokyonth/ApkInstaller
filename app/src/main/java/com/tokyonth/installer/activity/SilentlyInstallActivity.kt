@@ -5,16 +5,18 @@ import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
 import androidx.viewbinding.ViewBinding
-import com.tokyonth.installer.App
 
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.install.APKCommander
 import com.tokyonth.installer.data.ApkInfoEntity
+import com.tokyonth.installer.data.LocalDataRepo
 import com.tokyonth.installer.install.InstallCallback
 import com.tokyonth.installer.install.InstallStatus
-import com.tokyonth.installer.utils.CommonUtils
-import com.tokyonth.installer.utils.NotificationUtil
+import com.tokyonth.installer.utils.AppHelper
+import com.tokyonth.installer.utils.NotificationUtils
+import com.tokyonth.installer.utils.ktx.string
+import com.tokyonth.installer.utils.ktx.toast
 import java.io.File
 
 class SilentlyInstallActivity : BaseActivity(), InstallCallback {
@@ -24,30 +26,31 @@ class SilentlyInstallActivity : BaseActivity(), InstallCallback {
 
     private var installLog = ""
 
-    override fun initView(): ViewBinding? {
-        if (App.localData.isFirstBoot()) {
+    override fun setBinding(): ViewBinding? = null
+
+    override fun initView() {
+        if (LocalDataRepo.instance.isFirstBoot()) {
             startActivity(Intent(this, SettingsActivity::class.java))
             finish()
         }
-        return null
     }
 
     override fun initData() {
-        val apkSource = CommonUtils.reflectGetReferrer(this)!!
+        val apkSource = AppHelper.reflectGetReferrer(this)!!
         if (intent.getBooleanExtra(Constants.IS_FORM_INSTALL_ACT, false)) {
             apkInfoEntity = intent.getParcelableExtra(Constants.APK_INFO)!!
             apkCommander = APKCommander(apkInfoEntity, this)
-            apkCommander.start()
+            apkCommander.startParse()
             return
         }
         intent.data.let { uri ->
             if (uri == null) {
-                showToast(getString(R.string.unable_install_apk))
+                toast(string(R.string.unable_install_apk))
                 finish()
             } else {
-                if (App.localData.isDefaultSilent()) {
+                if (LocalDataRepo.instance.isDefaultSilent()) {
                     apkCommander = APKCommander(uri, apkSource, this)
-                    apkCommander.start()
+                    apkCommander.startParse()
                     return
                 }
                 Intent(this, InstallerActivity::class.java).let {
@@ -65,31 +68,36 @@ class SilentlyInstallActivity : BaseActivity(), InstallCallback {
             apkInfoEntity = apkInfo
             apkCommander.startInstall()
         } else {
-            showToast(getString(R.string.unable_install_apk))
+            toast(string(R.string.unable_install_apk))
             finish()
         }
     }
 
     override fun onApkPreInstall() {
-        showToast(getString(R.string.start_install, apkInfoEntity.appName))
+        toast(string(R.string.start_install, apkInfoEntity.appName))
     }
 
     override fun onApkInstalled(installStatus: InstallStatus) {
         var notificationSub = apkInfoEntity.appName!!
         val status = when (installStatus) {
             InstallStatus.SUCCESS -> {
-                if (App.localData.isAutoDel()) {
+                if (LocalDataRepo.instance.isAutoDel()) {
                     File(apkInfoEntity.filePath!!).delete()
-                    notificationSub = (getString(R.string.auto_del_notification, notificationSub))
+                    notificationSub = (string(R.string.auto_del_notification, notificationSub))
                 }
-                getString(R.string.install_successful)
+                string(R.string.install_successful)
             }
             InstallStatus.FAILURE -> {
                 notificationSub += " ($installLog)"
-                getString(R.string.install_failed_msg)
+                string(R.string.install_failed_msg)
             }
         }
-        NotificationUtil().sendNotification(this, status, notificationSub, apkInfoEntity.getIcon()!!)
+        NotificationUtils.sendNotification(
+            this,
+            status,
+            notificationSub,
+            apkInfoEntity.getIcon()!!
+        )
         finish()
     }
 
@@ -106,8 +114,14 @@ class SilentlyInstallActivity : BaseActivity(), InstallCallback {
         }
         window.apply {
             attributes = attr
-            setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL)
-            setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+            )
+            setFlags(
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            )
         }
     }
 

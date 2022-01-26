@@ -3,12 +3,13 @@ package com.tokyonth.installer.adapter
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tokyonth.installer.R
+import com.tokyonth.installer.utils.ktx.color
 import java.util.ArrayList
 
-class ActivityAdapter(private val list: ArrayList<String>) : RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder>() {
+class ActivityAdapter(private val list: ArrayList<String>) :
+    RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActivityViewHolder {
         return ActivityViewHolder(activityText(parent.context))
@@ -24,7 +25,7 @@ class ActivityAdapter(private val list: ArrayList<String>) : RecyclerView.Adapte
 
     private fun activityText(context: Context): TextView {
         return TextView(context).apply {
-            setTextColor(ResourcesCompat.getColor(context.resources, R.color.colorTextSub, null))
+            setTextColor(color(R.color.colorTextSub))
         }
     }
 

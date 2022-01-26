@@ -3,15 +3,15 @@ package com.tokyonth.installer.view
 import android.content.Context
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.tokyonth.installer.App
 import com.tokyonth.installer.R
+import com.tokyonth.installer.data.LocalDataRepo
 
 class CustomizeDialog private constructor(context: Context, overrideThemeResId: Int) :
-        MaterialAlertDialogBuilder(context, overrideThemeResId) {
+    MaterialAlertDialogBuilder(context, overrideThemeResId) {
     companion object {
 
-        fun getInstance(context: Context): CustomizeDialog {
-            val theme = if (App.localData.isNightMode())
+        fun get(context: Context): CustomizeDialog {
+            val theme = if (LocalDataRepo.instance.isNightMode())
                 R.style.DialogTheme
             else
                 0

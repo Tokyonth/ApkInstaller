@@ -10,20 +10,19 @@ import com.tokyonth.installer.R
 import com.tokyonth.installer.view.CustomizeDialog
 
 import androidx.core.app.NotificationCompat
-import com.tokyonth.installer.install.InstallStatus
 
-class NotificationUtil {
+object NotificationUtils {
 
     fun checkNotification(context: Context) {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            CustomizeDialog.getInstance(context)
-                    .setMessage(context.getString(R.string.notification_perm))
-                    .setNegativeButton(context.getString(R.string.dialog_btn_cancel), null)
-                    .setPositiveButton(context.getString(R.string.dialog_btn_ok)) { _, _ ->
-                        startNotificationPerm(context)
-                    }
-                    .setCancelable(false)
-                    .show()
+            CustomizeDialog.get(context)
+                .setMessage(context.getString(R.string.notification_perm))
+                .setNegativeButton(context.getString(R.string.dialog_btn_cancel), null)
+                .setPositiveButton(
+                    context.getString(R.string.dialog_btn_ok)
+                ) { _, _ -> startNotificationPerm(context) }
+                .setCancelable(false)
+                .show()
         }
     }
 
@@ -46,21 +45,26 @@ class NotificationUtil {
 
     fun sendNotification(context: Context, status: String, appName: String, appIcon: Bitmap) {
         val channel: NotificationChannel
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channel = NotificationChannel("status", "apkInstallStatus", NotificationManager.IMPORTANCE_DEFAULT)
+            channel = NotificationChannel(
+                "status",
+                "apkInstallStatus",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
             channel.enableLights(true)
             channel.setShowBadge(true)
             notificationManager.createNotificationChannel(channel)
         }
         val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, "status")
-                .setContentTitle(status)
-                .setWhen(System.currentTimeMillis())
-                .setSmallIcon(R.mipmap.ic_app_icon)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true)
-                .setContentText(appName)
-                .setLargeIcon(appIcon)
+            .setContentTitle(status)
+            .setWhen(System.currentTimeMillis())
+            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentText(appName)
+            .setLargeIcon(appIcon)
         notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
     }
 

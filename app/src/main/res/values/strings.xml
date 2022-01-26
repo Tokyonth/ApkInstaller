@@ -50,7 +50,7 @@
     <string name="text_apk_source">Source:%s</string>
     <string name="text_apk_file_size">File Size : %s</string>
     <string name="text_apk_source_more">Click to view details</string>
-    <string name="text_apk_cache">APK Installation package cache size:%s\nClick please</string>
+    <string name="text_apk_cache">APK Installation package cache size:%s\nClick Clear</string>
     <string name="text_cancel_installation">Cancel</string>
     <string name="text_settings_version">Version : %S</string>
     <string name="text_settings_author">Author : TOKYONTH</string>
@@ -73,7 +73,7 @@
     <string name="follow_system_night_mode_sub">Follow the system night mode</string>
     <string name="install_mode">Installation mode</string>
     <string name="install_mode_sub">Choose installation mode</string>
-    <string name="shizuku_not_installed">Not Installed Shizuku！</string>
+    <string name="shizuku_not_installed">Not Installed Shizuku!</string>
     <string name="exit_app">Exit</string>
     <string name="cannot_found_pkg">Failed to get the package name</string>
     <string name="default_silent">Silent by default</string>

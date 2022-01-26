@@ -8,13 +8,14 @@ import android.graphics.drawable.Drawable
 import android.view.animation.LinearInterpolator
 import kotlin.math.min
 
-class ProgressDrawable: Drawable(), Animatable, ValueAnimator.AnimatorUpdateListener, Animator.AnimatorListener {
+class ProgressDrawable : Drawable(), Animatable, ValueAnimator.AnimatorUpdateListener,
+    Animator.AnimatorListener {
 
     private val paint = Paint().apply {
         isAntiAlias = true
         isDither = true
         style = Paint.Style.STROKE
-       // strokeCap = Paint.Cap.ROUND
+        // strokeCap = Paint.Cap.ROUND
     }
 
     private val colorList = ArrayList<Int>()
@@ -120,7 +121,11 @@ class ProgressDrawable: Drawable(), Animatable, ValueAnimator.AnimatorUpdateList
         if (animation == animator) {
             val value = animator.animatedValue as Float
             val isShrink = value > 1
-            val sweepValue = if (value > 1) { 2 - value } else { value }
+            val sweepValue = if (value > 1) {
+                2 - value
+            } else {
+                value
+            }
             val sweepLength = sweepStep * sweepValue
             val startValue = if (value < lastAnimationProgress) {
                 2F - lastAnimationProgress + value
@@ -149,7 +154,7 @@ class ProgressDrawable: Drawable(), Animatable, ValueAnimator.AnimatorUpdateList
     }
 
     override fun onAnimationRepeat(animation: Animator?) {
-        colorIndex ++
+        colorIndex++
         colorIndex %= colorList.size
         paint.color = colorList[colorIndex]
     }
@@ -159,7 +164,7 @@ class ProgressDrawable: Drawable(), Animatable, ValueAnimator.AnimatorUpdateList
     override fun onAnimationCancel(animation: Animator?) {}
 
     override fun onAnimationStart(animation: Animator?) {
-        colorIndex ++
+        colorIndex++
         colorIndex %= colorList.size
         paint.color = colorList[colorIndex]
     }

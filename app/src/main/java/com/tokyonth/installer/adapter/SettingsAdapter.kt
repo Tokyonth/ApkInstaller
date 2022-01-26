@@ -4,42 +4,78 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.tokyonth.installer.App
 import com.tokyonth.installer.R
-
+import com.tokyonth.installer.data.LocalDataRepo
 import com.tokyonth.installer.data.SettingsEntity
 import com.tokyonth.installer.databinding.ItemRvSettingsBinding
-import com.tokyonth.installer.view.BurnRoundView
-import com.tokyonth.installer.view.SwitchButton
 
 import java.util.ArrayList
 
-class SettingsAdapter(context: Context) : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>() {
+class SettingsAdapter(context: Context) :
+    RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>() {
 
     private val list: ArrayList<SettingsEntity> = ArrayList()
 
+    private val local = LocalDataRepo.instance
+
     init {
         list.apply {
-            add(SettingsEntity(context.getString(R.string.title_show_perm), context.getString(R.string.summary_show_perm),
-                    R.drawable.ic_perm, ContextCompat.getColor(context, R.color.color0),
-                    App.localData.isShowPermission()))
-            add(SettingsEntity(context.getString(R.string.title_show_activity), context.getString(R.string.summary_show_activity),
-                    R.drawable.ic_activity, ContextCompat.getColor(context, R.color.color1),
-                    App.localData.isShowActivity()))
-            add(SettingsEntity(context.getString(R.string.default_silent), context.getString(R.string.default_silent_sub),
-                    R.drawable.ic_silent, ContextCompat.getColor(context, R.color.color6),
-                    App.localData.isDefaultSilent()))
-            add(SettingsEntity(context.getString(R.string.auto_del_apk_title), context.getString(R.string.auto_delete_apk),
-                    R.drawable.ic_delete, ContextCompat.getColor(context, R.color.color2),
-                    App.localData.isAutoDel()))
-            add(SettingsEntity(context.getString(R.string.follow_system_night_mode), context.getString(R.string.follow_system_night_mode_sub),
-                    R.drawable.ic_follow, ContextCompat.getColor(context, R.color.color4),
-                    App.localData.isFollowSystem()))
-            add(SettingsEntity(context.getString(R.string.install_mode), App.localData.getInstallName() /*context.getString(R.string.install_mode_sub)*/,
-                    R.drawable.ic_mode, ContextCompat.getColor(context, R.color.color5), false))
+            add(
+                SettingsEntity(
+                    context.getString(R.string.title_show_perm),
+                    context.getString(R.string.summary_show_perm),
+                    R.drawable.ic_perm,
+                    ContextCompat.getColor(context, R.color.color0),
+                    local.isShowPermission()
+                )
+            )
+            add(
+                SettingsEntity(
+                    context.getString(R.string.title_show_activity),
+                    context.getString(R.string.summary_show_activity),
+                    R.drawable.ic_activity,
+                    ContextCompat.getColor(context, R.color.color1),
+                    local.isShowActivity()
+                )
+            )
+            add(
+                SettingsEntity(
+                    context.getString(R.string.default_silent),
+                    context.getString(R.string.default_silent_sub),
+                    R.drawable.ic_silent,
+                    ContextCompat.getColor(context, R.color.color6),
+                    local.isDefaultSilent()
+                )
+            )
+            add(
+                SettingsEntity(
+                    context.getString(R.string.auto_del_apk_title),
+                    context.getString(R.string.auto_delete_apk),
+                    R.drawable.ic_delete,
+                    ContextCompat.getColor(context, R.color.color2),
+                    local.isAutoDel()
+                )
+            )
+            add(
+                SettingsEntity(
+                    context.getString(R.string.follow_system_night_mode),
+                    context.getString(R.string.follow_system_night_mode_sub),
+                    R.drawable.ic_follow,
+                    ContextCompat.getColor(context, R.color.color4),
+                    local.isFollowSystem()
+                )
+            )
+            add(
+                SettingsEntity(
+                    context.getString(R.string.install_mode),
+                    local.getInstallName() /*context.getString(R.string.install_mode_sub)*/,
+                    R.drawable.ic_mode,
+                    ContextCompat.getColor(context, R.color.color5),
+                    false
+                )
+            )
         }
     }
 
@@ -58,7 +94,7 @@ class SettingsAdapter(context: Context) : RecyclerView.Adapter<SettingsAdapter.S
     }
 
     fun updateInstallMode() {
-        list[list.size - 1].sub = App.localData.getInstallName()
+        list[list.size - 1].sub = local.getInstallName()
         notifyItemChanged(list.size - 1)
     }
 
@@ -75,25 +111,25 @@ class SettingsAdapter(context: Context) : RecyclerView.Adapter<SettingsAdapter.S
         return list.size
     }
 
-    class SettingsViewHolder(private val vb: ItemRvSettingsBinding) : RecyclerView.ViewHolder(vb.root) {
-
-        private val title: TextView = vb.settingsItemTitle
-        private val sub: TextView = vb.settingsItemSub
-        private val icon: BurnRoundView = vb.settingsItemIcon
-        private val switchBtn: SwitchButton = vb.settingsItemSwitch
+    class SettingsViewHolder(private val vb: ItemRvSettingsBinding) :
+        RecyclerView.ViewHolder(vb.root) {
 
         fun bind(entity: SettingsEntity, onItemClickListener: OnItemClickListener) {
-            title.text = entity.title
-            sub.text = entity.sub
-            icon.setBurnSrc(entity.icon, entity.color, true)
-            switchBtn.isChecked = entity.selected
-            if (bindingAdapterPosition == 5) {
-                switchBtn.visibility = View.GONE
+            vb.settingsItemTitle.text = entity.title
+            vb.settingsItemSub.text = entity.sub
+            vb.settingsItemIcon.setBurnSrc(entity.icon, entity.color, true)
+
+            vb.settingsItemSwitch.run {
+                isChecked = entity.selected
+                if (bindingAdapterPosition == 5) {
+                    visibility = View.GONE
+                }
+
+                setOnCheckedChangeListener { _, isChecked ->
+                    onItemClickListener.onSwitch(bindingAdapterPosition, isChecked)
+                }
             }
 
-            switchBtn.setOnCheckedChangeListener { _, isChecked ->
-                onItemClickListener.onSwitch(bindingAdapterPosition, isChecked)
-            }
             vb.root.setOnClickListener {
                 onItemClickListener.onClick(bindingAdapterPosition)
             }
@@ -101,4 +137,3 @@ class SettingsAdapter(context: Context) : RecyclerView.Adapter<SettingsAdapter.S
     }
 
 }
-

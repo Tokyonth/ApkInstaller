@@ -8,11 +8,16 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
+import androidx.annotation.Keep
 import androidx.appcompat.widget.AppCompatCheckBox
 import com.tokyonth.installer.R
-import com.tokyonth.installer.utils.dp2px
+import com.tokyonth.installer.utils.ktx.dp2px
 
-class SwitchButton @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : AppCompatCheckBox(context, attrs, defStyleAttr) {
+class SwitchButton @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : AppCompatCheckBox(context, attrs, defStyleAttr) {
     /**
      * 画笔
      */
@@ -78,13 +83,22 @@ class SwitchButton @JvmOverloads constructor(context: Context, attrs: AttributeS
         // 根据是否选中的状态设置画笔颜色
         if (isChecked) {
             // 选中状态时,背景颜色由未选中状态的背景颜色逐渐过渡到选中状态的背景颜色
-            mPaint.color = getCurrentColor(mColorGradientFactor, mBackgroundColorUnchecked, mBackgroundColorChecked)
+            mPaint.color = getCurrentColor(
+                mColorGradientFactor,
+                mBackgroundColorUnchecked,
+                mBackgroundColorChecked
+            )
         } else {
             // 未选中状态时,背景颜色由选中状态的背景颜色逐渐过渡到未选中状态的背景颜色
-            mPaint.color = getCurrentColor(mColorGradientFactor, mBackgroundColorChecked, mBackgroundColorUnchecked)
+            mPaint.color = getCurrentColor(
+                mColorGradientFactor,
+                mBackgroundColorChecked,
+                mBackgroundColorUnchecked
+            )
         }
         // 设置背景的矩形范围
-        mRectF[mPaint.strokeWidth, mPaint.strokeWidth, measuredWidth - mPaint.strokeWidth] = measuredHeight - mPaint.strokeWidth
+        mRectF[mPaint.strokeWidth, mPaint.strokeWidth, measuredWidth - mPaint.strokeWidth] =
+            measuredHeight - mPaint.strokeWidth
         // 绘制圆角矩形作为背景
         canvas.drawRoundRect(mRectF, measuredHeight.toFloat(), measuredHeight.toFloat(), mPaint)
 
@@ -170,10 +184,12 @@ class SwitchButton @JvmOverloads constructor(context: Context, attrs: AttributeS
         return Color.argb(alphaCurrent, redCurrent, greenCurrent, blueCurrent)
     }
 
+    @Keep
     fun setButtonCenterXOffset(buttonCenterXOffset: Float) {
         mButtonCenterXOffset = buttonCenterXOffset
     }
 
+    @Keep
     fun setColorGradientFactor(colorGradientFactor: Float) {
         mColorGradientFactor = colorGradientFactor
     }

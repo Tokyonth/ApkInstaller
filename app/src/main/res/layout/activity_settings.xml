@@ -1,7 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorBackground"
@@ -18,7 +16,7 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fadingEdge="none"
@@ -27,8 +25,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/info_card"
@@ -47,6 +44,7 @@
                     android:padding="16dp">
 
                     <TextView
+                        android:id="@+id/tv_app_name"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_weight="1"
@@ -73,142 +71,89 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_settings"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_settings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/info_card"
                 android:layout_margin="16dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/colorCard"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                android:background="@drawable/bg_round_8"
+                android:fadingEdge="none"
+                android:overScrollMode="never" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_settings"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fadingEdge="none"
-                    android:overScrollMode="never" />
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_apk_cache"
+            <TextView
+                android:id="@+id/tv_apk_cache"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/card_settings"
+                android:layout_below="@id/rv_settings"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:foreground="?android:attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/colorCard"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                android:background="@drawable/bg_round_8"
+                android:gravity="center|start"
+                android:padding="16dp"
+                android:text="@string/text_apk_cache"
+                android:textColor="@color/colorTextSub" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center|start"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/tv_apk_cache"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/text_apk_cache"
-                        android:textColor="@color/colorTextSub" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tv_tips"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/card_apk_cache"
+                android:layout_below="@id/tv_apk_cache"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginEnd="12dp">
+                android:layout_marginEnd="12dp"
+                android:drawablePadding="6dp"
+                android:text="@string/text_sys_pkg_tips"
+                android:textColor="@color/colorTextSub"
+                app:drawableStartCompat="@drawable/ic_info"
+                app:drawableTint="@color/colorSvg" />
 
-                <LinearLayout
-                    android:id="@+id/ll_box"
-                    android:layout_width="match_parent"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cs_sys_pkg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_tips"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_round_8"
+                android:gravity="center|start"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <TextView
+                    android:id="@+id/tv_pkg_tips"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:gravity="center|start"
-                    tools:ignore="UseCompoundDrawables">
+                    android:text="@string/text_input_sys_pkg"
+                    android:textColor="@color/colorTextSub"
+                    app:layout_constraintEnd_toStartOf="@id/cb_use_sys_pkg"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_margin="6dp"
-                        android:src="@drawable/ic_info"
-                        app:tint="@color/colorSvg"
-                        tools:ignore="ContentDescription" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/text_sys_pkg_tips"
-                        android:textColor="@color/colorTextSub" />
-
-                </LinearLayout>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_pkg"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tv_pkg_name"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/ll_box"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    app:cardBackgroundColor="@color/colorCard"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="0dp"
-                    app:cardPreventCornerOverlap="true"
-                    app:cardUseCompatPadding="true">
+                    android:text="@string/text_settings_pkg"
+                    android:textColor="@color/colorTextSub"
+                    app:layout_constraintEnd_toStartOf="@id/cb_use_sys_pkg"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_pkg_tips" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center|start"
-                        android:orientation="horizontal"
-                        android:padding="12dp">
+                <com.tokyonth.installer.view.SwitchButton
+                    android:id="@+id/cb_use_sys_pkg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@id/tv_pkg_name"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tv_pkg_tips" />
 
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/text_input_sys_pkg"
-                                android:textColor="@color/colorTextSub" />
-
-                            <TextView
-                                android:id="@+id/tv_pkg_name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/text_settings_pkg"
-                                android:textColor="@color/colorTextSub" />
-
-                        </LinearLayout>
-
-                        <com.tokyonth.installer.view.SwitchButton
-                            android:id="@+id/cb_use_sys_pkg"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-            </RelativeLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </RelativeLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

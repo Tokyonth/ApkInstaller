@@ -7,7 +7,8 @@ import com.tokyonth.installer.data.PermFullEntity
 import com.tokyonth.installer.view.item.PermissionItemView
 import java.util.ArrayList
 
-class PermissionAdapter(private val list: ArrayList<PermFullEntity>) : RecyclerView.Adapter<PermissionAdapter.PermissionViewHolder>() {
+class PermissionAdapter(private val list: ArrayList<PermFullEntity>) :
+    RecyclerView.Adapter<PermissionAdapter.PermissionViewHolder>() {
 
     private lateinit var itemClickListener: (PermFullEntity) -> Unit
 
@@ -27,7 +28,8 @@ class PermissionAdapter(private val list: ArrayList<PermFullEntity>) : RecyclerV
         return list.size
     }
 
-    class PermissionViewHolder(private val permissionItemView: PermissionItemView) : RecyclerView.ViewHolder(permissionItemView) {
+    class PermissionViewHolder(private val permissionItemView: PermissionItemView) :
+        RecyclerView.ViewHolder(permissionItemView) {
 
         fun bind(entity: PermFullEntity, itemClickListener: (PermFullEntity) -> Unit) {
             permissionItemView.setData(entity)

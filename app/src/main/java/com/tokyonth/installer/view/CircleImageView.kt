@@ -13,18 +13,28 @@ import kotlin.math.min
 
 class CircleImageView : AppCompatImageView {
 
-    private var mRadius = 0
-
     constructor(context: Context?) : super(context!!)
+
     constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context!!, attrs, defStyleAttr)
+
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context!!,
+        attrs,
+        defStyleAttr
+    )
+
+    private var mRadius = 0
 
     private fun getIconBitmap(drawable: Drawable): Bitmap? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (drawable is BitmapDrawable) {
                 return drawable.bitmap
             } else if (drawable is AdaptiveIconDrawable) {
-                val bitmapIcon = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888)
+                val bitmapIcon = Bitmap.createBitmap(
+                    drawable.getIntrinsicWidth(),
+                    drawable.getIntrinsicHeight(),
+                    Bitmap.Config.ARGB_8888
+                )
                 val canvas = Canvas(bitmapIcon)
                 drawable.setBounds(0, 0, canvas.width, canvas.height)
                 drawable.draw(canvas)

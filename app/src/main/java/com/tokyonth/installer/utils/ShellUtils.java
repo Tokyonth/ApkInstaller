@@ -71,16 +71,16 @@ public class ShellUtils {
     private static void safeCancel(OutputReader reader) {
         try {
             if (reader != null) reader.cancel();
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     private static void safeClose(Closeable closeable) {
         try {
             if (closeable != null) closeable.close();
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -117,8 +117,11 @@ public class ShellUtils {
 
     public interface Result {
         void onStdout(String text);
+
         void onStderr(String text);
+
         void onCommand(String command);
+
         void onFinish(int resultCode);
     }
 
@@ -128,8 +131,8 @@ public class ShellUtils {
 
     public static class OutputReader extends Thread implements Closeable {
 
-        private Output output ;
-        private BufferedReader reader;
+        private final Output output;
+        private final BufferedReader reader;
         private boolean isRunning;
 
         private OutputReader(BufferedReader reader, Output output) {
@@ -142,7 +145,8 @@ public class ShellUtils {
         public void close() {
             try {
                 reader.close();
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
@@ -155,7 +159,8 @@ public class ShellUtils {
                     line = reader.readLine();
                     if (line != null)
                         output.output(line);
-                } catch (IOException ignored) {
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -167,4 +172,5 @@ public class ShellUtils {
             }
         }
     }
+
 }

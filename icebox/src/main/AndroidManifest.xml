@@ -5,11 +5,15 @@
     <uses-permission android:name="com.catchingnow.icebox.STATE" />
 
     <application>
+
         <receiver
-            android:name=".StateReceiver">
+            android:name=".StateReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.catchingnow.icebox.SDK_STATE" />
             </intent-filter>
         </receiver>
+
     </application>
+
 </manifest>

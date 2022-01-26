@@ -2,7 +2,7 @@
 <resources>
 
     <declare-styleable name="BurnRoundView">
-        <attr name="isBurn" format="boolean" />
+        <attr name="burnOpen" format="boolean" />
         <attr name="burnColor" format="color" />
         <attr name="burnSrc" format="reference" />
     </declare-styleable>

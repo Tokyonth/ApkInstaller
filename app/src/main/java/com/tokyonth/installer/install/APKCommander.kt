@@ -3,18 +3,18 @@ package com.tokyonth.installer.install
 import android.net.Uri
 import android.util.Log
 
-import com.tokyonth.installer.App
 import com.tokyonth.installer.data.ApkInfoEntity
-import com.tokyonth.installer.utils.doAsync
-import com.tokyonth.installer.utils.onUI
+import com.tokyonth.installer.data.LocalDataRepo
+import com.tokyonth.installer.utils.ktx.doAsync
+import com.tokyonth.installer.utils.ktx.onUI
 
 class APKCommander {
 
-    private var installCallback: InstallCallback
     private lateinit var apkInfoEntity: ApkInfoEntity
 
     private var uri: Uri? = null
     private var referrer: String? = null
+    private var installCallback: InstallCallback
 
     constructor(apkInfoEntity: ApkInfoEntity, installCallback: InstallCallback) {
         this.apkInfoEntity = apkInfoEntity
@@ -27,7 +27,7 @@ class APKCommander {
         this.installCallback = installCallback
     }
 
-    fun start() {
+    fun startParse() {
         if (this::apkInfoEntity.isInitialized) {
             installCallback.onApkParsed(apkInfoEntity)
             return
@@ -45,12 +45,9 @@ class APKCommander {
     }
 
     fun startInstall() {
-        when (App.localData.getInstallMode()) {
-            0 -> InstallApkShellTask(apkInfoEntity, installCallback).start()
-
-            1 -> InstallApkShizukuTask(apkInfoEntity, installCallback).start()
-
-            2 -> InstallApkIceBoxTask(apkInfoEntity, installCallback).start()
+        InstallerFactory.create(LocalDataRepo.instance.getInstallMode()).apply {
+            make(installCallback, apkInfoEntity)
+            install()
         }
     }
 

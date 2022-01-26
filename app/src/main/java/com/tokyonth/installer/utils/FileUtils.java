@@ -6,7 +6,7 @@ import android.util.Log;
 import java.io.File;
 import java.text.DecimalFormat;
 
-public class FileIOUtils {
+public class FileUtils {
 
     public static void deleteFolderFile(String filePath, boolean deleteThisPath) {
         if (!TextUtils.isEmpty(filePath)) {

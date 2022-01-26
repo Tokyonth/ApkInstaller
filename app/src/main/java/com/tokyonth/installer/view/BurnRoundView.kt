@@ -5,7 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import com.tokyonth.installer.R
-import com.tokyonth.installer.utils.CommonUtils
+import com.tokyonth.installer.utils.AppHelper
 import kotlin.math.min
 
 class BurnRoundView : View {
@@ -13,60 +13,64 @@ class BurnRoundView : View {
     private var mWidth = 0
     private var mHeight = 0
     private var burnColor = 0
+
     private var isBurn = false
     private var burnSrc: Bitmap? = null
-    private var mContext: Context? = null
-    private var overlayPaint: Paint? = null
+    private var burnRes: Int = R.mipmap.ic_launcher_round
+
     private var mPaint: Paint? = null
+    private var overlayPaint: Paint? = null
 
     constructor(context: Context) : super(context) {
-        this.mContext = context
+        initView()
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        this.mContext = context
-        initView(attrs)
+        initAttr(attrs)
+        initView()
     }
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        this.mContext = context
-        initView(attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        initAttr(attrs)
+        initView()
     }
 
-    private fun initView(attrs: AttributeSet?) {
-        val array = context.obtainStyledAttributes(attrs, R.styleable.BurnRoundView)
-        val imageId = array.getResourceId(R.styleable.BurnRoundView_burnSrc, 0)
-        val color = array.getColor(R.styleable.BurnRoundView_burnColor, Color.RED)
+    private fun initView() {
         overlayPaint = Paint()
         mPaint = Paint()
-        replaceImageColor(imageId, color)
-        isBurn = array.getBoolean(R.styleable.BurnRoundView_isBurn, true)
-        burnColor = if (isBurn) {
-            color and 0x20FFFFFF
-        } else {
-            color
-        }
+        setBurnSrc(burnRes, burnColor, isBurn)
+    }
+
+    private fun initAttr(attrs: AttributeSet?) {
+        val array = context.obtainStyledAttributes(attrs, R.styleable.BurnRoundView)
+        burnRes = array.getResourceId(R.styleable.BurnRoundView_burnSrc, R.mipmap.ic_launcher_round)
+        burnColor = array.getColor(R.styleable.BurnRoundView_burnColor, Color.RED)
+        isBurn = array.getBoolean(R.styleable.BurnRoundView_burnOpen, true)
         array.recycle()
     }
 
     private fun replaceImageColor(imageId: Int, color: Int) {
-        burnSrc = CommonUtils.getBitmapFromDrawable(context, imageId)
+        burnSrc = AppHelper.getBitmapFromDrawable(context, imageId)
         overlayPaint!!.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
     }
 
-    private fun setBurnColor(color: Int, isBurn: Boolean): Int {
-        this.isBurn = isBurn
+    private fun burnColor(color: Int, isBurn: Boolean) {
         burnColor = if (isBurn) {
             color and 0x20FFFFFF
         } else {
             color
         }
-        invalidate()
-        return color
+        //return burnColor
     }
 
     fun setBurnSrc(burnSrc: Int, color: Int, isBurn: Boolean) {
-        replaceImageColor(burnSrc, setBurnColor(color, isBurn))
+        //this.isBurn = isBurn
+        replaceImageColor(burnSrc, color)
+        burnColor(color, isBurn)
         invalidate()
     }
 
@@ -78,15 +82,22 @@ class BurnRoundView : View {
         mPaint!!.isAntiAlias = true
         mPaint!!.color = burnColor
         //width >> 1 与 height >> 1为圆心位置
-        canvas.drawBitmap(burnSrc!!, (width shr 1) - (burnSrc!!.width shr 1).toFloat(),
-                (height shr 1) - (burnSrc!!.height shr 1).toFloat(), overlayPaint)
-        canvas.drawCircle((width shr 1.toFloat().toInt()).toFloat(),
-                (height shr 1.toFloat().toInt()).toFloat(), (measuredWidth / 2.5).toFloat(), mPaint!!)
+        canvas.drawBitmap(
+            burnSrc!!, (width shr 1) - (burnSrc!!.width shr 1).toFloat(),
+            (height shr 1) - (burnSrc!!.height shr 1).toFloat(), overlayPaint
+        )
+        canvas.drawCircle(
+            (width shr 1.toFloat().toInt()).toFloat(),
+            (height shr 1.toFloat().toInt()).toFloat(), (measuredWidth / 2.5).toFloat(), mPaint!!
+        )
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        setMeasuredDimension(measureWidthAndHeight(widthMeasureSpec), measureWidthAndHeight(heightMeasureSpec))
+        setMeasuredDimension(
+            measureWidthAndHeight(widthMeasureSpec),
+            measureWidthAndHeight(heightMeasureSpec)
+        )
         mWidth = measureWidthAndHeight(widthMeasureSpec)
         mHeight = measureWidthAndHeight(heightMeasureSpec)
     }
@@ -107,7 +118,9 @@ class BurnRoundView : View {
     }
 
     companion object {
+
         private const val DEFAULT_SIZE = 72
+
     }
 
 }

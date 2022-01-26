@@ -2,35 +2,39 @@ package com.tokyonth.installer.activity.crash
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import androidx.viewbinding.ViewBinding
 import com.tokyonth.installer.R
 import com.tokyonth.installer.activity.BaseActivity
 import com.tokyonth.installer.databinding.ActivityCrashErrorBinding
-import com.tokyonth.installer.utils.lazyBind
+import com.tokyonth.installer.utils.ktx.lazyBind
+import com.tokyonth.installer.utils.ktx.toast
 
 class ErrorActivity : BaseActivity() {
 
-    private val vb: ActivityCrashErrorBinding by lazyBind()
+    private val binding: ActivityCrashErrorBinding by lazyBind()
 
-    override fun initView(): ViewBinding {
-        return vb
+    override fun setBinding() = binding
+
+    override fun initView() {
+        val crashInfo = ActivityOnCrash.getAllErrorDetailsFromIntent(this, intent)
+        binding.run {
+            tvCrashInfo.text = crashInfo
+            btnErrorCopy.setOnClickListener {
+                copyErrorToClipboard(crashInfo)
+                toast(getString(R.string.copy_error_log))
+            }
+            btnErrorExit.setOnClickListener {
+                ActivityOnCrash.closeApplication(this@ErrorActivity)
+            }
+        }
     }
 
     override fun initData() {
-        val crashInfo = ActivityOnCrash.getAllErrorDetailsFromIntent(this, intent)
-        vb.tvCrashInfo.text = crashInfo
-        vb.btnErrorCopy.setOnClickListener {
-            copyErrorToClipboard(crashInfo)
-            showToast(getString(R.string.copy_error_log))
-        }
-        vb.btnErrorExit.setOnClickListener {
-            ActivityOnCrash.closeApplication(this)
-        }
+
     }
 
     private fun copyErrorToClipboard(info: String) {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("error", info)
+        val clip = ClipData.newPlainText("apkInstallerError", info)
         clipboard.setPrimaryClip(clip)
     }
 

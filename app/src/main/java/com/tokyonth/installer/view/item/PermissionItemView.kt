@@ -4,14 +4,15 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.res.ResourcesCompat
 import com.tokyonth.installer.R
 import com.tokyonth.installer.data.PermFullEntity
-import com.tokyonth.installer.utils.visibleOrGone
+import com.tokyonth.installer.utils.ktx.color
+import com.tokyonth.installer.utils.ktx.dp2px
+import com.tokyonth.installer.utils.ktx.visibleOrGone
 
 class PermissionItemView : LinearLayout {
 
-    private val padding = 16
+    private val padding = 16.dp2px().toInt()
 
     private lateinit var tvLab: TextView
 
@@ -25,16 +26,12 @@ class PermissionItemView : LinearLayout {
         initView()
     }
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         initView()
-    }
-
-    fun setData(data: PermFullEntity) {
-        tvLab.text = data.perm
-        tvDes.apply {
-            visibleOrGone(data.des.isNotEmpty())
-            text = data.des
-        }
     }
 
     private fun initView() {
@@ -43,23 +40,23 @@ class PermissionItemView : LinearLayout {
             setPadding(it, it, it, it)
         }
 
-        tvLab = labTextView()
-        tvDes = desTextView()
+        tvLab = createTextView()
+        tvDes = createTextView()
         addView(tvLab)
         addView(tvDes)
     }
 
-    private fun labTextView(): TextView {
-        val color = ResourcesCompat.getColor(context.resources, R.color.colorTextSub, null)
+    private fun createTextView(): TextView {
         return TextView(context).apply {
-            setTextColor(color)
+            setTextColor(color(R.color.colorTextSub))
         }
     }
 
-    private fun desTextView(): TextView {
-        val color = ResourcesCompat.getColor(context.resources, R.color.colorTextSub, null)
-        return TextView(context).apply {
-            setTextColor(color)
+    fun setData(data: PermFullEntity) {
+        tvLab.text = data.perm
+        tvDes.apply {
+            visibleOrGone(data.des.isNotEmpty())
+            text = data.des
         }
     }
 

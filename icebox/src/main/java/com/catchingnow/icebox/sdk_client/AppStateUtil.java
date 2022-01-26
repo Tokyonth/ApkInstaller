@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import java.lang.reflect.Field;
 
 class AppStateUtil {
+
     private static final int PM_FLAGS_GET_APP_INFO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
             PackageManager.MATCH_UNINSTALLED_PACKAGES
             : PackageManager.GET_UNINSTALLED_PACKAGES;

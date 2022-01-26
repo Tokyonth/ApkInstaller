@@ -10,19 +10,19 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.viewbinding.ViewBinding
-import com.tokyonth.installer.App
 import com.tokyonth.installer.R
 import com.tokyonth.installer.utils.path.DocumentFileUriUtils
-import com.tokyonth.installer.view.CustomizeDialog
-
 import com.tokyonth.installer.Constants
-import com.tokyonth.installer.utils.NotificationUtil
+import com.tokyonth.installer.data.LocalDataRepo
+import com.tokyonth.installer.utils.NotificationUtils
+import com.tokyonth.installer.utils.ktx.string
+import com.tokyonth.installer.utils.ktx.toast
+import com.tokyonth.installer.utils.DialogUtils
 
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -31,46 +31,49 @@ abstract class BaseActivity : AppCompatActivity() {
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
-    abstract fun initView(): ViewBinding?
+    abstract fun setBinding(): ViewBinding?
+
+    abstract fun initView()
 
     abstract fun initData()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK).let {
-            val isNightMode = if (it == 0x20) {
+        val uiMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK)
+        val isNightMode = uiMode == 0x20
+
+        isNightMode.let {
+            if (it) {
                 window.navigationBarColor = ContextCompat.getColor(this, R.color.colorCard)
-                true
-            } else {
-                WindowCompat.getInsetsController(window, window.decorView)?.apply {
-                    isAppearanceLightStatusBars = true
-                }
-                false
             }
-            App.localData.setNightMode(isNightMode)
+            WindowCompat.getInsetsController(window, window.decorView)?.apply {
+                isAppearanceLightStatusBars = !it
+            }
+            LocalDataRepo.instance.setNightMode(it)
         }
-        initView().let {
+
+        setBinding().let {
             if (it != null)
                 setContentView(it.root)
         }
-        check()
+        initView()
+        checkPermission()
     }
 
-    private fun check() {
-        if (App.localData.isFirstBoot()) {
-            CustomizeDialog.getInstance(this)
-                .setMessage(getString(R.string.use_app_warn))
-                .setNegativeButton(getString(R.string.exit_app)) { _, _ -> finish() }
-                .setPositiveButton(getString(R.string.dialog_btn_ok)) { _, _ ->
+    private fun checkPermission() {
+        if (LocalDataRepo.instance.isFirstBoot()) {
+            DialogUtils.permissionDialog(this) {
+                if (it == DialogUtils.NEGATIVE_BUTTON) {
+                    finish()
+                } else {
                     requestPermission()
-                    NotificationUtil().checkNotification(this)
+                    NotificationUtils.checkNotification(this)
                 }
-                .setCancelable(false)
-                .show()
+            }
         } else {
             requestPermission()
-            NotificationUtil().checkNotification(this)
+            NotificationUtils.checkNotification(this)
         }
     }
 
@@ -110,10 +113,6 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun showToast(text: String) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-    }
-
     @SuppressLint("WrongConstant")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -135,7 +134,7 @@ abstract class BaseActivity : AppCompatActivity() {
                     initData()
                 }
             } else {
-                showToast(getString(R.string.no_permissions))
+                toast(string(R.string.no_permissions))
                 finish()
             }
         }
@@ -159,7 +158,7 @@ abstract class BaseActivity : AppCompatActivity() {
             ) {
                 initData()
             } else {
-                showToast(getString(R.string.no_permissions))
+                toast(string(R.string.no_permissions))
                 finish()
             }
         }

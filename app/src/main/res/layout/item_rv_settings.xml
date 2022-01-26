@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -15,36 +15,41 @@
         android:layout_height="48dp"
         app:burnColor="@color/colorAccent"
         app:burnSrc="@drawable/ic_settings"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="PrivateResource" />
 
-    <LinearLayout
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/settings_item_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:textColor="@color/colorText"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/settings_item_sub"
+        app:layout_constraintStart_toEndOf="@id/settings_item_icon"
+        app:layout_constraintTop_toTopOf="@id/settings_item_icon"
+        tools:text="Title" />
 
-        <TextView
-            android:id="@+id/settings_item_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorText"
-            android:textSize="16sp"
-            tools:text="Title" />
-
-        <TextView
-            android:id="@+id/settings_item_sub"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorTextSub"
-            android:textSize="14sp"
-            tools:text="Sub" />
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/settings_item_sub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/colorTextSub"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/settings_item_icon"
+        app:layout_constraintStart_toEndOf="@id/settings_item_icon"
+        app:layout_constraintTop_toBottomOf="@id/settings_item_title"
+        tools:text="Sub" />
 
     <com.tokyonth.installer.view.SwitchButton
         android:id="@+id/settings_item_switch"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
