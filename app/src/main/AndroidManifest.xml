@@ -43,11 +43,10 @@
         tools:targetApi="r">
 
         <activity
-            android:name=".activity.SilentlyInstallActivity"
+            android:name=".activity.InstallerActivity"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoDisplay">
+            android:screenOrientation="portrait">
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -64,37 +63,10 @@
         </activity>
 
         <activity
-            android:name=".activity.UninstallActivity"
-            android:excludeFromRecents="true"
-            android:exported="true"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.ActivityDialogStyle">
-
-            <intent-filter>
-                <action android:name="android.intent.action.DELETE" />
-                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="package" />
-            </intent-filter>
-
-        </activity>
-
-        <activity
-            android:name=".activity.InstallerActivity"
-            android:excludeFromRecents="true"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/InstallAppTheme" />
-
-        <activity
             android:name=".activity.SettingsActivity"
             android:exported="true"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:theme="@style/InstallAppTheme">
+            android:screenOrientation="portrait">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -106,8 +78,7 @@
         <activity
             android:name=".activity.crash.ErrorActivity"
             android:process=":appError"
-            android:screenOrientation="portrait"
-            android:theme="@style/InstallAppTheme" />
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -128,11 +99,9 @@
             android:multiprocess="false"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
-        <provider
-            android:name=".activity.crash.InitProvider"
-            android:authorities="${applicationId}.activityCrashInitProvider"
-            android:exported="false"
-            android:initOrder="110" />
+        <service
+            android:name=".install.InstallerServer"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
     </application>
 

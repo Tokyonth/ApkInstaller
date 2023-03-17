@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import com.tokyonth.installer.data.LocalDataRepo
+import com.google.android.material.color.DynamicColors
+import com.tokyonth.installer.activity.crash.ActivityOnCrash
+import com.tokyonth.installer.data.SPDataManager
 import me.weishu.reflection.Reflection
 
 class App : Application() {
@@ -21,15 +23,22 @@ class App : Application() {
         super.onCreate()
         context = applicationContext
 
-        LocalDataRepo.instance.run {
+        ActivityOnCrash.install(this)
+        DynamicColors.applyToActivitiesIfAvailable(this)
+        initNightMode()
+    }
+
+    private fun initNightMode() {
+        SPDataManager.instance.run {
             if (isFollowSystem()) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             } else {
                 AppCompatDelegate.setDefaultNightMode(
-                    if (isNightMode())
+                    if (isNightMode()) {
                         AppCompatDelegate.MODE_NIGHT_YES
-                    else
+                    } else {
                         AppCompatDelegate.MODE_NIGHT_NO
+                    }
                 )
             }
         }

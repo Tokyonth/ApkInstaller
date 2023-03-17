@@ -55,11 +55,8 @@ class ProgressDrawable : Drawable(), Animatable, ValueAnimator.AnimatorUpdateLis
         canvas.drawArc(ovalBounds, startAngle, sweepAngle, false, paint)
     }
 
-    override fun onBoundsChange(bounds: Rect?) {
+    override fun onBoundsChange(bounds: Rect) {
         super.onBoundsChange(bounds)
-        if (bounds == null) {
-            return
-        }
         radius = min(bounds.width(), bounds.height()) * 0.5F
         val strokeWidth = radius * strokeWidthWeight
         radius -= strokeWidth * 0.5F
@@ -117,7 +114,7 @@ class ProgressDrawable : Drawable(), Animatable, ValueAnimator.AnimatorUpdateLis
         animator.cancel()
     }
 
-    override fun onAnimationUpdate(animation: ValueAnimator?) {
+    override fun onAnimationUpdate(animation: ValueAnimator) {
         if (animation == animator) {
             val value = animator.animatedValue as Float
             val isShrink = value > 1
@@ -153,17 +150,17 @@ class ProgressDrawable : Drawable(), Animatable, ValueAnimator.AnimatorUpdateLis
         }
     }
 
-    override fun onAnimationRepeat(animation: Animator?) {
+    override fun onAnimationRepeat(animation: Animator) {
         colorIndex++
         colorIndex %= colorList.size
         paint.color = colorList[colorIndex]
     }
 
-    override fun onAnimationEnd(animation: Animator?) {}
+    override fun onAnimationEnd(animation: Animator) {}
 
-    override fun onAnimationCancel(animation: Animator?) {}
+    override fun onAnimationCancel(animation: Animator) {}
 
-    override fun onAnimationStart(animation: Animator?) {
+    override fun onAnimationStart(animation: Animator) {
         colorIndex++
         colorIndex %= colorList.size
         paint.color = colorList[colorIndex]

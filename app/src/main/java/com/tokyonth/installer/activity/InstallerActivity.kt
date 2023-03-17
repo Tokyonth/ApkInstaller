@@ -1,24 +1,22 @@
 package com.tokyonth.installer.activity
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
+import androidx.activity.viewModels
 import androidx.core.content.res.ResourcesCompat
-import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
+import com.tokyonth.installer.activity.model.InstallerViewModel
 import com.tokyonth.installer.adapter.ActivityAdapter
 import com.tokyonth.installer.adapter.PermissionAdapter
 import com.tokyonth.installer.data.ApkInfoEntity
-import com.tokyonth.installer.data.LocalDataRepo
-import com.tokyonth.installer.data.PermFullEntity
+import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.databinding.*
-import com.tokyonth.installer.install.APKCommander
-import com.tokyonth.installer.install.InstallCallback
 import com.tokyonth.installer.install.InstallStatus
+import com.tokyonth.installer.install.InstallerServer
 import com.tokyonth.installer.utils.*
 import com.tokyonth.installer.utils.ktx.lazyBind
 import com.tokyonth.installer.utils.ktx.string
@@ -30,48 +28,28 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class InstallerActivity : BaseActivity(), InstallCallback {
+class InstallerActivity : BaseActivity() {
 
     private val binding: ActivityInstallerBinding by lazyBind()
 
-    private lateinit var apkInfoEntity: ApkInfoEntity
-    private lateinit var apkCommander: APKCommander
-    private lateinit var progressDrawable: ProgressDrawable
+    private val model: InstallerViewModel by viewModels()
 
-    private lateinit var apkSource: String
-    private var local = LocalDataRepo.instance
-    private var installSuccess = false
+    private val sp = SPDataManager.instance
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        if (this::apkInfoEntity.isInitialized) {
-            outState.putParcelable(Constants.APK_INFO, apkInfoEntity)
-        }
-    }
+    private var apkInfoEntity: ApkInfoEntity? = null
+
+    private var progressDrawable: ProgressDrawable? = null
+
+    private var apkSource: String = ""
+
+    private var installed = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if (savedInstanceState != null) {
-            apkInfoEntity = savedInstanceState.getParcelable(Constants.APK_INFO)!!
-        } else {
-            setViewStatus(false)
+        if (sp.isDefaultSilent()) {
+            startSilentlyFun()
+            return
         }
         super.onCreate(savedInstanceState)
-    }
-
-    override fun initData() {
-        intent.data.let {
-            if (it == null) {
-                finish()
-            } else {
-                apkSource = intent.getStringExtra(Constants.APK_SOURCE)!!
-                apkCommander = if (this::apkInfoEntity.isInitialized) {
-                    APKCommander(apkInfoEntity, this)
-                } else {
-                    APKCommander(it, apkSource, this)
-                }
-                apkCommander.startParse()
-            }
-        }
     }
 
     override fun setBinding() = binding
@@ -85,7 +63,7 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         ).let { views ->
             View.OnClickListener {
                 when (it) {
-                    views[0] -> startInstallFun()
+                    views[0] -> startInstallFun(apkInfoEntity!!)
                     views[1] -> startSilentlyFun()
                     views[2] -> finish()
                     views[3] -> AppHelper.toSelfSetting(this, apkSource)
@@ -98,11 +76,42 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         }
     }
 
-    override fun onApkParsed(apkInfo: ApkInfoEntity) {
+    override fun initData() {
+        intent.data.let {
+            if (it == null) {
+                finish()
+            } else {
+                initLiveDataObs()
+                apkSource = AppHelper.reflectGetReferrer(this).toString()
+                model.startParse(it, apkSource)
+            }
+        }
+    }
+
+    private fun initLiveDataObs() {
+        model.apkParsedLiveData.observe(this) {
+            this.apkInfoEntity = it
+            onApkParsed(it)
+        }
+        model.apkPreInstallLiveData.observe(this) {
+            onApkPreInstall()
+        }
+        model.apkInstallLogLiveData.observe(this) {
+            onInstallLog(it)
+        }
+        model.apkInstalledLiveData.observe(this) {
+            onApkInstalled(apkInfoEntity!!, it)
+        }
+    }
+
+    private fun onApkParsed(apkInfo: ApkInfoEntity) {
         if (!apkInfo.packageName.isNullOrEmpty()) {
-            apkInfoEntity = apkInfo
             setViewStatus(true)
-            initApkDetails()
+            try {
+                initApkDetails(apkInfo)
+            } catch (e:Exception){
+                Log.e("打印-->", e.stackTraceToString())
+            }
         } else {
             DialogUtils.parseFailedDialog(this, intent.data) {
                 finish()
@@ -110,7 +119,7 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         }
     }
 
-    override fun onApkPreInstall() {
+    private fun onApkPreInstall() {
         setViewStatus(false)
         progressDrawable = ProgressDrawable().apply {
             putColor(Color.WHITE)
@@ -119,16 +128,17 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         }
 
         binding.run {
-            fabInstall.icon = progressDrawable
+            //   fabInstall.icon = progressDrawable
+            fabInstall.setImageDrawable(progressDrawable)
             tvInstallMsg.text = ""
             installHeadView.setAppName(string(R.string.installing))
         }
     }
 
-    override fun onApkInstalled(installStatus: InstallStatus) {
+    private fun onApkInstalled(apkInfo: ApkInfoEntity, installStatus: InstallStatus) {
         when (installStatus) {
-            InstallStatus.SUCCESS -> installSuccess()
-            InstallStatus.FAILURE -> installFailure()
+            InstallStatus.SUCCESS -> installSuccess(apkInfo)
+            InstallStatus.FAILURE -> installFailure(apkInfo)
         }
 
         binding.run {
@@ -137,25 +147,25 @@ class InstallerActivity : BaseActivity(), InstallCallback {
             installHeadView.isEnabled = true
         }
 
-        progressDrawable.stop()
-        installSuccess = true
+        progressDrawable?.stop()
+        installed = true
 
-        if (local.isAutoDel()) {
-            File(apkInfoEntity.filePath!!).delete()
-            toast(string(R.string.apk_deleted, apkInfoEntity.appName))
+        if (sp.isAutoDel()) {
+            File(apkInfo.filePath!!).delete()
+            toast(string(R.string.apk_deleted, apkInfo.appName))
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun initApkDetails() {
+    private fun initApkDetails(apkInfo: ApkInfoEntity) {
         binding.installHeadView.apply {
-            setAppIcon(apkInfoEntity.getIcon()!!)
-            setAppName(apkInfoEntity.appName!!)
-            setAppVersion(apkInfoEntity.version)
+            setAppIcon(apkInfo.icon!!)
+            setAppName(apkInfo.appName!!)
+            setAppVersion(apkInfo.version)
         }
 
         binding.sbAutoDel.setOnCheckedChangeListener { _, isChecked ->
-            local.setAutoDel(
+            sp.setAutoDel(
                 isChecked
             )
         }
@@ -166,25 +176,25 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         binding.ivApkSource.setImageDrawable(PackageUtils.getAppIconByPackageName(this, apkSource))
 
         val apkSize = FileUtils.byteToString(
-            FileUtils.getFileSize(apkInfoEntity.filePath)
+            FileUtils.getFileSize(apkInfo.filePath)
         )
         binding.tvInstallMsg.text =
-            string(R.string.info_pkg_name) + " " + apkInfoEntity.packageName + "\n" +
-                    string(R.string.info_apk_path) + " " + apkInfoEntity.filePath + "\n" +
+            string(R.string.info_pkg_name) + " " + apkInfo.packageName + "\n" +
+                    string(R.string.info_apk_path) + " " + apkInfo.filePath + "\n" +
                     string(R.string.text_apk_file_size, apkSize)
-        if (apkInfoEntity.hasInstalledApp()) {
-            binding.tvInstallMsg.append("\n${string(R.string.info_installed_version)} ${apkInfoEntity.installedVersion}")
+        if (apkInfo.isHasInstalledApp) {
+            binding.tvInstallMsg.append("\n${string(R.string.info_installed_version)} ${apkInfo.installedVersion}")
             binding.installHeadView.showVersionTip(
-                apkInfoEntity.versionCode,
-                apkInfoEntity.installedVersionCode
+                apkInfo.versionCode,
+                apkInfo.installedVersionCode
             )
         }
-        loadingPermActInfo()
+        loadingPermActInfo(apkInfo)
     }
 
     private fun setViewStatus(isEnable: Boolean) {
         binding.run {
-            clAct.visibleOrGone(isEnable)
+            clActivity.visibleOrGone(isEnable)
             clPerm.visibleOrGone(isEnable)
             tvCancel.visibleOrGone(isEnable)
             tvSilently.visibleOrGone(isEnable)
@@ -195,18 +205,13 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         }
     }
 
-    private fun loadingPermActInfo() {
+    private fun loadingPermActInfo(apkInfo: ApkInfoEntity) {
         binding.clPerm.setTitle(string(R.string.app_permissions, "0"))
-        apkInfoEntity.permissions?.let {
-            val permList = ArrayList<PermFullEntity>()
-            val (group, lab, des) = apkInfoEntity.permissionsDesc!!
-            for (index in it.indices) {
-                permList.add(PermFullEntity(it[index], group[index], des[index], lab[index]))
-            }
+        apkInfo.permissions?.let {
             binding.clPerm.apply {
                 setScrollView(binding.fabInstall)
                 setAdapter {
-                    PermissionAdapter(permList).apply {
+                    PermissionAdapter(it).apply {
                         setItemClickListener { perm ->
                             DialogUtils.permInfoDialog(this@InstallerActivity, perm)
                         }
@@ -216,9 +221,9 @@ class InstallerActivity : BaseActivity(), InstallCallback {
             }
         }
 
-        binding.clAct.apply {
+        binding.clActivity.apply {
             setTitle(string(R.string.apk_activity, "0"))
-            apkInfoEntity.activities?.let {
+            apkInfo.activities?.let {
                 val actList = ArrayList<String>()
                 for (act in it) {
                     actList.add(act.name)
@@ -232,11 +237,11 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         }
     }
 
-    private fun installSuccess() {
-        val launch = packageManager.getLaunchIntentForPackage(apkInfoEntity.packageName!!)
+    private fun installSuccess(apkInfo: ApkInfoEntity) {
+        val launch = packageManager.getLaunchIntentForPackage(apkInfo.packageName!!)
         binding.fabInstall.apply {
-            icon = ContextCompat.getDrawable(this@InstallerActivity, R.drawable.ic_open)
-            text = string(R.string.open_installed_app)
+            //icon = ContextCompat.getDrawable(this@InstallerActivity, R.drawable.ic_open)
+            //text = string(R.string.open_installed_app)
             if (launch != null) {
                 isEnabled = true
             } else {
@@ -254,12 +259,12 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         binding.tvCancel.text = string(R.string.back_track)
     }
 
-    private fun installFailure() {
+    private fun installFailure(apkInfo: ApkInfoEntity) {
         binding.fabInstall.apply {
             backgroundTintList =
                 ColorStateList.valueOf(ResourcesCompat.getColor(resources, R.color.color7, null))
-            icon = ContextCompat.getDrawable(this@InstallerActivity, R.drawable.ic_close)
-            text = string(R.string.install_failed_msg)
+            //icon = ContextCompat.getDrawable(this@InstallerActivity, R.drawable.ic_close)
+            //text = string(R.string.install_failed_msg)
             isEnabled = false
         }
         binding.installHeadView.setAppName(string(R.string.install_failed_msg))
@@ -267,45 +272,41 @@ class InstallerActivity : BaseActivity(), InstallCallback {
         DialogUtils.useSysPkgTipsDialog(this) {
             when (it) {
                 DialogUtils.NEUTRAL_BUTTON -> {
-                    local.setNeverShowUsePkg()
+                    sp.setNeverShowUsePkg()
                 }
                 DialogUtils.POSITIVE_BUTTON -> {
-                    AppHelper.startSystemPkgInstall(this, apkInfoEntity.filePath)
+                    AppHelper.startSystemPkgInstall(this, apkInfo.filePath)
                     finish()
                 }
             }
         }
     }
 
-    override fun onInstallLog(installLog: String) {
+    private fun onInstallLog(installLog: String) {
         binding.tvInstallMsg.append(installLog)
     }
 
-    private fun startInstallFun() {
-        if (installSuccess) {
-            startActivity(packageManager.getLaunchIntentForPackage(apkInfoEntity.packageName!!))
+    private fun startInstallFun(apkInfo: ApkInfoEntity) {
+        if (installed) {
+            startActivity(packageManager.getLaunchIntentForPackage(apkInfo.packageName!!))
             finish()
         } else {
-            apkCommander.startInstall()
+            model.startInstall()
         }
     }
 
     private fun startSilentlyFun() {
-        Intent(this, SilentlyInstallActivity::class.java).let {
-            it.putExtra(Constants.IS_FORM_INSTALL_ACT, true)
-            it.putExtra(Constants.APK_INFO, apkInfoEntity)
-            startActivity(it)
-            finish()
-        }
+        InstallerServer.enqueueWork(this, intent)
+        finish()
     }
 
     override fun onResume() {
         super.onResume()
-        if (installSuccess)
-            return
-        binding.run {
-            clAct.visibleOrGone(local.isShowActivity())
-            clPerm.visibleOrGone(local.isShowPermission())
+        if (!installed) {
+            binding.run {
+                clActivity.visibleOrGone(sp.isShowActivity())
+                clPerm.visibleOrGone(sp.isShowPermission())
+            }
         }
     }
 

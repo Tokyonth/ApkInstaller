@@ -3,16 +3,15 @@ package com.tokyonth.installer.adapter
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 
-import com.tokyonth.installer.data.PermFullEntity
+import com.tokyonth.installer.data.PermissionInfoEntity
 import com.tokyonth.installer.view.item.PermissionItemView
-import java.util.ArrayList
 
-class PermissionAdapter(private val list: ArrayList<PermFullEntity>) :
+class PermissionAdapter(private val list: MutableList<PermissionInfoEntity>) :
     RecyclerView.Adapter<PermissionAdapter.PermissionViewHolder>() {
 
-    private lateinit var itemClickListener: (PermFullEntity) -> Unit
+    private lateinit var itemClickListener: (PermissionInfoEntity) -> Unit
 
-    fun setItemClickListener(itemClickListener: (PermFullEntity) -> Unit) {
+    fun setItemClickListener(itemClickListener: (PermissionInfoEntity) -> Unit) {
         this.itemClickListener = itemClickListener
     }
 
@@ -28,10 +27,10 @@ class PermissionAdapter(private val list: ArrayList<PermFullEntity>) :
         return list.size
     }
 
-    class PermissionViewHolder(private val permissionItemView: PermissionItemView) :
+    inner class PermissionViewHolder(private val permissionItemView: PermissionItemView) :
         RecyclerView.ViewHolder(permissionItemView) {
 
-        fun bind(entity: PermFullEntity, itemClickListener: (PermFullEntity) -> Unit) {
+        fun bind(entity: PermissionInfoEntity, itemClickListener: (PermissionInfoEntity) -> Unit) {
             permissionItemView.setData(entity)
             permissionItemView.setOnClickListener {
                 itemClickListener.invoke(entity)

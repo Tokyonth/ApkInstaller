@@ -8,6 +8,7 @@ import android.util.Log
 import com.tokyonth.installer.App
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.data.ApkInfoEntity
+import com.tokyonth.installer.data.PermissionInfoEntity
 import com.tokyonth.installer.utils.AppHelper
 import com.tokyonth.installer.utils.PackageUtils
 import com.tokyonth.installer.utils.path.DocumentFileUriUtils
@@ -18,7 +19,10 @@ import java.io.IOException
 import java.lang.RuntimeException
 import java.util.*
 
-class ParseApkTask(private var uri: Uri, private var referrer: String) {
+class ParseApkTask(
+    private var uri: Uri,
+    private var referrer: String
+) {
 
     private val context = App.context
     private val packageManager = context.packageManager
@@ -50,11 +54,9 @@ class ParseApkTask(private var uri: Uri, private var referrer: String) {
                 } else {
                     apkInfo.versionCode = it.longVersionCode.toInt()
                 }
-                apkInfo.setIcon(
-                    AppHelper.drawableToBitmap(
-                        it.applicationInfo.loadIcon(
-                            packageManager
-                        )
+                apkInfo.icon = AppHelper.drawableToBitmap(
+                    it.applicationInfo.loadIcon(
+                        packageManager
                     )
                 )
             }
@@ -68,8 +70,7 @@ class ParseApkTask(private var uri: Uri, private var referrer: String) {
                 apkInfo.filePath!!,
                 PackageManager.GET_PERMISSIONS
             )?.requestedPermissions?.let {
-                apkInfo.permissions = it
-                apkInfo.permissionsDesc = getPermissionInfo(it)
+                apkInfo.permissions = getPermissionInfo(it)
             }
             if (PackageUtils.isAppClientAvailable(context, apkInfo.packageName!!)) {
                 packageManager.getPackageInfo(apkInfo.packageName!!, 0)?.let {
@@ -89,38 +90,33 @@ class ParseApkTask(private var uri: Uri, private var referrer: String) {
         return apkInfo
     }
 
-    private fun getPermissionInfo(permission: Array<String>): Triple<ArrayList<String>, ArrayList<String>, ArrayList<String>> {
-        val groupNames = ArrayList<String>()
-        val labelNames = ArrayList<String>()
-        val descNames = ArrayList<String>()
+    private fun getPermissionInfo(permission: Array<String>): MutableList<PermissionInfoEntity> {
+        val list = mutableListOf<PermissionInfoEntity>()
         for (str in permission) {
+            val item = PermissionInfoEntity()
             try {
+                item.permissionName = str
                 packageManager.getPermissionInfo(str, 0).run {
                     group.let {
                         if (it != null) {
-                            groupNames.add(it)
-                        } else {
-                            groupNames.add("")
+                            item.permissionGroup = it
                         }
                     }
                     loadLabel(packageManager).let {
-                        labelNames.add(it.toString())
+                        item.permissionLabel = it.toString()
                     }
                     loadDescription(packageManager).let {
                         if (it != null) {
-                            descNames.add(it.toString())
-                        } else {
-                            descNames.add("")
+                            item.permissionDesc = it.toString()
                         }
                     }
                 }
             } catch (e: PackageManager.NameNotFoundException) {
-                groupNames.add("")
-                labelNames.add("")
-                descNames.add("")
+                e.printStackTrace()
             }
+            list.add(item)
         }
-        return Triple(groupNames, labelNames, descNames)
+        return list
     }
 
 }

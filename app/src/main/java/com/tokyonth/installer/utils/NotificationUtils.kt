@@ -7,15 +7,15 @@ import android.graphics.Bitmap
 import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import com.tokyonth.installer.R
-import com.tokyonth.installer.view.CustomizeDialog
 
 import androidx.core.app.NotificationCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 object NotificationUtils {
 
     fun checkNotification(context: Context) {
         if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            CustomizeDialog.get(context)
+            MaterialAlertDialogBuilder(context)
                 .setMessage(context.getString(R.string.notification_perm))
                 .setNegativeButton(context.getString(R.string.dialog_btn_cancel), null)
                 .setPositiveButton(

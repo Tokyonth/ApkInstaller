@@ -44,8 +44,4 @@ class InstallApkShellTask : MakeInstaller() {
         }
     }
 
-    override fun unInstall(uninstallCallback: UninstallCallback) {
-
-    }
-
 }

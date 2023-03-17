@@ -18,12 +18,12 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
-import com.tokyonth.installer.data.LocalDataRepo
+import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.utils.ktx.string
 import com.tokyonth.installer.utils.ktx.toast
-import com.tokyonth.installer.view.CustomizeDialog
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -39,13 +39,13 @@ object AppHelper {
             version > installedVersion -> string(R.string.apk_new_version)
 
             else -> {
-                if (!LocalDataRepo.instance.isNeverShowTip()) {
-                    CustomizeDialog.get(context)
+                if (!SPDataManager.instance.isNeverShowTip()) {
+                    MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.dialog_title_tip)
                         .setMessage(R.string.low_version_tip)
                         .setPositiveButton(R.string.dialog_btn_ok, null)
                         .setNegativeButton(R.string.dialog_no_longer_prompt) { _, _ ->
-                            LocalDataRepo.instance.setNeverShowTip()
+                            SPDataManager.instance.setNeverShowTip()
                         }
                         .setCancelable(false)
                         .show()
@@ -106,8 +106,8 @@ object AppHelper {
     }
 
     fun startSystemPkgInstall(context: Context, filePath: String?) {
-        val sysPkgName: String = if (LocalDataRepo.instance.isUseSystemPkg()) {
-            LocalDataRepo.instance.getSystemPkg()
+        val sysPkgName: String = if (SPDataManager.instance.isUseSystemPkg()) {
+            SPDataManager.instance.getSystemPkg()
         } else {
             Constants.DEFAULT_SYS_PKG_NAME
         }
@@ -123,7 +123,7 @@ object AppHelper {
         if (activityName != null) {
             Intent().apply {
                 val apkUri =
-                    FileProvider.getUriForFile(context, Constants.PROVIDER_STR, File(filePath!!))
+                    FileProvider.getUriForFile(context, Constants.PROVIDER_NAME, File(filePath!!))
                 component = ComponentName(sysPkgName, activityName)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 setDataAndType(apkUri, Constants.URI_DATA_TYPE)

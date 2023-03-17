@@ -15,6 +15,4 @@ abstract class MakeInstaller {
 
     abstract fun install()
 
-    abstract fun unInstall(uninstallCallback: UninstallCallback)
-
 }

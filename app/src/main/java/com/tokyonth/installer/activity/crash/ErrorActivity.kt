@@ -2,6 +2,7 @@ package com.tokyonth.installer.activity.crash
 
 import android.content.ClipData
 import android.content.ClipboardManager
+
 import com.tokyonth.installer.R
 import com.tokyonth.installer.activity.BaseActivity
 import com.tokyonth.installer.databinding.ActivityCrashErrorBinding
@@ -15,7 +16,7 @@ class ErrorActivity : BaseActivity() {
     override fun setBinding() = binding
 
     override fun initView() {
-        val crashInfo = ActivityOnCrash.getAllErrorDetailsFromIntent(this, intent)
+        val crashInfo = ActivityOnCrash.getErrorDetails(this, intent)
         binding.run {
             tvCrashInfo.text = crashInfo
             btnErrorCopy.setOnClickListener {

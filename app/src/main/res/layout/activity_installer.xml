@@ -1,204 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorBackground"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <com.tokyonth.installer.view.InstallHeadView
-        android:id="@+id/install_head_view"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp" />
+        android:layout_height="match_parent"
+        android:fadingEdge="none"
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <androidx.core.widget.NestedScrollView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fadingEdge="none"
-            android:overScrollMode="never"
-            android:scrollbars="none">
+            android:fitsSystemWindows="true"
+            android:layout_marginHorizontal="16dp">
 
-            <LinearLayout
+            <com.tokyonth.installer.view.InstallHeadView
+                android:id="@+id/install_head_view"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_install_msg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:orientation="vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="16dp">
+                android:layout_marginTop="16dp"
+                android:lineSpacingExtra="6dp"
+                android:textIsSelectable="true"
+                android:layout_marginHorizontal="4dp"
+                app:layout_goneMarginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:textColor="?attr/colorAccent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/install_head_view"
+                tools:text="@string/app_name" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_source"
+                style="?attr/materialCardViewFilledStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_install_msg">
+
+                <LinearLayout
                     android:id="@+id/rl_to_source"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_round_8"
                     android:foreground="?android:attr/selectableItemBackground"
-                    android:padding="16dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
                     tools:ignore="UnusedAttribute">
+
+                    <com.tokyonth.installer.view.CircleImageView
+                        android:id="@+id/iv_apk_source"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        tools:src="@tools:sample/avatars" />
 
                     <TextView
                         android:id="@+id/tv_apk_source"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/colorTextSub"
-                        app:layout_constraintBottom_toTopOf="@id/base_center"
-                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginStart="4dp"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?android:attr/textColorSecondary"
                         tools:text="@string/text_apk_source" />
 
-                    <View
-                        android:id="@+id/base_center"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                </LinearLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/text_apk_source_more"
-                        android:textColor="@color/colorTextSub"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/base_center" />
+            </com.google.android.material.card.MaterialCardView>
 
-                    <com.tokyonth.installer.view.CircleImageView
-                        android:id="@+id/iv_apk_source"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+            <com.tokyonth.installer.view.ContractListView
+                android:id="@+id/cl_perm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_source" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.tokyonth.installer.view.ContractListView
+                android:id="@+id/cl_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cl_perm" />
 
-                <TextView
-                    android:id="@+id/tv_install_msg"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/bg_round_8"
-                    android:lineSpacingExtra="6dp"
-                    android:padding="12dp"
-                    android:textColor="@color/colorText"
-                    android:textIsSelectable="true"
-                    android:textStyle="bold" />
-
-                <com.tokyonth.installer.view.ContractListView
-                    android:id="@+id/cl_perm"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" />
-
-                <com.tokyonth.installer.view.ContractListView
-                    android:id="@+id/cl_act"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" />
+            <com.google.android.material.card.MaterialCardView
+                style="?attr/materialCardViewFilledStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cl_activity">
 
                 <LinearLayout
                     android:id="@+id/ll_del"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:background="@drawable/bg_round_8"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:padding="12dp"
-                    android:visibility="gone">
+                    android:paddingHorizontal="12dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/auto_delete_apk"
-                        android:textColor="@color/colorText"
                         android:textStyle="bold" />
 
-                    <com.tokyonth.installer.view.SwitchButton
+                    <com.google.android.material.materialswitch.MaterialSwitch
                         android:id="@+id/sb_auto_del"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-        </androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bottom_app_bar"
-            style="@style/Widget.MaterialComponents.BottomAppBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            app:backgroundTint="@color/colorCard"
-            app:contentInsetLeft="0dp"
-            app:contentInsetStart="0dp"
-            app:elevation="2dp"
-            app:fabAlignmentMode="center"
-            app:fabCradleMargin="6dp"
-            app:fabCradleRoundedCornerRadius="6dp"
-            app:hideOnScroll="true"
-            app:titleMargin="0dp">
+    </androidx.core.widget.NestedScrollView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:gravity="center"
-                android:orientation="horizontal">
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottom_app_bar"
+        style="@style/Widget.Material3.BottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:contentInsetStart="0dp"
+        app:hideOnScroll="true">
 
-                <TextView
-                    android:id="@+id/tv_silently"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:gravity="center"
-                    android:padding="16dp"
-                    android:text="@string/install_silently"
-                    android:textColor="@color/colorText"
-                    android:textStyle="bold" />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
-
-                <TextView
-                    android:id="@+id/tv_cancel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:gravity="center"
-                    android:padding="16dp"
-                    android:text="@string/text_cancel_installation"
-                    android:textColor="@color/colorText"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </com.google.android.material.bottomappbar.BottomAppBar>
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/fab_install"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:gravity="center"
-            android:text="@string/install"
-            android:textColor="@android:color/white"
-            app:backgroundTint="@color/colorAccent"
-            app:elevation="4dp"
-            app:icon="@drawable/ic_install"
-            app:iconGravity="textStart"
-            app:iconTint="@android:color/white"
-            app:layout_anchor="@+id/bottom_app_bar" />
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:gravity="center|start"
+            android:orientation="horizontal">
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <TextView
+                android:id="@+id/tv_silently"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/install_silently"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?android:attr/textColorSecondary" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/tv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="@string/text_cancel_installation"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?android:attr/textColorSecondary" />
+
+        </LinearLayout>
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_install"
+        style="?attr/floatingActionButtonSmallStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@null"
+        app:layout_anchor="@+id/bottom_app_bar"
+        app:srcCompat="@drawable/ic_install" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

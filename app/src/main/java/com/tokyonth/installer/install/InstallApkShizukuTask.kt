@@ -133,8 +133,4 @@ class InstallApkShizukuTask : MakeInstaller() {
         }
     }
 
-    override fun unInstall(uninstallCallback: UninstallCallback) {
-
-    }
-
 }

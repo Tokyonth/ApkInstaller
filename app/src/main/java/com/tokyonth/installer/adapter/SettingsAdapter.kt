@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tokyonth.installer.R
-import com.tokyonth.installer.data.LocalDataRepo
+import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.data.SettingsEntity
 import com.tokyonth.installer.databinding.ItemRvSettingsBinding
 
@@ -18,7 +18,7 @@ class SettingsAdapter(context: Context) :
 
     private val list: ArrayList<SettingsEntity> = ArrayList()
 
-    private val local = LocalDataRepo.instance
+    private val local = SPDataManager.instance
 
     init {
         list.apply {

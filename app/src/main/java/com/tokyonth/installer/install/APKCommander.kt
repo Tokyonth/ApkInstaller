@@ -2,18 +2,15 @@ package com.tokyonth.installer.install
 
 import android.net.Uri
 import android.os.Build
-import android.system.Os
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.tokyonth.installer.App
 
 import com.tokyonth.installer.data.ApkInfoEntity
-import com.tokyonth.installer.data.LocalDataRepo
+import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.utils.ktx.doAsync
 import com.tokyonth.installer.utils.ktx.onUI
 import java.io.File
-import java.nio.file.Files
-import kotlin.io.path.pathString
 
 class APKCommander {
 
@@ -75,7 +72,7 @@ class APKCommander {
     }
 
     fun startInstall() {
-        InstallerFactory.create(LocalDataRepo.instance.getInstallMode()).apply {
+        InstallerFactory.create(SPDataManager.instance.getInstallMode()).apply {
             make(installCallback, apkInfoEntity)
             install()
         }

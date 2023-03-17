@@ -5,15 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
-    android:gravity="center|start"
-    android:orientation="horizontal"
-    android:padding="12dp">
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
 
     <com.tokyonth.installer.view.BurnRoundView
         android:id="@+id/settings_item_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        app:burnColor="@color/colorAccent"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         app:burnSrc="@drawable/ic_settings"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,8 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:textColor="@color/colorText"
-        android:textSize="16sp"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
         app:layout_constraintBottom_toTopOf="@id/settings_item_sub"
         app:layout_constraintStart_toEndOf="@id/settings_item_icon"
         app:layout_constraintTop_toTopOf="@id/settings_item_icon"
@@ -37,14 +34,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:textColor="@color/colorTextSub"
-        android:textSize="14sp"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?android:attr/textColorSecondary"
         app:layout_constraintBottom_toBottomOf="@id/settings_item_icon"
         app:layout_constraintStart_toEndOf="@id/settings_item_icon"
         app:layout_constraintTop_toBottomOf="@id/settings_item_title"
         tools:text="Sub" />
 
-    <com.tokyonth.installer.view.SwitchButton
+    <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/settings_item_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

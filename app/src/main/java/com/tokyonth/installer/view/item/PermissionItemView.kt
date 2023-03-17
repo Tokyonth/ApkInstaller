@@ -4,9 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.tokyonth.installer.R
-import com.tokyonth.installer.data.PermFullEntity
-import com.tokyonth.installer.utils.ktx.color
+import com.tokyonth.installer.data.PermissionInfoEntity
 import com.tokyonth.installer.utils.ktx.dp2px
 import com.tokyonth.installer.utils.ktx.visibleOrGone
 
@@ -48,15 +46,15 @@ class PermissionItemView : LinearLayout {
 
     private fun createTextView(): TextView {
         return TextView(context).apply {
-            setTextColor(color(R.color.colorTextSub))
+            //setTextColor(color(R.color.colorTextSub))
         }
     }
 
-    fun setData(data: PermFullEntity) {
-        tvLab.text = data.perm
+    fun setData(data: PermissionInfoEntity) {
+        tvLab.text = data.permissionName
         tvDes.apply {
-            visibleOrGone(data.des.isNotEmpty())
-            text = data.des
+            visibleOrGone(data.permissionLabel.isNotEmpty())
+            text = data.permissionLabel
         }
     }
 

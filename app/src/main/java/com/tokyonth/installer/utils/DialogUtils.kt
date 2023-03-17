@@ -3,12 +3,12 @@ package com.tokyonth.installer.utils
 import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tokyonth.installer.R
-import com.tokyonth.installer.data.LocalDataRepo
-import com.tokyonth.installer.data.PermFullEntity
+import com.tokyonth.installer.data.PermissionInfoEntity
+import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.databinding.LayoutInputPkgBinding
 import com.tokyonth.installer.utils.ktx.string
-import com.tokyonth.installer.view.CustomizeDialog
 
 object DialogUtils {
 
@@ -17,7 +17,7 @@ object DialogUtils {
     const val NEUTRAL_BUTTON = 2
 
     fun permissionDialog(context: Context, btnClick: (Int) -> Unit) {
-        CustomizeDialog.get(context)
+        MaterialAlertDialogBuilder(context)
             .setMessage(R.string.use_app_warn)
             .setNegativeButton(R.string.exit_app) { _, _ ->
                 btnClick.invoke(NEGATIVE_BUTTON)
@@ -29,20 +29,20 @@ object DialogUtils {
             .show()
     }
 
-    fun permInfoDialog(context: Context, entity: PermFullEntity) {
-        val lab = if (entity.lab.isEmpty()) {
+    fun permInfoDialog(context: Context, entity: PermissionInfoEntity) {
+        val lab = if (entity.permissionLabel.isEmpty()) {
             string(R.string.text_no_description)
         } else {
-            entity.lab
+            entity.permissionLabel
         }
-        val des = if (entity.des.isEmpty()) {
+        val des = if (entity.permissionDesc.isEmpty()) {
             string(R.string.text_no_description)
         } else {
-            entity.des
+            entity.permissionDesc
         }
 
-        CustomizeDialog.get(context)
-            .setMessage(entity.perm + "\n\n" + lab + "\n\n" + des)
+        MaterialAlertDialogBuilder(context)
+            .setMessage(entity.permissionName + "\n\n" + lab + "\n\n" + des)
             .setPositiveButton(R.string.dialog_btn_ok, null)
             .create()
             .show()
@@ -50,9 +50,9 @@ object DialogUtils {
 
     fun unInstallDialog(context: Context, pkgName: String, btnClick: (Int) -> Unit) {
         val appName = PackageUtils.getAppNameByPackageName(context, pkgName)
-        val uninstallMode = LocalDataRepo.instance.getInstallMode()
+        val uninstallMode = SPDataManager.instance.getInstallMode()
         val arr = context.resources.getStringArray(R.array.install_mode_arr)
-        CustomizeDialog.get(context)
+        MaterialAlertDialogBuilder(context)
             .setTitle(string(R.string.text_uninstall, {
                 when (uninstallMode) {
                     0 -> arr[0]
@@ -73,7 +73,7 @@ object DialogUtils {
     }
 
     fun parseFailedDialog(context: Context, uri: Uri?, btnClick: (Int) -> Unit) {
-        CustomizeDialog.get(context)
+        MaterialAlertDialogBuilder(context)
             .setMessage(string(R.string.parse_apk_failed, uri))
             .setNegativeButton(R.string.exit_app) { _, _ ->
                 btnClick.invoke(NEGATIVE_BUTTON)
@@ -83,10 +83,10 @@ object DialogUtils {
     }
 
     fun installModeDialog(context: Context, btnClick: (Int) -> Unit) {
-        CustomizeDialog.get(context)
+        MaterialAlertDialogBuilder(context)
             .setSingleChoiceItems(
                 R.array.install_mode_arr,
-                LocalDataRepo.instance.getInstallMode()
+                SPDataManager.instance.getInstallMode()
             ) { dialog, which ->
                 btnClick.invoke(which)
                 dialog.dismiss()
@@ -97,7 +97,7 @@ object DialogUtils {
 
     fun systemPkgNameDialog(context: Context, resultPkg: (String) -> Unit) {
         val inputVB = LayoutInputPkgBinding.inflate(LayoutInflater.from(context))
-        CustomizeDialog.get(context)
+        MaterialAlertDialogBuilder(context)
             .setTitle(R.string.text_title_input)
             .setView(inputVB.root)
             .setPositiveButton(R.string.dialog_btn_ok) { _, _ ->
@@ -110,9 +110,9 @@ object DialogUtils {
     }
 
     fun useSysPkgTipsDialog(context: Context, btnClick: (Int) -> Unit) {
-        if (LocalDataRepo.instance.isNeverShowUsePkg())
+        if (SPDataManager.instance.isNeverShowUsePkg())
             return
-        CustomizeDialog.get(context)
+        MaterialAlertDialogBuilder(context)
             .setTitle(R.string.dialog_title_tip)
             .setMessage(R.string.use_system_pkg)
             .setPositiveButton(R.string.dialog_btn_ok) { _, _ ->

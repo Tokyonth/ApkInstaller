@@ -1,35 +1,42 @@
 package com.tokyonth.installer.activity
 
-import android.content.pm.PackageManager
+import android.view.MenuItem
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.GridLayoutManager
+import com.catchingnow.icebox.sdk_client.IceBox
 import com.google.android.material.snackbar.Snackbar
 import com.tokyonth.installer.BuildConfig
 import com.tokyonth.installer.R
 import com.tokyonth.installer.adapter.SettingsAdapter
 import com.tokyonth.installer.adapter.SettingsAdapter.*
-import com.tokyonth.installer.data.LocalDataRepo
+import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.databinding.ActivitySettingsBinding
 import com.tokyonth.installer.utils.PackageUtils
 import com.tokyonth.installer.utils.FileUtils
 import com.tokyonth.installer.utils.ktx.lazyBind
-import com.tokyonth.installer.utils.PermissionUtils.requestIceBoxPermission
-import com.tokyonth.installer.utils.PermissionUtils.requestShizukuPermission
 import com.tokyonth.installer.utils.ktx.string
 import com.tokyonth.installer.utils.DialogUtils
+import rikka.shizuku.ShizukuProvider
 
 class SettingsActivity : BaseActivity() {
 
     private val binding: ActivitySettingsBinding by lazyBind()
 
-    private val local = LocalDataRepo.instance
+    private val local = SPDataManager.instance
 
     private var settingsAdapter: SettingsAdapter? = null
+
+    private var requestPermissionLauncher: ActivityResultLauncher<String>? = null
 
     override fun setBinding() = binding
 
     override fun initView() {
-        binding.tvAppName.append("\uD83C\uDFEE")
+        setSupportActionBar(binding.toolBar)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+        }
         initViewStatus()
     }
 
@@ -50,8 +57,9 @@ class SettingsActivity : BaseActivity() {
                         2 -> local.setDefaultSilent(bool)
                         3 -> local.setAutoDel(bool)
                         4 -> {
-                            if (bool)
+                            if (bool) {
                                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                            }
                             local.setFollowSystem(bool)
                         }
                     }
@@ -112,6 +120,28 @@ class SettingsActivity : BaseActivity() {
         }
     }
 
+    private fun requestPermission(code: Int) {
+        val c = ActivityResultContracts.RequestPermission()
+        requestPermissionLauncher = registerForActivityResult(c) {
+            if (it) {
+                local.setInstallMode(code)
+                settingsAdapter?.updateInstallMode()
+            } else {
+                val str = when (code) {
+                    1 -> string(R.string.shizuku_permission_request)
+                    2 -> string(R.string.icebox_permission_request)
+                    else -> ""
+                }
+                Snackbar.make(binding.root, str, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+        if (code == 1) {
+            requestPermissionLauncher?.launch(ShizukuProvider.PERMISSION)
+        } else if (code == 2) {
+            requestPermissionLauncher?.launch(IceBox.SDK_PERMISSION)
+        }
+    }
+
     private fun iceBoxCheck(code: Int) {
         if (!PackageUtils.isIceBoxClientAvailable(this)) {
             Snackbar.make(
@@ -120,10 +150,7 @@ class SettingsActivity : BaseActivity() {
                 Snackbar.LENGTH_SHORT
             ).show()
         } else {
-            if (requestIceBoxPermission(this, code)) {
-                local.setInstallMode(code)
-                settingsAdapter?.updateInstallMode()
-            }
+            requestPermission(code)
         }
     }
 
@@ -135,32 +162,15 @@ class SettingsActivity : BaseActivity() {
                 Snackbar.LENGTH_SHORT
             ).show()
         } else {
-            if (requestShizukuPermission(this, code)) {
-                local.setInstallMode(code)
-                settingsAdapter?.updateInstallMode()
-            }
+            requestPermission(code)
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 0 || requestCode == 1) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                local.setInstallMode(requestCode)
-                settingsAdapter?.updateInstallMode()
-            } else {
-                val str = when (requestCode) {
-                    1 -> string(R.string.shizuku_permission_request)
-                    2 -> string(R.string.icebox_permission_request)
-                    else -> ""
-                }
-                Snackbar.make(binding.root, str, Snackbar.LENGTH_SHORT).show()
-            }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
         }
+        return super.onOptionsItemSelected(item)
     }
 
 }

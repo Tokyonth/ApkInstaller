@@ -43,7 +43,7 @@ class InstallApkIceBoxTask : MakeInstaller() {
             return
         }
         doAsync {
-            val authority: String = Constants.PROVIDER_STR
+            val authority: String = Constants.PROVIDER_NAME
             val uri: Uri =
                 FileProvider.getUriForFile(App.context, authority, File(apkInfoEntity.filePath!!))
             val status = IceBox.installPackage(App.context, uri)
@@ -55,10 +55,6 @@ class InstallApkIceBoxTask : MakeInstaller() {
                 }
             }
         }
-    }
-
-    override fun unInstall(uninstallCallback: UninstallCallback) {
-
     }
 
 }

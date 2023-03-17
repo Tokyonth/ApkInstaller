@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4CAF50</color>
-    <color name="colorPrimaryDark">#1E1F23</color>
-    <color name="colorAccent">#4CAF50</color>
-    <color name="colorText">#FFFFFF</color>
-    <color name="colorTextSub">#FFFFFF</color>
-    <color name="colorCard">#313236</color>
-    <color name="colorBackground">#FF1E1F23</color>
-    <color name="colorNightLayer">#A12E2E2E</color>
-    <color name="colorLine">#00FFFFFF</color>
-    <color name="colorSvg">#FFFFFF</color>
-
     <color name="color0">#673AB7</color>
     <color name="color1">#009688</color>
     <color name="color2">#F44336</color>
