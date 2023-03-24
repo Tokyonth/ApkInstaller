@@ -11,18 +11,12 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.VectorDrawable
 import android.net.Uri
 import android.os.Environment
-import androidx.annotation.DrawableRes
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tokyonth.installer.Constants
 import com.tokyonth.installer.R
 import com.tokyonth.installer.data.SPDataManager
-import com.tokyonth.installer.utils.ktx.string
 import com.tokyonth.installer.utils.ktx.toast
 import java.io.File
 import java.io.FileInputStream
@@ -30,30 +24,28 @@ import java.io.IOException
 import java.util.*
 import kotlin.math.floor
 
-object AppHelper {
-
-    fun checkVersion(context: Context, version: Int, installedVersion: Int): String {
-        return when {
-            version == installedVersion -> string(R.string.apk_equal_version)
-
-            version > installedVersion -> string(R.string.apk_new_version)
-
-            else -> {
-                if (!SPDataManager.instance.isNeverShowTip()) {
-                    MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.dialog_title_tip)
-                        .setMessage(R.string.low_version_tip)
-                        .setPositiveButton(R.string.dialog_btn_ok, null)
-                        .setNegativeButton(R.string.dialog_no_longer_prompt) { _, _ ->
-                            SPDataManager.instance.setNeverShowTip()
-                        }
-                        .setCancelable(false)
-                        .show()
-                }
-                string(R.string.apk_low_version)
-            }
+fun Drawable.drawable2Bitmap(): Bitmap {
+    return when (this) {
+        is BitmapDrawable -> {
+            this.bitmap
+        }
+        else -> {
+            val config =
+                if (this.opacity != PixelFormat.OPAQUE) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565
+            val bitmap = Bitmap.createBitmap(
+                this.intrinsicWidth,
+                this.intrinsicHeight,
+                config
+            )
+            val canvas = Canvas(bitmap)
+            this.setBounds(0, 0, canvas.width, canvas.height)
+            this.draw(canvas)
+            bitmap
         }
     }
+}
+
+object AppHelper {
 
     fun toSelfSetting(context: Context, str: String?) {
         Intent().apply {
@@ -74,63 +66,29 @@ object AppHelper {
         return Color.rgb(red, green, blue)
     }
 
-    fun drawableToBitmap(drawable: Drawable): Bitmap {
-        val w = drawable.intrinsicWidth
-        val h = drawable.intrinsicHeight
-        val config =
-            if (drawable.opacity != PixelFormat.OPAQUE) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565
-        val bitmap = Bitmap.createBitmap(w, h, config)
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, w, h)
-        drawable.draw(canvas)
-        return bitmap
-    }
-
-    fun getBitmapFromDrawable(context: Context?, @DrawableRes drawableId: Int): Bitmap? {
-        val drawable = ContextCompat.getDrawable(context!!, drawableId)
-        return if (drawable is BitmapDrawable) {
-            drawable.bitmap
-        } else if (drawable is VectorDrawable || drawable is VectorDrawableCompat) {
-            val bitmap = Bitmap.createBitmap(
-                drawable.intrinsicWidth,
-                drawable.intrinsicHeight,
-                Bitmap.Config.ARGB_8888
-            )
-            val canvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, canvas.width, canvas.height)
-            drawable.draw(canvas)
-            bitmap
-        } else {
-            throw IllegalArgumentException("unsupported drawable type")
-        }
-    }
-
-    fun startSystemPkgInstall(context: Context, filePath: String?) {
-        val sysPkgName: String = if (SPDataManager.instance.isUseSystemPkg()) {
+    fun executeSystemPkgInstall(context: Context, filePath: String) {
+        val sysPkgName = if (SPDataManager.instance.isUseSystemPkg()) {
             SPDataManager.instance.getSystemPkg()
         } else {
             Constants.DEFAULT_SYS_PKG_NAME
         }
-        val activityName: String? = try {
-            context.packageManager.getPackageInfo(sysPkgName, PackageManager.GET_ACTIVITIES)
-                .let {
-                    it.activities[0].name
-                }
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-            null
-        }
-        if (activityName != null) {
+        try {
+            val actName =
+                context.packageManager.getPackageInfo(sysPkgName, PackageManager.GET_ACTIVITIES)
+                    .let {
+                        it.activities[0].name
+                    }
             Intent().apply {
                 val apkUri =
-                    FileProvider.getUriForFile(context, Constants.PROVIDER_NAME, File(filePath!!))
-                component = ComponentName(sysPkgName, activityName)
+                    FileProvider.getUriForFile(context, Constants.PROVIDER_NAME, File(filePath))
+                component = ComponentName(sysPkgName, actName)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 setDataAndType(apkUri, Constants.URI_DATA_TYPE)
                 context.startActivity(this)
             }
-        } else {
+        } catch (e: PackageManager.NameNotFoundException) {
             toast(context.getString(R.string.open_sys_pkg_failure))
+            e.printStackTrace()
         }
     }
 

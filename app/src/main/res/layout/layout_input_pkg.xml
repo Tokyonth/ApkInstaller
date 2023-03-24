@@ -5,14 +5,17 @@
     android:layout_height="wrap_content"
     android:hint="@string/text_hint_input_pkg"
     android:padding="16dp"
-    app:boxCornerRadiusBottomEnd="8dp"
-    app:boxCornerRadiusBottomStart="8dp"
-    app:boxCornerRadiusTopEnd="8dp"
-    app:boxCornerRadiusTopStart="8dp">
+    app:boxCornerRadiusBottomEnd="16dp"
+    app:boxCornerRadiusBottomStart="16dp"
+    app:boxCornerRadiusTopEnd="16dp"
+    app:boxCornerRadiusTopStart="16dp">
 
     <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/et_sys_pkg_name"
+        android:id="@+id/et_system_pkg"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:imeOptions="actionDone"
+        android:inputType="text"
+        android:maxLength="30" />
 
 </com.google.android.material.textfield.TextInputLayout>

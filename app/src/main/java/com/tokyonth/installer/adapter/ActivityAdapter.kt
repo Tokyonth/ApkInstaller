@@ -1,15 +1,17 @@
 package com.tokyonth.installer.adapter
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import java.util.ArrayList
+import com.tokyonth.installer.databinding.ItemActivityDetailBinding
 
-class ActivityAdapter(private val list: ArrayList<String>) :
+class ActivityAdapter(private val list: MutableList<String>) :
     RecyclerView.Adapter<ActivityAdapter.ActivityViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ActivityViewHolder {
-        return ActivityViewHolder(TextView(parent.context))
+        val binding =
+            ItemActivityDetailBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ActivityViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ActivityViewHolder, position: Int) {
@@ -20,11 +22,11 @@ class ActivityAdapter(private val list: ArrayList<String>) :
         return list.size
     }
 
-    inner class ActivityViewHolder(private val textView: TextView) :
-        RecyclerView.ViewHolder(textView) {
+    inner class ActivityViewHolder(private val binding: ItemActivityDetailBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(string: String) {
-            textView.text = string
+        fun bind(name: String) {
+            binding.tvItemActivityName.text = name
         }
 
     }

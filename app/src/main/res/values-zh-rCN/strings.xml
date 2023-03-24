@@ -64,7 +64,7 @@
     <string name="shizuku_not_installed">未安装Shizuku!</string>
     <string name="shizuku_lowest_api">系统SDK小于等于23无法使用Shizuku</string>
     <string name="icebox_permission_request">请给予本软件 IceBox 权限</string>
-    <string name="not_install_icebox">未安装冰箱</string>
+    <string name="not_install_icebox">未安装冰箱!</string>
     <string name="not_support_icebox_version">冰箱版本过低</string>
     <string name="not_support_icebox_system">当前系统版本不支持静默安装</string>
     <string name="not_icebox_owner">冰箱不是设备管理员</string>
@@ -87,8 +87,11 @@
     <string name="error_details">错误日志</string>
     <string name="error_details_copy">复制日志</string>
     <string name="copy_error_log">已复制到剪切板</string>
+    <string name="apk_so_32">32位</string>
+    <string name="apk_so_64">64位</string>
+    <string name="apk_fake_path">临时文件</string>
     <array name="install_mode_arr">
-        <item>Shell</item>
+        <item>Root</item>
         <item>Shizuku</item>
         <item>IceBox</item>
     </array>

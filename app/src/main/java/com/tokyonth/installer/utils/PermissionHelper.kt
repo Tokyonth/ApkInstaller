@@ -13,11 +13,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
-import com.tokyonth.installer.utils.path.DocumentFileUriUtils
+import com.tokyonth.installer.utils.path.DATA_TREE_URL
+import com.tokyonth.installer.utils.path.isGrantDataDir
 
 class PermissionHelper(
-    private val activity: AppCompatActivity,
-    private val isGrant: (Boolean) -> Unit
+    private val activity: AppCompatActivity
 ) {
 
     private val permissionArray = arrayOf(
@@ -25,13 +25,47 @@ class PermissionHelper(
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
 
+    private var isGrant: ((Boolean, Int) -> Unit)? = null
+
     private var requestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
+
+    private var requestDataLauncher: ActivityResultLauncher<Intent>? = null
 
     private var requestResultLauncher: ActivityResultLauncher<Intent>? = null
 
-    private fun requestData() {
-        val uri =
-            Uri.parse("content://com.android.externalstorage.documents/tree/primary%3AAndroid%2Fdata")
+    private var requestCode = -1
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun requestR() {
+        val c = ActivityResultContracts.StartActivityForResult()
+        requestResultLauncher = activity.registerForActivityResult(c) {
+            isGrant?.invoke(true, requestCode)
+        }
+        if (Environment.isExternalStorageManager()) {
+            isGrant?.invoke(true, requestCode)
+        } else {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                data = Uri.parse("package:${activity.packageName}")
+            }
+            requestResultLauncher?.launch(intent)
+        }
+    }
+
+    private fun requestM(array: Array<String>) {
+        val c = ActivityResultContracts.RequestMultiplePermissions()
+        requestPermissionLauncher = activity.registerForActivityResult(c) { map ->
+            val all = map.filter { !it.value }
+            isGrant?.invoke(all.isEmpty(), requestCode)
+        }
+        requestPermissionLauncher?.launch(array)
+    }
+
+    private fun requestDataDir(pkg: String) {
+        var uriString = DATA_TREE_URL
+        if (pkg.isNotEmpty()) {
+            uriString = uriString.plus("%2F$pkg")
+        }
+        val uri = Uri.parse(uriString)
         val documentFile = DocumentFile.fromTreeUri(activity, uri)
         val intent1 = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
         intent1.flags = (Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -42,61 +76,59 @@ class PermissionHelper(
             assert(documentFile != null)
             intent1.putExtra(DocumentsContract.EXTRA_INITIAL_URI, documentFile!!.uri)
         }
-        requestResultLauncher?.launch(intent1)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun requestR() {
-        if (Environment.isExternalStorageManager()) {
-            if (!DocumentFileUriUtils.isGrant(activity)) {
-                requestData()
-            } else {
-                isGrant.invoke(true)
-            }
-        } else {
-            val c = ActivityResultContracts.StartActivityForResult()
-            requestResultLauncher = activity.registerForActivityResult(c) {
-                it.data?.let { intent ->
-                    saveFlag(intent)
-                }
-            }
-            val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                data = Uri.parse("package:${activity.packageName}")
-            }
-            requestResultLauncher?.launch(intent)
-        }
-    }
-
-    private fun requestM() {
-        val c = ActivityResultContracts.RequestMultiplePermissions()
-        requestPermissionLauncher = activity.registerForActivityResult(c) { map ->
-            val all = map.filter { !it.value }
-            isGrant.invoke(all.isEmpty())
-        }
-        requestPermissionLauncher?.launch(permissionArray)
-    }
-
-    @SuppressLint("WrongConstant")
-    private fun saveFlag(intent: Intent) {
-        activity.contentResolver.takePersistableUriPermission(
-            intent.data!!,
-            intent.flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-        )
-        isGrant.invoke(true)
+        requestDataLauncher?.launch(intent1)
     }
 
     fun start() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             requestR()
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestM()
+            requestM(permissionArray)
         } else {
-            isGrant.invoke(true)
+            isGrant?.invoke(true, requestCode)
         }
+    }
+
+    @SuppressLint("WrongConstant")
+    fun startData(pkg: String) {
+        val c = ActivityResultContracts.StartActivityForResult()
+        requestDataLauncher = activity.registerForActivityResult(c) {
+            it.data?.let { intent ->
+                activity.contentResolver.takePersistableUriPermission(
+                    intent.data!!,
+                    intent.flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                )
+                isGrant?.invoke(true, requestCode)
+            }
+        }
+        if (!activity.isGrantDataDir(pkg)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    requestDataDir(pkg)
+                } else {
+                    requestDataDir("")
+                }
+            }
+        } else {
+            isGrant?.invoke(true, requestCode)
+        }
+    }
+
+    fun start(array: Array<String>, requestCode: Int = -1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestM(array)
+        } else {
+            isGrant?.invoke(true, requestCode)
+        }
+    }
+
+    fun registerCallback(isGrant: ((Boolean, Int) -> Unit)? = null) {
+        this.isGrant = isGrant
     }
 
     fun dispose() {
         requestPermissionLauncher?.unregister()
+        requestDataLauncher?.unregister()
         requestResultLauncher?.unregister()
     }
 

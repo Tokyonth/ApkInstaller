@@ -4,11 +4,16 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.tokyonth.installer.R
-import com.tokyonth.installer.utils.AppHelper
+import com.tokyonth.installer.utils.drawable2Bitmap
 import kotlin.math.min
 
 class BurnRoundView : View {
+
+    companion object {
+        private const val DEFAULT_SIZE = 72
+    }
 
     private var mWidth = 0
     private var mHeight = 0
@@ -54,7 +59,10 @@ class BurnRoundView : View {
     }
 
     private fun replaceImageColor(imageId: Int, color: Int) {
-        burnSrc = AppHelper.getBitmapFromDrawable(context, imageId)
+        val drawable = ContextCompat.getDrawable(context, imageId)
+        if (drawable != null) {
+            burnSrc = drawable.drawable2Bitmap()
+        }
         overlayPaint!!.colorFilter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
     }
 
@@ -64,11 +72,9 @@ class BurnRoundView : View {
         } else {
             color
         }
-        //return burnColor
     }
 
     fun setBurnSrc(burnSrc: Int, color: Int, isBurn: Boolean) {
-        //this.isBurn = isBurn
         replaceImageColor(burnSrc, color)
         burnColor(color, isBurn)
         invalidate()
@@ -115,12 +121,6 @@ class BurnRoundView : View {
             }
         }
         return result
-    }
-
-    companion object {
-
-        private const val DEFAULT_SIZE = 72
-
     }
 
 }

@@ -5,7 +5,7 @@ import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.color.DynamicColors
-import com.tokyonth.installer.activity.crash.ActivityOnCrash
+import com.tokyonth.installer.activity.crash.CrashHelper
 import com.tokyonth.installer.data.SPDataManager
 import me.weishu.reflection.Reflection
 
@@ -23,7 +23,7 @@ class App : Application() {
         super.onCreate()
         context = applicationContext
 
-        ActivityOnCrash.install(this)
+        CrashHelper.install(this)
         DynamicColors.applyToActivitiesIfAvailable(this)
         initNightMode()
     }

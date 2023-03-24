@@ -63,7 +63,7 @@
     <string name="shizuku_permission_request">Please give Shizuku permission to this software</string>
     <string name="shizuku_lowest_api">System SDK less than or equal to 23 not available Shizuku</string>
     <string name="icebox_permission_request">Please give IceBox permission to this software</string>
-    <string name="not_install_icebox">No IceBox Installed</string>
+    <string name="not_install_icebox">No IceBox Installed!</string>
     <string name="not_support_icebox_version">IceBox version too low</string>
     <string name="not_support_icebox_system">The current system version does not support silent installation</string>
     <string name="not_icebox_owner">IceBox not device owner</string>
@@ -87,8 +87,11 @@
     <string name="use_app_warn">Software operation requires storage read and write permissions, Android11 additionally requires access to all files and Android/data access permissions,
          Please give permission. If the installation fails, please try to close the GooglePlay security scan, customize the systems USB ADB installation monitoring, etc. At the same time, it is strongly not recommended that you uninstall or disable the system installer, which is very dangerous.</string>
     <string name="open_sys_pkg_failure">Open failed! Try to customize the package name in the settings</string>
+    <string name="apk_so_32">32 Bit</string>
+    <string name="apk_so_64">64 Bit</string>
+    <string name="apk_fake_path">Temp file</string>
     <array name="install_mode_arr">
-        <item>Shell</item>
+        <item>Root</item>
         <item>Shizuku</item>
         <item>IceBox</item>
     </array>

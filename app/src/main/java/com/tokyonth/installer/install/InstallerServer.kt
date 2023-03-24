@@ -6,10 +6,8 @@ import androidx.core.app.JobIntentService
 import com.tokyonth.installer.R
 import com.tokyonth.installer.data.ApkInfoEntity
 import com.tokyonth.installer.data.SPDataManager
-import com.tokyonth.installer.utils.AppHelper
 import com.tokyonth.installer.utils.NotificationUtils
 import com.tokyonth.installer.utils.ktx.string
-import com.tokyonth.installer.utils.ktx.toast
 import java.io.File
 
 class InstallerServer : JobIntentService(), InstallCallback {
@@ -29,52 +27,59 @@ class InstallerServer : JobIntentService(), InstallCallback {
     private var installLog: String = ""
 
     override fun onHandleWork(intent: Intent) {
+        //toast(string(R.string.unable_install_apk))
         intent.data.let { uri ->
             if (uri == null) {
-                toast(string(R.string.unable_install_apk))
+                sendNotification(string(R.string.unable_install_apk))
             } else {
-                if (SPDataManager.instance.isDefaultSilent()) {
-                    val apkSource = AppHelper.reflectGetReferrer(applicationContext).toString()
-                    apkCommander = APKCommander(uri, apkSource, this)
-                    apkCommander?.startParse()
-                    return
-                }
+                apkCommander = APKCommander(uri, "", this)
+                apkCommander?.startParse()
             }
         }
     }
 
     override fun onApkParsed(apkInfo: ApkInfoEntity) {
-        if (!apkInfo.packageName.isNullOrEmpty()) {
+        if (apkInfo.packageName.isNotEmpty()) {
             this.apkInfo = apkInfo
-            apkCommander?.startInstall()
+            apkCommander?.startInstall(apkInfo)
         } else {
-            toast(string(R.string.unable_install_apk))
+            sendNotification(string(R.string.unable_install_apk))
         }
     }
 
-    override fun onApkPreInstall() {
-        toast(string(R.string.start_install, apkInfo!!.appName))
+    override fun onApkParsedFailed(msg: String) {
+        sendNotification(string(R.string.unable_install_apk))
     }
 
-    override fun onApkInstalled(installStatus: InstallStatus) {
-        var notificationSub = apkInfo!!.appName!!
-        val status = when (installStatus) {
-            InstallStatus.SUCCESS -> {
-                if (SPDataManager.instance.isAutoDel()) {
-                    File(apkInfo!!.filePath!!).delete()
-                    notificationSub = string(R.string.auto_del_notification, notificationSub)
-                }
-                string(R.string.install_successful)
+    override fun onApkPreInstall() {
+        sendNotification(string(R.string.start_install, apkInfo!!.appName))
+    }
+
+    override fun onApkInstalled(isInstalled: Boolean) {
+        var notificationSub = apkInfo!!.appName
+        val status = if (isInstalled) {
+            if (SPDataManager.instance.isAutoDel()) {
+                File(apkInfo!!.filePath).delete()
+                notificationSub = string(R.string.auto_del_notification, notificationSub)
             }
-            InstallStatus.FAILURE -> {
-                notificationSub += " ($installLog)"
-                string(R.string.install_failed_msg)
-            }
+            string(R.string.install_successful)
+        } else {
+            notificationSub += " ($installLog)"
+            string(R.string.install_failed_msg)
         }
         NotificationUtils.sendNotification(
             this,
             status,
             notificationSub,
+            apkInfo!!.icon!!
+        )
+    }
+
+    private fun sendNotification(msg: String) {
+        NotificationUtils.sendNotification(
+            this,
+            "安装中...",
+            msg,
             apkInfo!!.icon!!
         )
     }

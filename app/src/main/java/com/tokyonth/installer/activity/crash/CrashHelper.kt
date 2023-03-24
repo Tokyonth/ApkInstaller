@@ -14,9 +14,9 @@ import java.io.StringWriter
 import java.util.*
 import kotlin.system.exitProcess
 
-object ActivityOnCrash {
+object CrashHelper {
 
-    private val TAG = ActivityOnCrash::class.java.simpleName
+    private val TAG = CrashHelper::class.java.simpleName
 
     private const val DEFAULT_HANDLER_PACKAGE_NAME = "com.android.internal.os"
 

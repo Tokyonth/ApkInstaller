@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <external-path path="Android/data/" name="files_root" />
-    <external-path path="." name="external_storage_root" />
+
+    <files-path
+        name="apk_files"
+        path="." />
+
+    <cache-path
+        name="apk_cache"
+        path="." />
+
+    <external-files-path
+        name="apk_external_files"
+        path="." />
+
+    <external-cache-path
+        name="apk_external_cache"
+        path="." />
+
+    <external-path
+        name="apk_external_path"
+        path="." />
+
 </paths>

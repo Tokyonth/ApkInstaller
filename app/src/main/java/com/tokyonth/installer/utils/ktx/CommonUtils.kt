@@ -4,6 +4,10 @@ import android.content.res.Resources
 import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.tokyonth.installer.App
 import com.tokyonth.installer.R
@@ -23,11 +27,11 @@ fun toast(text: String) {
     Toast.makeText(App.context, text, Toast.LENGTH_SHORT).show()
 }
 
-fun color(colorId: Int): Int {
-    return ResourcesCompat.getColor(App.context.resources, colorId, null)
+fun color(@ColorRes colorId: Int): Int {
+    return ContextCompat.getColor(App.context, colorId)
 }
 
-fun string(stringId: Int, vararg args: Any?): String {
+fun string(@StringRes stringId: Int, vararg args: Any?): String {
     return App.context.getString(stringId, *args)
 }
 

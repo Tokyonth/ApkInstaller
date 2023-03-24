@@ -3,30 +3,60 @@ package com.tokyonth.installer.utils
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Build
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import com.tokyonth.installer.R
 
 import androidx.core.app.NotificationCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.tokyonth.installer.utils.ktx.string
 
 object NotificationUtils {
 
-    fun checkNotification(context: Context) {
-        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            MaterialAlertDialogBuilder(context)
-                .setMessage(context.getString(R.string.notification_perm))
-                .setNegativeButton(context.getString(R.string.dialog_btn_cancel), null)
+    private const val POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS"
+
+    fun checkNotification(activity: Activity) {
+        if (!checkNotification33(activity)) {
+            MaterialAlertDialogBuilder(activity)
+                .setMessage(string(R.string.notification_perm))
+                .setNegativeButton(string(R.string.dialog_btn_cancel), null)
                 .setPositiveButton(
-                    context.getString(R.string.dialog_btn_ok)
-                ) { _, _ -> startNotificationPerm(context) }
+                    string(R.string.dialog_btn_ok)
+                ) { _, _ -> startNotificationPermission(activity) }
                 .setCancelable(false)
                 .show()
         }
     }
 
-    private fun startNotificationPerm(context: Context) {
+    private fun checkNotification33(activity: Activity):Boolean {
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ActivityCompat.checkSelfPermission(
+                    activity,
+                    POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_DENIED
+            ) {
+                return if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                        activity,
+                        POST_NOTIFICATIONS
+                    )
+                ) {
+                    false
+                } else {
+                    ActivityCompat.requestPermissions(activity, arrayOf(POST_NOTIFICATIONS), 100)
+                    false
+                }
+            } else {
+                return true
+            }
+        } else {
+            return NotificationManagerCompat.from(activity).areNotificationsEnabled()
+        }
+    }
+
+    private fun startNotificationPermission(context: Context) {
         val intent = Intent()
         val sdk = Build.VERSION.SDK_INT
         when {
@@ -44,11 +74,10 @@ object NotificationUtils {
     }
 
     fun sendNotification(context: Context, status: String, appName: String, appIcon: Bitmap) {
-        val channel: NotificationChannel
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            channel = NotificationChannel(
+            val channel = NotificationChannel(
                 "status",
                 "apkInstallStatus",
                 NotificationManager.IMPORTANCE_DEFAULT
@@ -57,10 +86,10 @@ object NotificationUtils {
             channel.setShowBadge(true)
             notificationManager.createNotificationChannel(channel)
         }
-        val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, "status")
+        val builder = NotificationCompat.Builder(context, "status")
             .setContentTitle(status)
             .setWhen(System.currentTimeMillis())
-            .setSmallIcon(R.mipmap.ic_launcher_round)
+            .setSmallIcon(R.drawable.ic_launcher_round)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentText(appName)

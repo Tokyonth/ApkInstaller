@@ -1,85 +1,83 @@
 package com.tokyonth.installer.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+
 import com.tokyonth.installer.R
 import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.data.SettingsEntity
-import com.tokyonth.installer.databinding.ItemRvSettingsBinding
+import com.tokyonth.installer.databinding.ItemSettingPerfBinding
+import com.tokyonth.installer.utils.ktx.color
+import com.tokyonth.installer.utils.ktx.string
 
 import java.util.ArrayList
 
-class SettingsAdapter(context: Context) :
-    RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>() {
+class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>() {
 
-    private val list: ArrayList<SettingsEntity> = ArrayList()
-
-    private val local = SPDataManager.instance
+    private val list: MutableList<SettingsEntity> = ArrayList()
 
     init {
         list.apply {
             add(
                 SettingsEntity(
-                    context.getString(R.string.title_show_perm),
-                    context.getString(R.string.summary_show_perm),
-                    R.drawable.ic_perm,
-                    ContextCompat.getColor(context, R.color.color0),
-                    local.isShowPermission()
+                    string(R.string.title_show_perm),
+                    string(R.string.summary_show_perm),
+                    R.drawable.round_security_24,
+                    color(R.color.color0),
+                    SPDataManager.instance.isShowPermission()
                 )
             )
             add(
                 SettingsEntity(
-                    context.getString(R.string.title_show_activity),
-                    context.getString(R.string.summary_show_activity),
-                    R.drawable.ic_activity,
-                    ContextCompat.getColor(context, R.color.color1),
-                    local.isShowActivity()
+                    string(R.string.title_show_activity),
+                    string(R.string.summary_show_activity),
+                    R.drawable.round_layers_24,
+                    color(R.color.color1),
+                    SPDataManager.instance.isShowActivity()
                 )
             )
             add(
                 SettingsEntity(
-                    context.getString(R.string.default_silent),
-                    context.getString(R.string.default_silent_sub),
-                    R.drawable.ic_silent,
-                    ContextCompat.getColor(context, R.color.color6),
-                    local.isDefaultSilent()
+                    string(R.string.default_silent),
+                    string(R.string.default_silent_sub),
+                    R.drawable.round_silence_24,
+                    color(R.color.color6),
+                    SPDataManager.instance.isDefaultSilent()
                 )
             )
             add(
                 SettingsEntity(
-                    context.getString(R.string.auto_del_apk_title),
-                    context.getString(R.string.auto_delete_apk),
-                    R.drawable.ic_delete,
-                    ContextCompat.getColor(context, R.color.color2),
-                    local.isAutoDel()
+                    string(R.string.auto_del_apk_title),
+                    string(R.string.auto_delete_apk),
+                    R.drawable.round_delete_forever_24,
+                    color(R.color.color2),
+                    SPDataManager.instance.isAutoDel()
                 )
             )
             add(
                 SettingsEntity(
-                    context.getString(R.string.follow_system_night_mode),
-                    context.getString(R.string.follow_system_night_mode_sub),
-                    R.drawable.ic_follow,
-                    ContextCompat.getColor(context, R.color.color4),
-                    local.isFollowSystem()
+                    string(R.string.follow_system_night_mode),
+                    string(R.string.follow_system_night_mode_sub),
+                    R.drawable.round_auto_mode_24,
+                    color(R.color.color4),
+                    SPDataManager.instance.isFollowSystem()
                 )
             )
             add(
                 SettingsEntity(
-                    context.getString(R.string.install_mode),
-                    local.getInstallName() /*context.getString(R.string.install_mode_sub)*/,
-                    R.drawable.ic_mode,
-                    ContextCompat.getColor(context, R.color.color5),
+                    string(R.string.install_mode),
+                    SPDataManager.instance.getInstallName(),
+                    R.drawable.round_play_for_work_24,
+                    color(R.color.color5),
                     false
                 )
             )
         }
     }
 
-    interface OnItemClickListener {
+    interface OnItemActionListener {
 
         fun onSwitch(pos: Int, bool: Boolean)
 
@@ -87,51 +85,55 @@ class SettingsAdapter(context: Context) :
 
     }
 
-    private var onItemClickListener: OnItemClickListener? = null
+    private var onItemClickListener: OnItemActionListener? = null
 
-    fun setOnItemClickListener(onItemClickListener: OnItemClickListener) {
-        this.onItemClickListener = onItemClickListener
+    fun setOnItemActionListener(onItemActionListener: OnItemActionListener) {
+        this.onItemClickListener = onItemActionListener
     }
 
     fun updateInstallMode() {
-        list[list.size - 1].sub = local.getInstallName()
+        list[list.size - 1].sub = SPDataManager.instance.getInstallName()
         notifyItemChanged(list.size - 1)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingsViewHolder {
-        val vb = ItemRvSettingsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return SettingsViewHolder(vb)
+        val binding =
+            ItemSettingPerfBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return SettingsViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: SettingsViewHolder, position: Int) {
-        holder.bind(list[position], onItemClickListener!!)
+        holder.bind(list[position], onItemClickListener)
     }
 
     override fun getItemCount(): Int {
         return list.size
     }
 
-    class SettingsViewHolder(private val vb: ItemRvSettingsBinding) :
-        RecyclerView.ViewHolder(vb.root) {
+    inner class SettingsViewHolder(private val binding: ItemSettingPerfBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(entity: SettingsEntity, onItemClickListener: OnItemClickListener) {
-            vb.settingsItemTitle.text = entity.title
-            vb.settingsItemSub.text = entity.sub
-            vb.settingsItemIcon.setBurnSrc(entity.icon, entity.color, true)
+        fun bind(
+            data: SettingsEntity,
+            action: OnItemActionListener?
+        ) {
+            binding.itemSettingTitle.text = data.title
+            binding.itemSettingSub.text = data.sub
+            binding.itemSettingIcon.setBurnSrc(data.icon, data.color, true)
 
-            vb.settingsItemSwitch.run {
-                isChecked = entity.selected
+            binding.itemSettingSwitch.run {
+                isChecked = data.selected
                 if (bindingAdapterPosition == 5) {
                     visibility = View.GONE
                 }
 
                 setOnCheckedChangeListener { _, isChecked ->
-                    onItemClickListener.onSwitch(bindingAdapterPosition, isChecked)
+                    action?.onSwitch(bindingAdapterPosition, isChecked)
                 }
             }
 
-            vb.root.setOnClickListener {
-                onItemClickListener.onClick(bindingAdapterPosition)
+            binding.root.setOnClickListener {
+                action?.onClick(bindingAdapterPosition)
             }
         }
     }

@@ -80,7 +80,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="file:/$PROJECT_DIR$/../../AndroidSDK/icons/material/materialiconsround/handyman/round_handyman_24.xml" />
+                                                <entry key="url" value="file:/$USER_HOME$/AndroidSDK/icons/material/materialiconsround/handyman/round_handyman_24.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -312,11 +312,25 @@
                   <entry key="vectorAssetStep">
                     <value>
                       <PersistentState>
+                        <option name="children">
+                          <map>
+                            <entry key="clipartAsset">
+                              <value>
+                                <PersistentState>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="url" value="file:$USER_HOME$/Library/Android/sdk/icons/material/materialiconsround/beenhere/round_beenhere_24.xml" />
+                                    </map>
+                                  </option>
+                                </PersistentState>
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="ic_close" />
-                            <entry key="sourceFile" value="C:\Users\Tokyonth\Desktop\priority_high_black_24dp.svg" />
+                            <entry key="outputName" value="round_beenhere_24" />
+                            <entry key="sourceFile" value="/C:\Users\Tokyonth\Desktop\priority_high_black_24dp.svg" />
                           </map>
                         </option>
                       </PersistentState>

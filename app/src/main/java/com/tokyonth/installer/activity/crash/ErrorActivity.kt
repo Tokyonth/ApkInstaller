@@ -16,7 +16,7 @@ class ErrorActivity : BaseActivity() {
     override fun setBinding() = binding
 
     override fun initView() {
-        val crashInfo = ActivityOnCrash.getErrorDetails(this, intent)
+        val crashInfo = CrashHelper.getErrorDetails(this, intent)
         binding.run {
             tvCrashInfo.text = crashInfo
             btnErrorCopy.setOnClickListener {
@@ -24,7 +24,7 @@ class ErrorActivity : BaseActivity() {
                 toast(getString(R.string.copy_error_log))
             }
             btnErrorExit.setOnClickListener {
-                ActivityOnCrash.closeApplication(this@ErrorActivity)
+                CrashHelper.closeApplication(this@ErrorActivity)
             }
         }
     }

@@ -5,44 +5,45 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="12dp">
+    android:paddingVertical="12dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="16dp">
 
     <com.tokyonth.installer.view.BurnRoundView
-        android:id="@+id/settings_item_icon"
+        android:id="@+id/item_setting_icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        app:burnSrc="@drawable/ic_settings"
+        app:burnSrc="@drawable/round_settings_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="PrivateResource" />
 
     <TextView
-        android:id="@+id/settings_item_title"
+        android:id="@+id/item_setting_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:textAppearance="?attr/textAppearanceTitleMedium"
-        app:layout_constraintBottom_toTopOf="@id/settings_item_sub"
-        app:layout_constraintStart_toEndOf="@id/settings_item_icon"
-        app:layout_constraintTop_toTopOf="@id/settings_item_icon"
+        app:layout_constraintBottom_toTopOf="@id/item_setting_sub"
+        app:layout_constraintStart_toEndOf="@id/item_setting_icon"
+        app:layout_constraintTop_toTopOf="@id/item_setting_icon"
         tools:text="Title" />
 
     <TextView
-        android:id="@+id/settings_item_sub"
+        android:id="@+id/item_setting_sub"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:textColor="?android:attr/textColorSecondary"
-        app:layout_constraintBottom_toBottomOf="@id/settings_item_icon"
-        app:layout_constraintStart_toEndOf="@id/settings_item_icon"
-        app:layout_constraintTop_toBottomOf="@id/settings_item_title"
+        app:layout_constraintBottom_toBottomOf="@id/item_setting_icon"
+        app:layout_constraintStart_toEndOf="@id/item_setting_icon"
+        app:layout_constraintTop_toBottomOf="@id/item_setting_title"
         tools:text="Sub" />
 
     <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/settings_item_switch"
+        android:id="@+id/item_setting_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

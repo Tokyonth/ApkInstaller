@@ -7,19 +7,21 @@ import android.content.pm.PackageInstaller
 import android.os.Process
 
 import com.tokyonth.installer.App
+import com.tokyonth.installer.data.ApkInfoEntity
 import com.tokyonth.installer.install.shizuku.IIntentSenderAdaptor
 import com.tokyonth.installer.install.shizuku.IntentSenderUtils
 import com.tokyonth.installer.install.shizuku.PackageInstallerUtils
 import com.tokyonth.installer.install.shizuku.ShizukuSystemServerApi
-import com.tokyonth.installer.utils.ktx.doAsync
-import com.tokyonth.installer.utils.ktx.onUI
 
 import rikka.shizuku.Shizuku
 import rikka.shizuku.ShizukuBinderWrapper
 import java.io.File
 import java.util.concurrent.CountDownLatch
 
-class InstallApkShizukuTask : MakeInstaller() {
+class InstallApkShizukuTask(
+    apkInfoEntity: ApkInfoEntity,
+    installCallback: InstallCallback
+) : BaseInstaller(apkInfoEntity, installCallback) {
 
     private fun getPackageInstaller(): PackageInstaller {
         val isRoot = Shizuku.getUid() == 0
@@ -34,7 +36,7 @@ class InstallApkShizukuTask : MakeInstaller() {
     }
 
     private fun getPackageInstallerSession(totalSize: Long? = null): PackageInstaller.Session {
-        val res: StringBuilder = StringBuilder()
+        val res = StringBuilder()
         res.append("createSession: ")
 
         val params: PackageInstaller.SessionParams =
@@ -90,47 +92,37 @@ class InstallApkShizukuTask : MakeInstaller() {
         return results[0]
     }
 
-    override fun install() {
-        installCallback.onApkPreInstall()
-        val apkFile = File(apkInfoEntity.filePath!!)
-        doAsync {
-            var session: PackageInstaller.Session? = null
-            val res: StringBuilder = StringBuilder()
+    override suspend fun install() {
+        val apkFile = File(apkInfoEntity.filePath)
+        var session: PackageInstaller.Session? = null
+        val res: StringBuilder = StringBuilder()
+        try {
+            session = getPackageInstallerSession()
+            res.append('\n').append("write: ")
+            doWriteSession(session, apkFile)
 
+            res.append('\n').append("commit: ")
+            val result = doCommitSession(session)
+            val status = result!!.getIntExtra(
+                PackageInstaller.EXTRA_STATUS,
+                PackageInstaller.STATUS_FAILURE
+            )
+            val message = result.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
+            res.append('\n').append("status: ").append(status).append(" (").append(message)
+                .append(")")
+            installCallback.onApkInstalled(status == 0)
+        } catch (tr: Throwable) {
+            tr.printStackTrace()
+            res.append(tr)
+            installCallback.onApkInstalled(false)
+        } finally {
             try {
-                session = getPackageInstallerSession()
-                res.append('\n').append("write: ")
-                doWriteSession(session, apkFile)
-
-                res.append('\n').append("commit: ")
-                val result = doCommitSession(session)
-                val status = result!!.getIntExtra(
-                    PackageInstaller.EXTRA_STATUS,
-                    PackageInstaller.STATUS_FAILURE
-                )
-                val message = result.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
-                res.append('\n').append("status: ").append(status).append(" (").append(message)
-                    .append(")")
-                onUI {
-                    installCallback.onApkInstalled(InstallStatus.invoke(status))
-                }
+                session?.close()
             } catch (tr: Throwable) {
-                tr.printStackTrace()
                 res.append(tr)
-                onUI {
-                    installCallback.onApkInstalled(InstallStatus.invoke(-1))
-                }
-            } finally {
-                try {
-                    session?.close()
-                } catch (tr: Throwable) {
-                    res.append(tr)
-                }
-            }
-            onUI {
-                installCallback.onInstallLog(res.toString().trim())
             }
         }
+        installCallback.onInstallLog(res.toString().trim())
     }
 
 }
