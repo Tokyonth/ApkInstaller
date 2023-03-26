@@ -35,12 +35,31 @@ class PermissionHelper(
 
     private var requestCode = -1
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    private fun requestR() {
-        val c = ActivityResultContracts.StartActivityForResult()
-        requestResultLauncher = activity.registerForActivityResult(c) {
+    init {
+        val c1 = ActivityResultContracts.StartActivityForResult()
+        requestResultLauncher = activity.registerForActivityResult(c1) {
             isGrant?.invoke(true, requestCode)
         }
+        val c2 = ActivityResultContracts.RequestMultiplePermissions()
+        requestPermissionLauncher = activity.registerForActivityResult(c2) { map ->
+            val all = map.filter { !it.value }
+            isGrant?.invoke(all.isEmpty(), requestCode)
+        }
+        val c3 = ActivityResultContracts.StartActivityForResult()
+        @SuppressLint("WrongConstant")
+        requestDataLauncher = activity.registerForActivityResult(c3) {
+            it.data?.let { intent ->
+                activity.contentResolver.takePersistableUriPermission(
+                    intent.data!!,
+                    intent.flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                )
+                isGrant?.invoke(true, requestCode)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun requestR() {
         if (Environment.isExternalStorageManager()) {
             isGrant?.invoke(true, requestCode)
         } else {
@@ -52,11 +71,6 @@ class PermissionHelper(
     }
 
     private fun requestM(array: Array<String>) {
-        val c = ActivityResultContracts.RequestMultiplePermissions()
-        requestPermissionLauncher = activity.registerForActivityResult(c) { map ->
-            val all = map.filter { !it.value }
-            isGrant?.invoke(all.isEmpty(), requestCode)
-        }
         requestPermissionLauncher?.launch(array)
     }
 
@@ -89,18 +103,7 @@ class PermissionHelper(
         }
     }
 
-    @SuppressLint("WrongConstant")
     fun startData(pkg: String) {
-        val c = ActivityResultContracts.StartActivityForResult()
-        requestDataLauncher = activity.registerForActivityResult(c) {
-            it.data?.let { intent ->
-                activity.contentResolver.takePersistableUriPermission(
-                    intent.data!!,
-                    intent.flags and (Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                )
-                isGrant?.invoke(true, requestCode)
-            }
-        }
         if (!activity.isGrantDataDir(pkg)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -115,6 +118,7 @@ class PermissionHelper(
     }
 
     fun start(array: Array<String>, requestCode: Int = -1) {
+        this.requestCode = requestCode
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestM(array)
         } else {

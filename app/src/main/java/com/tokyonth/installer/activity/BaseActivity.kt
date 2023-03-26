@@ -22,7 +22,6 @@ abstract class BaseActivity : AppCompatActivity() {
     abstract fun initView()
 
     open fun initData() {
-        Log.e("打印-->", "检查通知")
         NotificationUtils.checkNotification(this)
     }
 
@@ -41,6 +40,7 @@ abstract class BaseActivity : AppCompatActivity() {
             SPDataManager.instance.setNightMode(it)
         }
 
+        permissionHelper = PermissionHelper(this)
         setBinding()?.let {
             setContentView(it.root)
         }
@@ -66,7 +66,6 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun requestPermission() {
-        permissionHelper = PermissionHelper(this)
         permissionHelper?.registerCallback { all, _ ->
             if (all) {
                 initData()

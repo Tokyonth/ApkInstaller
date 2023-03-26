@@ -15,7 +15,6 @@ import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.databinding.ActivitySettingsBinding
 import com.tokyonth.installer.databinding.LayoutInputPkgBinding
 import com.tokyonth.installer.utils.PackageUtils
-import com.tokyonth.installer.utils.PermissionHelper
 import com.tokyonth.installer.utils.ktx.*
 import rikka.shizuku.ShizukuProvider
 
@@ -38,7 +37,6 @@ class SettingsActivity : BaseActivity() {
     override fun initData() {
         super.initData()
         SPDataManager.instance.setNotFirstBoot()
-        permissionHelper = PermissionHelper(this)
         permissionHelper?.registerCallback { all, code ->
             if (all) {
                 SPDataManager.instance.setInstallMode(code)
