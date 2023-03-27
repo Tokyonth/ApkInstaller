@@ -30,7 +30,7 @@ class ParseApkTask(
             if (File(it).exists()) {
                 parseApkFile(it, false)
             } else {
-                UriPath.getFile(App.context, referrer,  uri).let { it1 ->
+                UriPath.getFile(App.context, referrer, uri).let { it1 ->
                     val name = uri.authority + ".apk"
                     if (it1 == null) {
                         val path = uri.copyFromStreamUri(name).path

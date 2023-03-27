@@ -10,8 +10,11 @@ class AuthorizeUtil {
 
     static PendingIntent getAuthorizedPI(Context context) {
         if (authorizePendingIntent == null) {
-            authorizePendingIntent = PendingIntent.getBroadcast(context,
-                    0x333, new Intent(context, StateReceiver.class), 0);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                authorizePendingIntent = PendingIntent.getActivity(context, 0x333, new Intent(context, StateReceiver.class), PendingIntent.FLAG_IMMUTABLE);
+            } else {
+                authorizePendingIntent = PendingIntent.getActivity(context, 0x333, new Intent(context, StateReceiver.class), PendingIntent.FLAG_ONE_SHOT);
+            }
         }
         return authorizePendingIntent;
     }

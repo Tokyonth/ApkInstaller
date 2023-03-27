@@ -18,8 +18,9 @@ object NotificationUtils {
 
     private const val POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS"
 
-    fun checkNotification(activity: Activity) {
-        if (!checkNotification33(activity)) {
+    fun checkNotification(activity: Activity): Boolean {
+        val b = checkNotification33(activity)
+        if (!b) {
             MaterialAlertDialogBuilder(activity)
                 .setMessage(string(R.string.notification_perm))
                 .setNegativeButton(string(R.string.dialog_btn_cancel), null)
@@ -29,9 +30,10 @@ object NotificationUtils {
                 .setCancelable(false)
                 .show()
         }
+        return b
     }
 
-    private fun checkNotification33(activity: Activity):Boolean {
+    private fun checkNotification33(activity: Activity): Boolean {
         if (Build.VERSION.SDK_INT >= 33) {
             if (ActivityCompat.checkSelfPermission(
                     activity,

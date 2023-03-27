@@ -18,17 +18,29 @@ import java.io.File
 object UriPath {
 
     private var uri: Uri? = null
+
     private var shardUid: String? = null
+
     private var uriPath: String? = null
+
     private var authority: String? = null
+
     private var SDCARD: String? = null
+
     private var getExternalStorageDirectory: String? = null
+
     private var getExternalRootDir: String? = null
+
     private var getExternalFilesDir: String? = null
+
     private var getExternalCacheDir: String? = null
+
     private var getStorageIsolationDir: String? = null
-    private var getfirstPathSegment: String? = null
+
+    private var getFirstPathSegment: String? = null
+
     private var getPathFromIndex1PathSegment: String? = null
+
     private var getLastPathSegment: String? = null
 
     /**
@@ -41,6 +53,7 @@ object UriPath {
         try {
             applicationInfo = pm.getApplicationInfo(pkgName!!, 0)
         } catch (ignore: Exception) {
+            // ignore
         }
         if (applicationInfo != null) {
             val pkgInfo =
@@ -155,8 +168,8 @@ object UriPath {
                 getDataColumn(context, uri, null, null)
             }
         }
-        return if (checkFileorPath(path)) {
-            File(path)
+        return if (checkFileOrPath(path)) {
+            File(path!!)
         } else null
     }
 
@@ -215,12 +228,12 @@ object UriPath {
             getStorageIsolationDir = "/Android/data/$referrer/sdcard"
 
             //获取索引0路径段
-            getfirstPathSegment = uri!!.pathSegments[0]
+            getFirstPathSegment = uri!!.pathSegments[0]
             //最后一个路径段
             getLastPathSegment = uri!!.lastPathSegment
 
             //删索引0路径段和其前面的"/"
-            getPathFromIndex1PathSegment = uriPath!!.substring(getfirstPathSegment!!.length + 1)
+            getPathFromIndex1PathSegment = uriPath!!.substring(getFirstPathSegment!!.length + 1)
         } catch (e: Exception) {
             authority = null
         }
@@ -283,7 +296,7 @@ object UriPath {
                 "moe.shizuku.redirectstorage.ServerFileProvider" -> if (uri!!.pathSegments.size > 2) {
                     val getIndex1PathSegment = uri!!.pathSegments[1]
                     val getPathfromIndex2PathSegment = uriPath!!.substring(
-                        getfirstPathSegment!!.length + 1 + getIndex1PathSegment.length + 1
+                        getFirstPathSegment!!.length + 1 + getIndex1PathSegment.length + 1
                     )
                     if (SDCARD.equals("/$getIndex1PathSegment", ignoreCase = true)) {
                         path = getPathFromIndex1PathSegment
@@ -294,11 +307,11 @@ object UriPath {
                     pathList.add(path)
                 }
                 "com.taptap.fileprovider" -> {
-                    if ("downloads_external" == getfirstPathSegment) {
+                    if ("downloads_external" == getFirstPathSegment) {
                         path =
                             "$getExternalStorageDirectory$getExternalFilesDir/Download$getPathFromIndex1PathSegment"
                     }
-                    when (getfirstPathSegment) {
+                    when (getFirstPathSegment) {
                         "files_root" ->                         //content://com.coolapk.market.fileprovider/files_root/file.apk
                             //content://com.coolapk.market.fileprovider/files_root/files/Download/file.apk
 
@@ -338,7 +351,7 @@ object UriPath {
                     pathList.add(path0)
                 }
                 "com.coolapk.market.fileprovider" -> {
-                    when (getfirstPathSegment) {
+                    when (getFirstPathSegment) {
                         "files_root" -> path =
                             getExternalStorageDirectory + getExternalRootDir + getPathFromIndex1PathSegment
                         "external_files_path" -> path =
@@ -359,7 +372,7 @@ object UriPath {
                     pathList.add(path0)
                 }
                 "com.coolapk.market.vn.fileProvider" -> {
-                    when (getfirstPathSegment) {
+                    when (getFirstPathSegment) {
                         "files_root" ->                         //content://com.coolapk.market.vn.fileProvider/files_root/file.apk
                             //content://com.coolapk.market.vn.fileProvider/files_root/files/Download/file.apk
 
@@ -382,7 +395,7 @@ object UriPath {
                     pathList.add(path0)
                 }
                 "com.tencent.mm.external.fileprovider", "com.tencent.mobileqq.fileprovider", "com.mi.android.globalFileexplorer.myprovider", "in.mfile.files", "com.estrongs.files", "com.ktls.fileinfo.provider", "pl.solidexplorer2.files", "cn.ljt.p7zip.fileprovider" -> {
-                    if ("downloads" == getfirstPathSegment) {
+                    if ("downloads" == getFirstPathSegment) {
                         if (uri!!.pathSegments.size > 1) {
                             path =
                                 "$getExternalStorageDirectory/Download$getPathFromIndex1PathSegment"
@@ -391,13 +404,13 @@ object UriPath {
                                 "$getExternalStorageDirectory$getStorageIsolationDir/Download$getPathFromIndex1PathSegment"
                             pathList.add(path)
                             pathList.add(path0)
-                            return pickValidFilefromPathList(pathList)
+                            return pickValidFileFromPathList(pathList)
                         }
                     }
                     return null
                 }
                 else -> {
-                    if ("downloads" == getfirstPathSegment) {
+                    if ("downloads" == getFirstPathSegment) {
                         if (uri!!.pathSegments.size > 1) {
                             path =
                                 "$getExternalStorageDirectory/Download$getPathFromIndex1PathSegment"
@@ -406,22 +419,22 @@ object UriPath {
                                 "$getExternalStorageDirectory$getStorageIsolationDir/Download$getPathFromIndex1PathSegment"
                             pathList.add(path)
                             pathList.add(path0)
-                            return pickValidFilefromPathList(pathList)
+                            return pickValidFileFromPathList(pathList)
                         }
                     }
                     return null
                 }
             }
-            return pickValidFilefromPathList(pathList)
+            return pickValidFileFromPathList(pathList)
         }
 
     //在pathList挑选有效的file
-    private fun pickValidFilefromPathList(pathList: ArrayList<String?>?): File? {
+    private fun pickValidFileFromPathList(pathList: ArrayList<String?>?): File? {
         return if (pathList == null) {
             null
         } else {
             for (getPath: String? in pathList) {
-                if (checkFileorPath(getPath)) {
+                if (checkFileOrPath(getPath)) {
                     return getPath?.let { File(it) }
                 } else {
                     Log.e("fakePath", getPath + "")
@@ -458,7 +471,7 @@ object UriPath {
                             getPathFromIndex1PathSegment!!
                         )
                     }
-                } else if (SDCARD.equals("/" + getfirstPathSegment, ignoreCase = true)) {
+                } else if (SDCARD.equals("/$getFirstPathSegment", ignoreCase = true)) {
                     if (size > 1) {
                         //content://in.mfile.files/storage/emulated/0/file.apk
                         pathList = getPathListStartWith(
@@ -531,18 +544,18 @@ object UriPath {
         get() {
             val pathList =
                 pathListAboutExternalStoragePublicDirectory
-            return pickValidFilefromPathList(pathList)
+            return pickValidFileFromPathList(pathList)
         }
 
-    private fun checkFileorPath(file: File?): Boolean {
+    private fun checkFileOrPath(file: File?): Boolean {
         return file != null && file.exists() && !file.isDirectory
     }
 
-    private fun checkFileorPath(path: String?): Boolean {
+    private fun checkFileOrPath(path: String?): Boolean {
         return if (path == null) {
             false
         } else {
-            checkFileorPath(File(path))
+            checkFileOrPath(File(path))
         }
     }
 

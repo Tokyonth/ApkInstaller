@@ -1,5 +1,6 @@
 package com.tokyonth.installer.install.shizuku;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.IPackageInstaller;
 import android.content.pm.IPackageInstallerSession;
@@ -34,10 +35,12 @@ public class PackageInstallerUtils {
                 .newInstance(session);
     }
 
+    @SuppressLint("PrivateApi")
     public static int getInstallFlags(PackageInstaller.SessionParams params) throws NoSuchFieldException, IllegalAccessException {
         return (int) PackageInstaller.SessionParams.class.getDeclaredField("installFlags").get(params);
     }
 
+    @SuppressLint("PrivateApi")
     public static void setInstallFlags(PackageInstaller.SessionParams params, int newValue) throws NoSuchFieldException, IllegalAccessException {
         PackageInstaller.SessionParams.class.getDeclaredField("installFlags").set(params, newValue);
     }

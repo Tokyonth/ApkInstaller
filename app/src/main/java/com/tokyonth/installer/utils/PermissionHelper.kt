@@ -3,6 +3,7 @@ package com.tokyonth.installer.utils
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -12,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import com.tokyonth.installer.utils.path.DATA_TREE_URL
 import com.tokyonth.installer.utils.path.isGrantDataDir
@@ -55,6 +57,19 @@ class PermissionHelper(
                 )
                 isGrant?.invoke(true, requestCode)
             }
+        }
+    }
+
+    fun check(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Environment.isExternalStorageManager()
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ContextCompat.checkSelfPermission(
+                activity,
+                permissionArray[0]
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
         }
     }
 

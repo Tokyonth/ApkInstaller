@@ -1,7 +1,9 @@
 package com.tokyonth.installer.activity
 
+import android.content.pm.PackageManager
 import android.view.LayoutInflater
 import android.view.MenuItem
+import android.widget.CompoundButton
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.catchingnow.icebox.sdk_client.IceBox
@@ -14,15 +16,18 @@ import com.tokyonth.installer.adapter.SettingsAdapter.*
 import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.databinding.ActivitySettingsBinding
 import com.tokyonth.installer.databinding.LayoutInputPkgBinding
+import com.tokyonth.installer.utils.NotificationUtils
 import com.tokyonth.installer.utils.PackageUtils
 import com.tokyonth.installer.utils.ktx.*
-import rikka.shizuku.ShizukuProvider
+import rikka.shizuku.Shizuku
 
 class SettingsActivity : BaseActivity() {
 
     private val binding: ActivitySettingsBinding by lazyBind()
 
     private var settingsAdapter = SettingsAdapter()
+
+    private var shizukuPermission: Shizuku.OnRequestPermissionResultListener? = null
 
     override fun setBinding() = binding
 
@@ -31,16 +36,20 @@ class SettingsActivity : BaseActivity() {
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
         }
+        initSettings()
         initViewStatus()
     }
 
     override fun initData() {
-        super.initData()
-        SPDataManager.instance.setNotFirstBoot()
+        shizukuPermission = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
+            if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                updateShizuku(requestCode)
+            }
+        }
+        Shizuku.addRequestPermissionResultListener(shizukuPermission!!)
         permissionHelper?.registerCallback { all, code ->
             if (all) {
-                SPDataManager.instance.setInstallMode(code)
-                settingsAdapter.updateInstallMode()
+                updateShizuku(code)
             } else {
                 val str = when (code) {
                     1 -> string(R.string.shizuku_permission_request)
@@ -52,18 +61,22 @@ class SettingsActivity : BaseActivity() {
         }
     }
 
-    private fun initViewStatus() {
+    private fun initSettings() {
         val local = SPDataManager.instance
-        binding.cbUseSysPkg.isChecked = local.isUseSystemPkg()
-        binding.tvPkgName.text = local.getSystemPkg()
-
         settingsAdapter.apply {
             setOnItemActionListener(object : OnItemActionListener {
-                override fun onSwitch(pos: Int, bool: Boolean) {
-                    when (pos) {
+                override fun onSwitch(view: CompoundButton, position: Int, bool: Boolean) {
+                    when (position) {
                         0 -> local.setShowPermission(bool)
                         1 -> local.setShowActivity(bool)
-                        2 -> local.setDefaultSilent(bool)
+                        2 -> {
+                            val b = NotificationUtils.checkNotification(this@SettingsActivity)
+                            if (b) {
+                                local.setDefaultSilent(bool)
+                            } else {
+                                view.isChecked = false
+                            }
+                        }
                         3 -> local.setAutoDel(bool)
                         4 -> {
                             if (bool) {
@@ -74,8 +87,8 @@ class SettingsActivity : BaseActivity() {
                     }
                 }
 
-                override fun onClick(pos: Int) {
-                    if (pos == 5) {
+                override fun onClick(position: Int) {
+                    if (position == 5) {
                         MaterialAlertDialogBuilder(this@SettingsActivity)
                             .setSingleChoiceItems(
                                 R.array.install_mode_arr,
@@ -99,6 +112,12 @@ class SettingsActivity : BaseActivity() {
             layoutManager = LinearLayoutManager(this@SettingsActivity)
             adapter = settingsAdapter
         }
+    }
+
+    private fun initViewStatus() {
+        val local = SPDataManager.instance
+        binding.cbUseSysPkg.isChecked = local.isUseSystemPkg()
+        binding.tvPkgName.text = local.getSystemPkg()
 
         val cacheSize = externalCacheDir?.fileOrFolderSize()?.toMemorySize() ?: 0
         binding.tvApkCache.text = string(R.string.text_apk_cache, cacheSize)
@@ -106,9 +125,10 @@ class SettingsActivity : BaseActivity() {
         binding.cbUseSysPkg.setOnCheckedChangeListener { _, isChecked ->
             local.setUseSystemPkg(isChecked)
         }
-        binding.csSysPkg.setOnClickListener {
-            val pkgBinding = LayoutInputPkgBinding.inflate(LayoutInflater.from(this))
-            MaterialAlertDialogBuilder(this)
+        binding.cardPkg.click {
+            val pkgBinding =
+                LayoutInputPkgBinding.inflate(LayoutInflater.from(this@SettingsActivity))
+            MaterialAlertDialogBuilder(this@SettingsActivity)
                 .setTitle(R.string.text_title_input)
                 .setView(pkgBinding.root)
                 .setPositiveButton(R.string.dialog_btn_ok) { _, _ ->
@@ -127,7 +147,7 @@ class SettingsActivity : BaseActivity() {
                 .setNegativeButton(R.string.dialog_btn_cancel, null)
                 .show()
         }
-        binding.tvApkCache.setOnClickListener {
+        binding.cardCache.click {
             externalCacheDir?.deleteFolderFile(true)
             Snackbar.make(
                 binding.root,
@@ -158,7 +178,39 @@ class SettingsActivity : BaseActivity() {
                 Snackbar.LENGTH_SHORT
             ).show()
         } else {
-            permissionHelper?.start(arrayOf(ShizukuProvider.PERMISSION), requestCode)
+            val p = checkShizukuPermission(requestCode)
+            if (p) {
+                updateShizuku(requestCode)
+            }
+            //permissionHelper?.start(arrayOf(ShizukuProvider.PERMISSION), requestCode)
+        }
+    }
+
+    private fun updateShizuku(code: Int) {
+        SPDataManager.instance.setInstallMode(code)
+        settingsAdapter.updateInstallMode()
+    }
+
+    private fun checkShizukuPermission(code: Int): Boolean {
+        if (Shizuku.isPreV11()) {
+            return false
+        }
+        return try {
+            if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
+                true
+            } else if (Shizuku.shouldShowRequestPermissionRationale()) {
+                false
+            } else {
+                Shizuku.requestPermission(code)
+                false
+            }
+        } catch (e: Exception) {
+            Snackbar.make(
+                binding.root,
+                getString(R.string.shizuku_not_run),
+                Snackbar.LENGTH_SHORT
+            ).show()
+            false
         }
     }
 
@@ -171,6 +223,7 @@ class SettingsActivity : BaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        Shizuku.removeRequestPermissionResultListener(shizukuPermission!!)
         permissionHelper?.dispose()
     }
 

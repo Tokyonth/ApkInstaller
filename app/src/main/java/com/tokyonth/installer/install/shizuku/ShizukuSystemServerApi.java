@@ -46,23 +46,4 @@ public class ShizukuSystemServerApi {
         }
     }
 
-    // method 2: use transactRemote directly
-    /*public static List<UserInfo> UserManager_getUsers(boolean excludeDying) {
-        Parcel data = SystemServiceHelper.obtainParcel(Context.USER_SERVICE, "android.os.IUserManager", "getUsers");
-        Parcel reply = Parcel.obtain();
-        data.writeInt(excludeDying ? 1 : 0);
-
-        List<UserInfo> res = null;
-        try {
-            ShizukuService.transactRemote(data, reply, 0);
-            reply.readException();
-            res = reply.createTypedArrayList(UserInfo.CREATOR);
-        } catch (RemoteException e) {
-            Log.e("ShizukuSample", "UserManager#getUsers", e);
-        } finally {
-            data.recycle();
-            reply.recycle();
-        }
-        return res;
-    }*/
 }

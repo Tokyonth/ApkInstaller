@@ -25,6 +25,5 @@ object Constants {
     const val SP_FOLLOW_SYSTEM_NIGHT_KEY = "nightFollowSystem"
     const val SP_NEVER_VERSION_TIP_KEY = "neverVersionTips"
     const val SP_NEVER_SYSTEM_PKG_KEY = "neverUseSystemPkg"
-    const val SP_IS_FIRST_BOOT_KEY = "isFirstBoot"
 
 }

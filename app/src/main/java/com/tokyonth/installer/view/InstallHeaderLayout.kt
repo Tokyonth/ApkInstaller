@@ -128,7 +128,7 @@ class InstallHeaderLayout : FrameLayout {
             else -> {
                 if (!SPDataManager.instance.isNeverShowTip()) {
                     MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.dialog_title_tip)
+                        //.setTitle(R.string.dialog_title_tip)
                         .setMessage(R.string.low_version_tip)
                         .setPositiveButton(R.string.dialog_btn_ok, null)
                         .setNegativeButton(R.string.dialog_no_longer_prompt) { _, _ ->

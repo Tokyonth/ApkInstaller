@@ -8,6 +8,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="16dp"
         android:fadingEdge="none"
         android:overScrollMode="never"
         android:scrollbars="none">
@@ -28,7 +29,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/tv_install_msg"
+                android:id="@+id/tv_apk_overview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="4dp"
@@ -49,7 +50,7 @@
                 android:paddingVertical="8dp"
                 app:chipSpacingVertical="8dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_install_msg" />
+                app:layout_constraintTop_toBottomOf="@id/tv_apk_overview" />
 
             <com.tokyonth.installer.view.BaseListLayout
                 android:id="@+id/cl_permission"
@@ -70,10 +71,17 @@
                 app:layout_constraintTop_toBottomOf="@id/cl_permission" />
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_del"
                 style="?attr/materialCardViewFilledStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/colorOnSurfaceInverse"
+                app:cardCornerRadius="24dp"
+                app:contentPaddingBottom="8dp"
+                app:contentPaddingLeft="16dp"
+                app:contentPaddingRight="16dp"
+                app:contentPaddingTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cl_activity">
@@ -83,8 +91,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="12dp">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="0dp"
@@ -99,6 +106,27 @@
                         android:layout_height="wrap_content" />
 
                 </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_log"
+                style="?attr/materialCardViewFilledStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="?attr/colorOnSurfaceInverse"
+                app:cardCornerRadius="24dp"
+                app:contentPadding="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/card_del">
+
+                <TextView
+                    android:id="@+id/tv_install_log"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -118,7 +146,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="10dp"
             android:gravity="center|start"
             android:orientation="horizontal">
 
@@ -131,7 +159,8 @@
                 android:padding="8dp"
                 android:text="@string/install_silently"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?android:attr/textColorSecondary" />
+                android:textColor="?android:attr/textColorSecondary"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_cancel"
@@ -140,9 +169,10 @@
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:gravity="center"
                 android:padding="8dp"
-                android:text="@string/text_cancel_installation"
+                android:text="@string/text_cancel_install"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?android:attr/textColorSecondary" />
+                android:textColor="?android:attr/textColorSecondary"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

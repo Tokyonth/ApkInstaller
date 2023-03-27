@@ -13,7 +13,8 @@ import java.io.File
 class InstallerServer : JobIntentService(), InstallCallback {
 
     companion object {
-        private const val JOB_ID = 1
+        private const val JOB_ID = 100
+        const val APK_REFERER = "apkReferer"
 
         fun enqueueWork(context: Context, work: Intent) {
             enqueueWork(context, InstallerServer::class.java, JOB_ID, work)
@@ -27,12 +28,12 @@ class InstallerServer : JobIntentService(), InstallCallback {
     private var installLog: String = ""
 
     override fun onHandleWork(intent: Intent) {
-        //toast(string(R.string.unable_install_apk))
         intent.data.let { uri ->
             if (uri == null) {
                 sendNotification(string(R.string.unable_install_apk))
             } else {
-                apkCommander = APKCommander(uri, "", this)
+                val ref = intent.getStringExtra(APK_REFERER).orEmpty()
+                apkCommander = APKCommander(uri, ref, this)
                 apkCommander?.startParse()
             }
         }
@@ -67,6 +68,9 @@ class InstallerServer : JobIntentService(), InstallCallback {
             notificationSub += " ($installLog)"
             string(R.string.install_failed_msg)
         }
+        if (apkInfo!!.isFakePath) {
+            File(apkInfo!!.filePath).delete()
+        }
         NotificationUtils.sendNotification(
             this,
             status,
@@ -78,7 +82,7 @@ class InstallerServer : JobIntentService(), InstallCallback {
     private fun sendNotification(msg: String) {
         NotificationUtils.sendNotification(
             this,
-            "安装中...",
+            string(R.string.installing),
             msg,
             apkInfo!!.icon!!
         )

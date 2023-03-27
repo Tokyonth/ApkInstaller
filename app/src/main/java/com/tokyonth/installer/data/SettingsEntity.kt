@@ -7,6 +7,6 @@ data class SettingsEntity(
     var sub: String,
     @DrawableRes
     var icon: Int,
-    var color: Int,
+    //var color: Int,
     var selected: Boolean
 )

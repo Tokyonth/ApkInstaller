@@ -22,8 +22,8 @@ class InstallerViewModel : ViewModel(), InstallCallback {
 
     private var apkCommander: APKCommander? = null
 
-    fun startParse(uri: Uri,referrer:String) {
-        apkCommander = APKCommander(uri, referrer,this)
+    fun startParse(uri: Uri, referrer: String) {
+        apkCommander = APKCommander(uri, referrer, this)
         apkCommander?.startParse()
     }
 

@@ -3,7 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.tokyonth.installer">
 
-    <uses-sdk tools:overrideLibrary="rikka.shizuku.shared, rikka.shizuku.api, rikka.shizuku.aidl, rikka.shizuku.provider" />
+    <uses-sdk tools:overrideLibrary="rikka.shizuku.shared,
+        rikka.shizuku.api,
+        rikka.shizuku.aidl,
+        rikka.shizuku.provider" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -29,7 +32,7 @@
 
     <uses-permission android:name="com.catchingnow.icebox.SDK" />
 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".App"
@@ -41,13 +44,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="LockedOrientationActivity"
+        tools:ignore="DataExtractionRules,LockedOrientationActivity"
         tools:targetApi="r">
 
         <activity
             android:name=".activity.InstallerActivity"
             android:excludeFromRecents="true"
             android:exported="true"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait">
 
             <intent-filter>

@@ -23,7 +23,7 @@ class App : Application() {
         super.onCreate()
         context = applicationContext
 
-        CrashHelper.install(this)
+       // CrashHelper.install(this)
         DynamicColors.applyToActivitiesIfAvailable(this)
         initNightMode()
     }

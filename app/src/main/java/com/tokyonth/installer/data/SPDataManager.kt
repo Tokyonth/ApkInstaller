@@ -109,17 +109,6 @@ class SPDataManager {
         return getSP(Constants.SP_NEVER_SYSTEM_PKG_KEY, false)
     }
 
-    fun setNotFirstBoot() {
-        putSP(Constants.SP_IS_FIRST_BOOT_KEY, BuildConfig.VERSION_NAME)
-    }
-
-    fun isFirstBoot(): Boolean {
-        if (BuildConfig.needRemindUser) {
-            return getSP(Constants.SP_IS_FIRST_BOOT_KEY, "") != BuildConfig.VERSION_NAME
-        }
-        return false
-    }
-
     fun getInstallName(): String {
         val arr = App.context.resources.getStringArray(R.array.install_mode_arr)
         return arr[getInstallMode()]

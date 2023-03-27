@@ -1,53 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="?attr/materialCardViewFilledStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground"
-    android:paddingVertical="12dp"
-    android:paddingStart="12dp"
-    android:paddingEnd="16dp">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="?attr/colorOnSurfaceInverse"
+    app:cardCornerRadius="24dp">
 
-    <com.tokyonth.installer.view.BurnRoundView
-        android:id="@+id/item_setting_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:burnSrc="@drawable/round_settings_24"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="PrivateResource" />
-
-    <TextView
-        android:id="@+id/item_setting_title"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        app:layout_constraintBottom_toTopOf="@id/item_setting_sub"
-        app:layout_constraintStart_toEndOf="@id/item_setting_icon"
-        app:layout_constraintTop_toTopOf="@id/item_setting_icon"
-        tools:text="Title" />
+        android:background="?android:attr/selectableItemBackground"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/item_setting_sub"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:textColor="?android:attr/textColorSecondary"
-        app:layout_constraintBottom_toBottomOf="@id/item_setting_icon"
-        app:layout_constraintStart_toEndOf="@id/item_setting_icon"
-        app:layout_constraintTop_toBottomOf="@id/item_setting_title"
-        tools:text="Sub" />
+        <ImageView
+            android:id="@+id/item_setting_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_icon"
+            android:padding="10dp"
+            android:src="@drawable/round_settings_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorControlNormal"
+            tools:ignore="ContentDescription" />
 
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/item_setting_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/item_setting_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginBottom="2dp"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            app:layout_constraintBottom_toTopOf="@id/guide"
+            app:layout_constraintStart_toEndOf="@id/item_setting_icon"
+            tools:text="Title" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <TextView
+            android:id="@+id/item_setting_sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="2dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?android:attr/textColorSecondary"
+            app:layout_constraintStart_toEndOf="@id/item_setting_icon"
+            app:layout_constraintTop_toBottomOf="@id/guide"
+            tools:text="Sub" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/item_setting_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

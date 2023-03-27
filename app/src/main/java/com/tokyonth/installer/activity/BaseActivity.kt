@@ -2,7 +2,6 @@ package com.tokyonth.installer.activity
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.viewbinding.ViewBinding
@@ -10,7 +9,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 import com.tokyonth.installer.R
 import com.tokyonth.installer.data.SPDataManager
-import com.tokyonth.installer.utils.NotificationUtils
 import com.tokyonth.installer.utils.ktx.string
 import com.tokyonth.installer.utils.ktx.toast
 import com.tokyonth.installer.utils.PermissionHelper
@@ -21,9 +19,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     abstract fun initView()
 
-    open fun initData() {
-        NotificationUtils.checkNotification(this)
-    }
+    abstract fun initData()
 
     open var permissionHelper: PermissionHelper? = null
 
@@ -49,8 +45,9 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun checkPermission() {
-        if (SPDataManager.instance.isFirstBoot()) {
+        if (!permissionHelper!!.check()) {
             MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.label_notice)
                 .setMessage(R.string.use_app_warn)
                 .setNegativeButton(R.string.exit_app) { _, _ ->
                     finish()

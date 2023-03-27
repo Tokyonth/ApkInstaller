@@ -3,13 +3,13 @@ package com.tokyonth.installer.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CompoundButton
 import androidx.recyclerview.widget.RecyclerView
 
 import com.tokyonth.installer.R
 import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.data.SettingsEntity
 import com.tokyonth.installer.databinding.ItemSettingPerfBinding
-import com.tokyonth.installer.utils.ktx.color
 import com.tokyonth.installer.utils.ktx.string
 
 import java.util.ArrayList
@@ -25,7 +25,7 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
                     string(R.string.title_show_perm),
                     string(R.string.summary_show_perm),
                     R.drawable.round_security_24,
-                    color(R.color.color0),
+                    //color(R.color.color0),
                     SPDataManager.instance.isShowPermission()
                 )
             )
@@ -34,7 +34,7 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
                     string(R.string.title_show_activity),
                     string(R.string.summary_show_activity),
                     R.drawable.round_layers_24,
-                    color(R.color.color1),
+                    //color(R.color.color1),
                     SPDataManager.instance.isShowActivity()
                 )
             )
@@ -43,7 +43,7 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
                     string(R.string.default_silent),
                     string(R.string.default_silent_sub),
                     R.drawable.round_silence_24,
-                    color(R.color.color6),
+                    //color(R.color.color6),
                     SPDataManager.instance.isDefaultSilent()
                 )
             )
@@ -52,7 +52,7 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
                     string(R.string.auto_del_apk_title),
                     string(R.string.auto_delete_apk),
                     R.drawable.round_delete_forever_24,
-                    color(R.color.color2),
+                    //color(R.color.color2),
                     SPDataManager.instance.isAutoDel()
                 )
             )
@@ -61,7 +61,7 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
                     string(R.string.follow_system_night_mode),
                     string(R.string.follow_system_night_mode_sub),
                     R.drawable.round_auto_mode_24,
-                    color(R.color.color4),
+                    //color(R.color.color4),
                     SPDataManager.instance.isFollowSystem()
                 )
             )
@@ -70,7 +70,7 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
                     string(R.string.install_mode),
                     SPDataManager.instance.getInstallName(),
                     R.drawable.round_play_for_work_24,
-                    color(R.color.color5),
+                    //color(R.color.color5),
                     false
                 )
             )
@@ -79,9 +79,9 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
 
     interface OnItemActionListener {
 
-        fun onSwitch(pos: Int, bool: Boolean)
+        fun onSwitch(view: CompoundButton, position: Int, bool: Boolean)
 
-        fun onClick(pos: Int)
+        fun onClick(position: Int)
 
     }
 
@@ -119,7 +119,8 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
         ) {
             binding.itemSettingTitle.text = data.title
             binding.itemSettingSub.text = data.sub
-            binding.itemSettingIcon.setBurnSrc(data.icon, data.color, true)
+            binding.itemSettingIcon.setImageResource(data.icon)
+            //binding.itemSettingIcon.setBurnSrc(data.icon, null, true)
 
             binding.itemSettingSwitch.run {
                 isChecked = data.selected
@@ -127,8 +128,8 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
                     visibility = View.GONE
                 }
 
-                setOnCheckedChangeListener { _, isChecked ->
-                    action?.onSwitch(bindingAdapterPosition, isChecked)
+                setOnCheckedChangeListener { view, isChecked ->
+                    action?.onSwitch(view, bindingAdapterPosition, isChecked)
                 }
             }
 

@@ -4,13 +4,37 @@ import android.content.res.Resources
 import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import com.tokyonth.installer.App
-import com.tokyonth.installer.R
+
+object CommonUtils {
+
+    fun getScreenHeight(): Int {
+        val metrics = App.context.resources.displayMetrics
+        return metrics.heightPixels
+    }
+
+    fun getScreenWidth(): Int {
+        val metrics = App.context.resources.displayMetrics
+        return metrics.widthPixels
+    }
+
+}
+
+inline fun <reified V : View> V.click(interval: Long = 600L, noinline callback: V.() -> Unit) {
+
+    var lastClickTime: Long = 0
+
+    this.setOnClickListener {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime > interval) {
+            callback.invoke(this)
+            lastClickTime = currentTime
+        }
+    }
+}
 
 inline fun <T : View> T.visibleOrGone(boolean: Boolean, onVisible: (T.() -> Unit) = {}) {
     visibility = if (boolean) {

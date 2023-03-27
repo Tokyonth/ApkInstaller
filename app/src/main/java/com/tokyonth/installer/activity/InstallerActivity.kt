@@ -1,6 +1,7 @@
 package com.tokyonth.installer.activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -29,7 +30,9 @@ class InstallerActivity : BaseActivity() {
 
     private var apkInfo: ApkInfoEntity? = null
 
-    private var installed = false
+    private var isInstalling = false
+
+    private var isInstalled = false
 
     private var apkSource = ""
 
@@ -41,38 +44,45 @@ class InstallerActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun setBinding() = binding
-
-    override fun initView() {
-        arrayOf(
-            binding.fabInstall,
-            binding.tvSilently,
-            binding.tvCancel
-        ).let { views ->
-            View.OnClickListener {
-                when (it) {
-                    views[0] -> startInstallFun()
-                    views[1] -> startSilentlyInstall()
-                    views[2] -> finish()
-                }
-            }.run {
-                for (view in views) {
-                    view.setOnClickListener(this)
-                }
-            }
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (!isInstalling) {
+            intent?.let { initApkUri(it) }
         }
     }
 
+    override fun setBinding() = binding
+
+    override fun initView() {
+        binding.fabInstall.click {
+            startInstallFun()
+        }
+        binding.tvSilently.click {
+            startSilentlyInstall()
+        }
+        binding.tvCancel.click {
+            if (SPDataManager.instance.isAutoDel()) {
+                File(apkInfo!!.filePath).delete()
+                toast(string(R.string.apk_deleted, apkInfo!!.appName))
+            }
+            finish()
+        }
+        binding.sbAutoDel.isChecked = SPDataManager.instance.isAutoDel()
+    }
+
     override fun initData() {
-        super.initData()
-        intent.data.let {
+        apkSource = AppHelper.reflectGetReferrer(this).orEmpty()
+        initLiveDataObs()
+        initApkUri(intent)
+    }
+
+    private fun initApkUri(mIntent: Intent) {
+        mIntent.data.let {
             if (it == null) {
                 finish()
             } else {
-                apkSource = AppHelper.reflectGetReferrer(this).toString()
                 permissionHelper?.registerCallback { all, _ ->
                     if (all) {
-                        initLiveDataObs()
                         model.startParse(it, apkSource)
                     } else {
                         toast(string(R.string.no_permissions))
@@ -87,7 +97,7 @@ class InstallerActivity : BaseActivity() {
     private fun initLiveDataObs() {
         model.apkParsedLiveData.observe(this) {
             apkInfo = it
-            onApkParsed(it)
+            onApkParsed()
         }
         model.apkParsedFailedLiveData.observe(this) {
             onApkParsedFailed(it)
@@ -103,22 +113,19 @@ class InstallerActivity : BaseActivity() {
         }
     }
 
-    private fun onApkParsed(apkInfo: ApkInfoEntity) {
-        if (apkInfo.packageName.isNotEmpty()) {
+    private fun onApkParsed() {
+        binding.cardLog.visibleOrGone(false)
+        if (!apkInfo?.packageName.isNullOrEmpty()) {
             changeViewStatus(true)
-            initApkDetails(apkInfo)
-        } else {
-            /*DialogUtils.parseFailedDialog(this, intent.data) {
-                finish()
-            }*/
+            initApkDetails(apkInfo!!)
         }
     }
 
     private fun onApkParsedFailed(msg: String) {
-
+        binding.tvInstallLog.append(msg)
     }
 
-    @SuppressLint("RestrictedApi")
+    @SuppressLint("RestrictedApi", "SetTextI18n")
     private fun onApkPreInstall() {
         changeViewStatus(false)
         val mColor =
@@ -131,14 +138,15 @@ class InstallerActivity : BaseActivity() {
         }
 
         binding.run {
-            tvInstallMsg.text = ""
+            cardLog.visibleOrGone(true)
+            tvInstallLog.text = "Start install..."
             fabInstall.setImageDrawable(progressDrawable)
             layoutHeader.setTitle(string(R.string.installing))
         }
     }
 
-    private fun onApkInstalled(isInstalled: Boolean) {
-        if (isInstalled) {
+    private fun onApkInstalled(installed: Boolean) {
+        if (installed) {
             installSuccess(apkInfo!!)
         } else {
             installFailure(apkInfo!!)
@@ -151,11 +159,11 @@ class InstallerActivity : BaseActivity() {
         }
 
         progressDrawable?.stop()
-        installed = true
+        isInstalling = false
+        isInstalled = true
 
-        if (SPDataManager.instance.isAutoDel()) {
+        if (apkInfo!!.isFakePath) {
             File(apkInfo!!.filePath).delete()
-            toast(string(R.string.apk_deleted, apkInfo!!.appName))
         }
     }
 
@@ -167,21 +175,18 @@ class InstallerActivity : BaseActivity() {
         }
 
         val apkSize = File(apkInfo.filePath).fileOrFolderSize().toMemorySize()
-        val msgBuilder = buildString {
-            append(string(R.string.info_pkg_name))
-            append(apkInfo.packageName)
+        val infoBuilder = buildString {
+            append(string(R.string.info_pkg_name, apkInfo.packageName))
             append("\n")
-            append(string(R.string.info_apk_path))
-            append(apkInfo.filePath)
+            append(string(R.string.info_apk_path, apkInfo.filePath))
             append("\n")
             append(string(R.string.text_apk_file_size, apkSize))
             if (apkInfo.isHasInstalledApp) {
                 append("\n")
-                append(string(R.string.info_installed_version))
-                append(apkInfo.installedVersion)
+                append(string(R.string.info_installed_version, apkInfo.installedVersion))
             }
         }
-        binding.tvInstallMsg.text = msgBuilder
+        binding.tvApkOverview.text = infoBuilder
 
         loadChipApk(apkInfo)
         loadingComposeInfo(apkInfo)
@@ -235,7 +240,6 @@ class InstallerActivity : BaseActivity() {
             else -> {
                 if (!SPDataManager.instance.isNeverShowTip()) {
                     MaterialAlertDialogBuilder(this)
-                        .setTitle(R.string.dialog_title_tip)
                         .setMessage(R.string.low_version_tip)
                         .setPositiveButton(R.string.dialog_btn_ok, null)
                         .setNegativeButton(R.string.dialog_no_longer_prompt) { _, _ ->
@@ -288,7 +292,7 @@ class InstallerActivity : BaseActivity() {
             isEnabled = launch != null
         }
         binding.layoutHeader.setTitle(string(R.string.install_successful))
-        binding.tvCancel.text = string(R.string.back_track)
+        binding.tvCancel.text = string(R.string.exit_app)
     }
 
     private fun installFailure(apkInfo: ApkInfoEntity) {
@@ -300,7 +304,6 @@ class InstallerActivity : BaseActivity() {
         binding.tvCancel.text = string(R.string.exit_app)
         if (!SPDataManager.instance.isNeverShowUsePkg()) {
             MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.dialog_title_tip)
                 .setMessage(R.string.use_system_pkg)
                 .setPositiveButton(R.string.dialog_btn_ok) { _, _ ->
                     AppHelper.executeSystemPkgInstall(this, apkInfo.filePath)
@@ -316,27 +319,34 @@ class InstallerActivity : BaseActivity() {
     }
 
     private fun onInstallLog(installLog: String) {
-        binding.tvInstallMsg.append(installLog)
+        binding.tvInstallLog.append("\n")
+        binding.tvInstallLog.append(installLog)
     }
 
     private fun startInstallFun() {
-        if (installed) {
+        if (isInstalled) {
             val launch = packageManager.getLaunchIntentForPackage(apkInfo!!.packageName)
             startActivity(launch)
             finish()
         } else {
+            isInstalling = true
             model.startInstall(apkInfo!!)
         }
     }
 
     private fun startSilentlyInstall() {
-        InstallerServer.enqueueWork(this, intent)
-        finish()
+        val b = NotificationUtils.checkNotification(this)
+        if (b) {
+            InstallerServer.enqueueWork(this, intent.apply {
+                putExtra(InstallerServer.APK_REFERER, apkSource)
+            })
+            finish()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (!installed) {
+        if (!isInstalled) {
             binding.run {
                 val showActivity = SPDataManager.instance.isShowActivity()
                 val showPermission = SPDataManager.instance.isShowPermission()
