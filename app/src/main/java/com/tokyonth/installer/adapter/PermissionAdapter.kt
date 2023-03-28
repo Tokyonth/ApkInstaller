@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 import com.tokyonth.installer.data.PermissionInfoEntity
 import com.tokyonth.installer.databinding.ItemPermissionDetailBinding
+import com.tokyonth.installer.utils.ktx.click
 import com.tokyonth.installer.utils.ktx.visibleOrGone
 
 class PermissionAdapter(private val list: MutableList<PermissionInfoEntity>) :
@@ -41,7 +42,7 @@ class PermissionAdapter(private val list: MutableList<PermissionInfoEntity>) :
             binding.tvItemPermissionName.text = data.permissionName
             binding.tvItemPermissionDesc.text = data.permissionDesc
             binding.tvItemPermissionDesc.visibleOrGone(data.permissionDesc.isNotEmpty())
-            binding.root.setOnClickListener {
+            binding.root.click {
                 click?.invoke(data)
             }
         }

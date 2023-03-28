@@ -43,13 +43,13 @@ class SettingsActivity : BaseActivity() {
     override fun initData() {
         shizukuPermission = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
             if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                updateShizuku(requestCode)
+                updateSettingsItem(requestCode)
             }
         }
         Shizuku.addRequestPermissionResultListener(shizukuPermission!!)
         permissionHelper?.registerCallback { all, code ->
             if (all) {
-                updateShizuku(code)
+                updateSettingsItem(code)
             } else {
                 val str = when (code) {
                     1 -> string(R.string.shizuku_permission_request)
@@ -178,15 +178,14 @@ class SettingsActivity : BaseActivity() {
                 Snackbar.LENGTH_SHORT
             ).show()
         } else {
-            val p = checkShizukuPermission(requestCode)
-            if (p) {
-                updateShizuku(requestCode)
+            if (checkShizukuPermission(requestCode)) {
+                updateSettingsItem(requestCode)
             }
             //permissionHelper?.start(arrayOf(ShizukuProvider.PERMISSION), requestCode)
         }
     }
 
-    private fun updateShizuku(code: Int) {
+    private fun updateSettingsItem(code: Int) {
         SPDataManager.instance.setInstallMode(code)
         settingsAdapter.updateInstallMode()
     }

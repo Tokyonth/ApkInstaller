@@ -10,13 +10,13 @@ import java.util.zip.ZipException
 
 class APKCommander(
     private val uri: Uri,
-    private val referrer:String,
+    private val referrer: String,
     private val callback: InstallCallback
 ) {
 
     fun startParse() {
         try {
-            ParseApkTask(uri,referrer) {
+            ParseApkTask(uri, referrer) {
                 if (it != null) {
                     callback.onApkParsed(it)
                 } else {

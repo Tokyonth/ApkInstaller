@@ -64,6 +64,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center|start"
+                    android:lineSpacingExtra="8dp"
                     android:text="@string/text_apk_cache" />
 
             </com.google.android.material.card.MaterialCardView>

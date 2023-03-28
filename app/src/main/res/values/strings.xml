@@ -90,6 +90,7 @@
     <string name="apk_so_32">32 Bit</string>
     <string name="apk_so_64">64 Bit</string>
     <string name="apk_fake_path">Temp file</string>
+    <string name="apk_xposed">Xposed module</string>
     <array name="install_mode_arr">
         <item>Root</item>
         <item>Shizuku</item>

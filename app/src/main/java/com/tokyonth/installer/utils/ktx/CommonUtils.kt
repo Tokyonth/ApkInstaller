@@ -1,6 +1,11 @@
 package com.tokyonth.installer.utils.ktx
 
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.PixelFormat
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
@@ -79,4 +84,29 @@ fun Int.sp2px(): Float {
 
 fun Int.dp2px(): Float {
     return this.toFloat().dp2px()
+}
+
+fun Drawable.drawable2Bitmap(): Bitmap {
+    return when (this) {
+        is BitmapDrawable -> {
+            this.bitmap
+        }
+        else -> {
+            val config =
+                if (this.opacity != PixelFormat.OPAQUE) {
+                    Bitmap.Config.ARGB_8888
+                } else {
+                    Bitmap.Config.RGB_565
+                }
+            val bitmap = Bitmap.createBitmap(
+                this.intrinsicWidth,
+                this.intrinsicHeight,
+                config
+            )
+            val canvas = Canvas(bitmap)
+            this.setBounds(0, 0, canvas.width, canvas.height)
+            this.draw(canvas)
+            bitmap
+        }
+    }
 }

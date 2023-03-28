@@ -90,6 +90,7 @@
     <string name="apk_so_32">32位</string>
     <string name="apk_so_64">64位</string>
     <string name="apk_fake_path">临时文件</string>
+    <string name="apk_xposed">Xposed模块</string>
     <array name="install_mode_arr">
         <item>Root</item>
         <item>Shizuku</item>

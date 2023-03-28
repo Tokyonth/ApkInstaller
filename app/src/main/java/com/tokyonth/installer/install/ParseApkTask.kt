@@ -8,7 +8,7 @@ import com.tokyonth.installer.App
 import com.tokyonth.installer.data.ApkInfoEntity
 import com.tokyonth.installer.data.PermissionInfoEntity
 import com.tokyonth.installer.utils.PackageUtils
-import com.tokyonth.installer.utils.drawable2Bitmap
+import com.tokyonth.installer.utils.ktx.drawable2Bitmap
 import com.tokyonth.installer.utils.path.UriPath
 import com.tokyonth.installer.utils.path.copyFromStreamUri
 import java.io.File
@@ -77,6 +77,10 @@ class ParseApkTask(
         val is64Bit = zip.entries().asSequence().filter {
             it.name.startsWith("lib/arm64-v8a")
         }.toMutableList().isNotEmpty()
+        val isXposedApk = zip.entries().asSequence().find {
+            it.name.contains("xposed_init")
+        }
+        apkInfo.isXposed = isXposedApk != null
         apkInfo.isArm64 = is64Bit
     }
 

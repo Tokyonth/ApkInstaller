@@ -12,6 +12,7 @@ import com.tokyonth.installer.adapter.ActivityAdapter
 import com.tokyonth.installer.adapter.PermissionAdapter
 import com.tokyonth.installer.data.PermissionInfoEntity
 import com.tokyonth.installer.databinding.LayoutBaseListBinding
+import com.tokyonth.installer.utils.ktx.click
 import com.tokyonth.installer.utils.ktx.lazyBind
 import com.tokyonth.installer.utils.ktx.string
 import com.tokyonth.installer.utils.ktx.visibleOrGone
@@ -34,7 +35,7 @@ class BaseListLayout : FrameLayout {
 
     private fun initView() {
         binding.rvBaseList.layoutManager = LinearLayoutManager(context)
-        binding.root.setOnClickListener {
+        binding.root.click {
             changeView()
         }
         addView(binding.root)

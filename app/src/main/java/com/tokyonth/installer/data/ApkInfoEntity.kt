@@ -8,6 +8,7 @@ class ApkInfoEntity {
     var filePath: String = ""
     var appName: String = ""
     var isArm64: Boolean = false
+    var isXposed: Boolean = false
     var isFakePath: Boolean = false
     var versionName: String = ""
     var versionCode: Int = 0

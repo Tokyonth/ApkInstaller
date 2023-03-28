@@ -54,6 +54,7 @@ class InstallerActivity : BaseActivity() {
     override fun setBinding() = binding
 
     override fun initView() {
+        binding.loadingView.showLoading()
         binding.fabInstall.click {
             startInstallFun()
         }
@@ -114,6 +115,7 @@ class InstallerActivity : BaseActivity() {
     }
 
     private fun onApkParsed() {
+        binding.loadingView.showContentView()
         binding.cardLog.visibleOrGone(false)
         if (!apkInfo?.packageName.isNullOrEmpty()) {
             changeViewStatus(true)
@@ -122,7 +124,13 @@ class InstallerActivity : BaseActivity() {
     }
 
     private fun onApkParsedFailed(msg: String) {
-        binding.tvInstallLog.append(msg)
+        val error = buildString {
+            append(string(R.string.parse_apk_failed, intent.data))
+            append("\n")
+            append(msg)
+        }
+        binding.loadingView.showErrorView(error)
+        //binding.tvInstallLog.append(msg)
     }
 
     @SuppressLint("RestrictedApi", "SetTextI18n")
@@ -214,6 +222,14 @@ class InstallerActivity : BaseActivity() {
             removeAllViews()
             addView(chipSource)
             addView(chipAbi)
+            if (apkInfo.isXposed) {
+                val chipXp = Chip(this@InstallerActivity).apply {
+                    this.setChipIconResource(R.drawable.round_construction_24)
+                    this.setEnsureMinTouchTargetSize(false)
+                    this.text = string(R.string.apk_xposed)
+                }
+                addView(chipXp)
+            }
             if (apkInfo.isFakePath) {
                 val chipFake = Chip(this@InstallerActivity).apply {
                     this.setChipIconResource(R.drawable.round_attachment_24)
@@ -267,7 +283,7 @@ class InstallerActivity : BaseActivity() {
 
     private fun loadingComposeInfo(apkInfo: ApkInfoEntity) {
         binding.clPermission.apply {
-            val size = apkInfo.activities?.size ?: 0
+            val size = apkInfo.permissions?.size ?: 0
             setTitle(string(R.string.app_permissions, size))
             apkInfo.permissions?.let {
                 setScrollView(binding.fabInstall)
@@ -335,8 +351,8 @@ class InstallerActivity : BaseActivity() {
     }
 
     private fun startSilentlyInstall() {
-        val b = NotificationUtils.checkNotification(this)
-        if (b) {
+        val hasPermission = NotificationUtils.checkNotification(this)
+        if (hasPermission) {
             InstallerServer.enqueueWork(this, intent.apply {
                 putExtra(InstallerServer.APK_REFERER, apkSource)
             })

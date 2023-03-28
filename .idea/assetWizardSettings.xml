@@ -319,7 +319,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:$USER_HOME$/Library/Android/sdk/icons/material/materialiconsround/beenhere/round_beenhere_24.xml" />
+                                      <entry key="url" value="file:$USER_HOME$/Library/Android/sdk/icons/material/materialiconsround/construction/round_construction_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -329,7 +329,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="round_beenhere_24" />
+                            <entry key="outputName" value="round_construction_24" />
                             <entry key="sourceFile" value="/C:\Users\Tokyonth\Desktop\priority_high_black_24dp.svg" />
                           </map>
                         </option>

@@ -10,6 +10,7 @@ import com.tokyonth.installer.R
 import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.data.SettingsEntity
 import com.tokyonth.installer.databinding.ItemSettingPerfBinding
+import com.tokyonth.installer.utils.ktx.click
 import com.tokyonth.installer.utils.ktx.string
 
 import java.util.ArrayList
@@ -126,7 +127,7 @@ class SettingsAdapter : RecyclerView.Adapter<SettingsAdapter.SettingsViewHolder>
                 }
             }
 
-            binding.root.setOnClickListener {
+            binding.root.click {
                 action?.onClick(bindingAdapterPosition)
             }
         }

@@ -8,22 +8,16 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
-import android.view.View
 import android.view.ViewAnimationUtils
-import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.resources.MaterialAttributes
 import com.tokyonth.installer.R
 import com.tokyonth.installer.activity.SettingsActivity
 import com.tokyonth.installer.data.ApkInfoEntity
 import com.tokyonth.installer.data.SPDataManager
 import com.tokyonth.installer.databinding.LayoutInstallHeaderBinding
-import com.tokyonth.installer.utils.ktx.color
-import com.tokyonth.installer.utils.ktx.dp2px
-import com.tokyonth.installer.utils.ktx.lazyBind
-import com.tokyonth.installer.utils.ktx.string
+import com.tokyonth.installer.utils.ktx.*
 
 class InstallHeaderLayout : FrameLayout {
 
@@ -43,10 +37,10 @@ class InstallHeaderLayout : FrameLayout {
 
     private fun initView() {
         changeNightModeStatus()
-        binding.ibNightMode.setOnClickListener {
+        binding.ibNightMode.click {
             changeNightMode()
         }
-        binding.ibSettings.setOnClickListener {
+        binding.ibSettings.click {
             context.startActivity(Intent(context, SettingsActivity::class.java))
         }
         addView(binding.root)
@@ -103,43 +97,10 @@ class InstallHeaderLayout : FrameLayout {
         }
     }
 
-    private fun showVersionTip(versionCode: Int, installedVersionCode: Int) {
-        val translateAnimation = TranslateAnimation(0f, 0f, -200f, 0f)
-        translateAnimation.duration = 500
-        binding.tvVersionTips.apply {
-            alpha = 0.70f
-            animation = translateAnimation
-            startAnimation(translateAnimation)
-            visibility = View.VISIBLE
-            text = checkVersion(versionCode, installedVersionCode)
-        }
-    }
-
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
         binding.ibNightMode.isEnabled = enabled
         binding.ibSettings.isEnabled = enabled
-    }
-
-    private fun checkVersion(version: Int, installedVersion: Int): String {
-        return when {
-            version == installedVersion -> string(R.string.apk_equal_version)
-            version > installedVersion -> string(R.string.apk_new_version)
-            else -> {
-                if (!SPDataManager.instance.isNeverShowTip()) {
-                    MaterialAlertDialogBuilder(context)
-                        //.setTitle(R.string.dialog_title_tip)
-                        .setMessage(R.string.low_version_tip)
-                        .setPositiveButton(R.string.dialog_btn_ok, null)
-                        .setNegativeButton(R.string.dialog_no_longer_prompt) { _, _ ->
-                            SPDataManager.instance.setNeverShowTip()
-                        }
-                        .setCancelable(false)
-                        .show()
-                }
-                string(R.string.apk_low_version)
-            }
-        }
     }
 
     private fun changeNightModeStatus() {
@@ -166,7 +127,8 @@ class InstallHeaderLayout : FrameLayout {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val height = MeasureSpec.makeMeasureSpec(220.dp2px().toInt(), MeasureSpec.EXACTLY)
+        val h = CommonUtils.getScreenHeight() * 0.3
+        val height = MeasureSpec.makeMeasureSpec(h.toInt(), MeasureSpec.EXACTLY)
         super.onMeasure(widthMeasureSpec, height)
     }
 

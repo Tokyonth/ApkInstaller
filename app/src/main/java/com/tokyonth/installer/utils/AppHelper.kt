@@ -24,27 +24,6 @@ import java.io.IOException
 import java.util.*
 import kotlin.math.floor
 
-fun Drawable.drawable2Bitmap(): Bitmap {
-    return when (this) {
-        is BitmapDrawable -> {
-            this.bitmap
-        }
-        else -> {
-            val config =
-                if (this.opacity != PixelFormat.OPAQUE) Bitmap.Config.ARGB_8888 else Bitmap.Config.RGB_565
-            val bitmap = Bitmap.createBitmap(
-                this.intrinsicWidth,
-                this.intrinsicHeight,
-                config
-            )
-            val canvas = Canvas(bitmap)
-            this.setBounds(0, 0, canvas.width, canvas.height)
-            this.draw(canvas)
-            bitmap
-        }
-    }
-}
-
 object AppHelper {
 
     fun toSelfSetting(context: Context, str: String?) {
